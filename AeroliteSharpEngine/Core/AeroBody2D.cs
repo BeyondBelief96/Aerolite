@@ -1,12 +1,11 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Interfaces;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core
 {
     public class AeroBody2D : Physics2DObjectBase, IBody2D
     {
-        // Add IBody2D specific properties
         public float Restitution { get; set; }
         public float Friction { get; set; }
         public float Angle { get; set; }
@@ -40,6 +39,12 @@ namespace AeroliteSharpEngine.Core
         {
             if (IsStatic) return;
             NetTorque += torque;
+        }
+
+        public void ClearTorque()
+        {
+            if (IsStatic) return;
+            NetTorque = 0.0f;
         }
     }
 }

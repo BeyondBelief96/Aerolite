@@ -1,4 +1,6 @@
-﻿namespace AeroliteSharpEngine.Interfaces
+﻿using AeroliteSharpEngine.Core.Interfaces;
+
+namespace AeroliteSharpEngine.Interfaces
 {
     /// <summary>
     /// A force generator can be asked to add a force to one or more

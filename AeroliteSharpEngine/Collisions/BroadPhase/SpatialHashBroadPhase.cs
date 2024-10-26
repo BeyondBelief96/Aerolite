@@ -1,5 +1,5 @@
 ﻿using AeroliteSharpEngine.Collision;
-using AeroliteSharpEngine.Interfaces;
+using AeroliteSharpEngine.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

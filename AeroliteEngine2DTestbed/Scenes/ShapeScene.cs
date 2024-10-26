@@ -1,7 +1,6 @@
 ﻿using AeroliteEngine2DTestbed.Helpers;
 using AeroliteEngine2DTestbed.Scenes;
 using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
 using Flat.Input;
 using Microsoft.Xna.Framework.Input;
@@ -9,7 +8,6 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using Flat;
 using AeroliteSharpEngine.Core;
 
 public class ShapeScene : Scene
@@ -131,13 +129,6 @@ public class ShapeScene : Scene
         }
 
         world.Update(dt);
-
-        // Log stats once per second
-        if (gameTime.TotalGameTime.TotalSeconds >= _nextLogTime)
-        {
-            Console.WriteLine(world.Performance.GetStatsString());
-            _nextLogTime = gameTime.TotalGameTime.TotalSeconds + LOG_INTERVAL;
-        }
     }
 
     public override void Draw(GameTime gameTime)

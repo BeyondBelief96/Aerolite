@@ -2,7 +2,7 @@
 
 namespace AeroliteSharpEngine.AeroMath
 {
-    public struct AeroVec2
+    public struct AeroVec2 : IEquatable<AeroVec2>
     {
         #region Properties
         public float X { get; set; }
@@ -93,11 +93,16 @@ namespace AeroliteSharpEngine.AeroMath
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AeroVec2 Rotate(float angle)
         {
-            float cos = MathF.Cos(angle);
-            float sin = MathF.Sin(angle);
+            var cos = MathF.Cos(angle);
+            var sin = MathF.Sin(angle);
             return new AeroVec2(
                 X * cos - Y * sin,
                 X * sin + Y * cos);
+        }
+        
+        public readonly bool Equals(AeroVec2 other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y);
         }
 
         #endregion
@@ -112,14 +117,14 @@ namespace AeroliteSharpEngine.AeroMath
         public static AeroVec2 operator *( int i, AeroVec2 v) => new AeroVec2(v.X * i, v.Y * i);
         public static AeroVec2 operator /(AeroVec2 v, float s) => new AeroVec2(v.X / s, v.Y / s);
         public static AeroVec2 operator -(AeroVec2 v) => new AeroVec2(-v.X, -v.Y);
-        public static bool operator ==(AeroVec2 lhs, AeroVec2 rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;
-        public static bool operator !=(AeroVec2 lhs, AeroVec2 rhs) => lhs.X != rhs.X || lhs.Y != rhs.Y;
+        public static bool operator ==(AeroVec2 lhs, AeroVec2 rhs) => lhs.Equals(rhs);
+        public static bool operator !=(AeroVec2 lhs, AeroVec2 rhs) => !lhs.Equals(rhs);
 
-        public override readonly bool Equals(object? obj)
+        public readonly override bool Equals(object? obj)
         {
             if(obj is AeroVec2 other)
             {
-                return X == other.X && Y == other.Y;
+                return Equals((AeroVec2)other);
             }
             return false;
         }

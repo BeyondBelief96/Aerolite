@@ -2,9 +2,11 @@
 using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.BroadPhase;
-using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Interfaces;
+
+namespace AeroliteSharpEngine.Core;
 
 public class AeroWorld2D : IAeroPhysicsWorld
 {
@@ -12,9 +14,9 @@ public class AeroWorld2D : IAeroPhysicsWorld
     private int _bodyCount = 0;
     private int _particleCount = 0;
 
-    private List<IPhysicsObject> _physicsObjects;
-    private List<AeroVec2> _globalForces;
-    private ForceRegistry _forceRegistry;
+    private readonly List<IPhysicsObject> _physicsObjects;
+    private readonly List<AeroVec2> _globalForces;
+    private readonly ForceRegistry _forceRegistry;
     private IIntegrator _integrator;
     private readonly IPerformanceMonitor _performanceMonitor;
 
@@ -122,7 +124,8 @@ public class AeroWorld2D : IAeroPhysicsWorld
             }
 
             // Integrate the object
-            _integrator.Integrate(physicsObject, dt);
+            _integrator.IntegrateLinear(physicsObject, dt);
+            _integrator.IntegrateAngular(physicsObject, dt);
         }
 
         if(_performanceMonitoringEnabled)

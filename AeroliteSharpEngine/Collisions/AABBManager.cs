@@ -1,6 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Core;
-using AeroliteSharpEngine.Interfaces;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Collisions
@@ -8,21 +8,21 @@ namespace AeroliteSharpEngine.Collisions
     /// <summary>
     /// Represents an axis-aligned bounding box.
     /// </summary>
-    public struct AABB
+    public readonly struct AABB
     {
-        public AeroVec2 Min;
-        public AeroVec2 Max;
+        private readonly AeroVec2 _min;
+        private readonly AeroVec2 _max;
 
-        public AABB(AeroVec2 min, AeroVec2 max)
+        private AABB(AeroVec2 min, AeroVec2 max)
         {
-            Min = min;
-            Max = max;
+            _min = min;
+            _max = max;
         }
 
         public bool Intersects(in AABB other)
         {
-            return !(Max.X <= other.Min.X || Min.X >= other.Max.X ||
-                    Max.Y <= other.Min.Y || Min.Y >= other.Max.Y);
+            return !(_max.X <= other._min.X || _min.X >= other._max.X ||
+                    _max.Y <= other._min.Y || _min.Y >= other._max.Y);
         }
 
         public static AABB CreateFromShape(in AeroShape2D shape, in AeroVec2 position)
@@ -74,14 +74,14 @@ namespace AeroliteSharpEngine.Collisions
     }
 
     /// <summary>
-    /// Simplified AABB testing without caching
+    /// Static class used to create AABB's and test AABB intersections.
     /// </summary>
-    public static class AABBTest
+    internal static class AABBTest
     {
         public static bool TestIntersection(IPhysicsObject a, IPhysicsObject b)
         {
-            AABB aabbA = GetAABB(a);
-            AABB aabbB = GetAABB(b);
+            var aabbA = GetAABB(a);
+            var aabbB = GetAABB(b);
             return aabbA.Intersects(aabbB);
         }
 

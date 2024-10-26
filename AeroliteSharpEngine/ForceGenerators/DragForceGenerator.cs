@@ -1,4 +1,5 @@
 ﻿using AeroliteSharpEngine.AeroMath;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.ForceGenerators

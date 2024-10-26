@@ -142,13 +142,6 @@ public class SolarSystemScene : Scene
         if (FlatKeyboard.Instance.IsKeyDown(Keys.Z)) _camera.IncZoom();
 
         _world.Update(dt);
-
-        // Log stats once per second
-        if (gameTime.TotalGameTime.TotalSeconds >= _nextLogTime)
-        {
-            Console.WriteLine(_world.Performance.GetStatsString());
-            _nextLogTime = gameTime.TotalGameTime.TotalSeconds + LOG_INTERVAL;
-        }
     }
 
     public override void Draw(GameTime gameTime)

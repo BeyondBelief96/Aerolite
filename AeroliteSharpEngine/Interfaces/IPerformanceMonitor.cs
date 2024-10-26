@@ -12,6 +12,5 @@
         IReadOnlyCollection<double> StepTimes { get; }
         void BeginStep();
         void EndStep(int bodyCount, int particleCount);
-        string GetStatsString();
     }
 }

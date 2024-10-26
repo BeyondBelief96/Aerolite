@@ -55,13 +55,16 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
             _lastFps = _frameCount / (_frameTimer.ElapsedMilliseconds / 1000.0);
             _lastAverageStepTime = _accumulatedTime / _frameCount;
 
+            Console.WriteLine(GetStatsString());
+
             _frameCount = 0;
             _accumulatedTime = 0;
             _frameTimer.Restart();
+
         }
     }
 
-    public string GetStatsString()
+    private string GetStatsString()
     {
         return $"FPS: {_lastFps:F1}\n" +
                $"Step Time: {_lastAverageStepTime:F3}ms\n" +

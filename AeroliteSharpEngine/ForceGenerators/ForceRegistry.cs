@@ -1,6 +1,7 @@
-﻿using AeroliteSharpEngine.Interfaces;
+﻿using AeroliteSharpEngine.Core.Interfaces;
+using AeroliteSharpEngine.Interfaces;
 
-public class ForceRegistry
+internal class ForceRegistry
 {
     protected struct ForceRegistration
     {
