@@ -5,6 +5,9 @@ namespace AeroliteEngine2DTestbed.Scenes
 {
     public abstract class Scene
     {
+        protected double _nextLogTime = 0;  // Track when to log next
+        protected const double LOG_INTERVAL = 1.0;  // Log every second
+
         protected Game _game;
         protected Screen _screen;
         protected Sprites _sprites;

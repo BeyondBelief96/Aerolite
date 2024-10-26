@@ -54,23 +54,28 @@ namespace AeroliteSharpEngine.AeroMath
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Normalize()
         {
-            if(Magnitude > 0)
+            float magnitude = Magnitude;
+            if (magnitude > float.Epsilon) // Use epsilon instead of just 0
             {
-                X /= Magnitude;
-                Y /= Magnitude;
+                X /= magnitude;
+                Y /= magnitude;
             }
             else
             {
-                throw new DivideByZeroException("Cannot divide components by zero");
+                X = 0;
+                Y = 0;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AeroVec2 UnitVector()
         {
-            AeroVec2 result = this;
-            result.Normalize();
-            return result;
+            float magnitude = Magnitude;
+            if (magnitude > float.Epsilon)
+            {
+                return new AeroVec2(X / magnitude, Y / magnitude);
+            }
+            return new AeroVec2(0, 0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,6 +107,9 @@ namespace AeroliteSharpEngine.AeroMath
         public static AeroVec2 operator +(AeroVec2 a, AeroVec2 b) => new AeroVec2(a.X + b.X, a.Y + b.Y);
         public static AeroVec2 operator -(AeroVec2 a, AeroVec2 b) => new AeroVec2(a.X - b.X, a.Y - b.Y);
         public static AeroVec2 operator *(AeroVec2 v, float s) => new AeroVec2(v.X * s, v.Y * s);
+        public static AeroVec2 operator *(float s, AeroVec2 v) => new AeroVec2(v.X * s, v.Y * s);
+        public static AeroVec2 operator *(AeroVec2 v, int i) => new AeroVec2(v.X * i, v.Y * i);
+        public static AeroVec2 operator *( int i, AeroVec2 v) => new AeroVec2(v.X * i, v.Y * i);
         public static AeroVec2 operator /(AeroVec2 v, float s) => new AeroVec2(v.X / s, v.Y / s);
         public static AeroVec2 operator -(AeroVec2 v) => new AeroVec2(-v.X, -v.Y);
         public static bool operator ==(AeroVec2 lhs, AeroVec2 rhs) => lhs.X == rhs.X && lhs.Y == rhs.Y;

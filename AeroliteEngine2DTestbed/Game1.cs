@@ -3,7 +3,6 @@ using Flat;
 using Flat.Graphics;
 using Flat.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 
@@ -17,7 +16,7 @@ namespace AeroliteEngine2DTestbed
         private Sprites _sprites;
         private Shapes _shapes;
 
-        private const double UpdatesPerSecond = 60d;
+        private const double UpdatesPerSecond = 60;
 
         public Game1()
         {
@@ -32,12 +31,12 @@ namespace AeroliteEngine2DTestbed
 
         protected override void Initialize()
         {
-            FlatUtil.SetRelativeBackBufferSize(_graphics, 0.85f);
-            _screen = new Screen(this, 1920, 1080);
+            FlatUtil.SetRelativeBackBufferSize(_graphics, 1.0f);
+            _screen = new Screen(this, 2560, 1440);
             _sprites = new Sprites(this);
             _shapes = new Shapes(this);
             
-            _currentScene = new SolarSystemScene(this, _screen, _sprites, _shapes);
+            _currentScene = new ShapeScene(this, _screen, _sprites, _shapes);
             base.Initialize();
         }
 
@@ -47,19 +46,7 @@ namespace AeroliteEngine2DTestbed
 
         protected override void Update(GameTime gameTime)
         {
-            FlatKeyboard keyboard = FlatKeyboard.Instance;
-            FlatMouse mouse = FlatMouse.Instance;
-
-            keyboard.Update();
-            mouse.Update();
-
-            if(keyboard.IsKeyAvailable)
-            {
-                if(keyboard.IsKeyClicked(Keys.Escape))
-                {
-                    Exit();
-                }
-            }
+            HandleInput();
 
             _currentScene.Update(gameTime);
 
@@ -70,6 +57,23 @@ namespace AeroliteEngine2DTestbed
         {
             _currentScene.Draw(gameTime);
             base.Draw(gameTime);
+        }
+
+        private void HandleInput()
+        {
+            FlatKeyboard keyboard = FlatKeyboard.Instance;
+            FlatMouse mouse = FlatMouse.Instance;
+
+            keyboard.Update();
+            mouse.Update();
+
+            if (keyboard.IsKeyAvailable)
+            {
+                if (keyboard.IsKeyClicked(Keys.Escape))
+                {
+                    Exit();
+                }
+            }
         }
     }
 }
