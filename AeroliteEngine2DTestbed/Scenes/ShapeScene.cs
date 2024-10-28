@@ -26,7 +26,6 @@ public class ShapeScene : Scene
     private AeroWorld2D world;
     private List<(AeroBody2D body, Color color)> bodies;
     private Random random;
-    private bool gravityEnabled = false;
     private const float SPAWN_FORCE = 500f;
     private int colorIndex = 0;
 

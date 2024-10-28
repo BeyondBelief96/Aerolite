@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using AeroliteSharpEngine.Core.Interfaces;
 
 public class SolarSystemScene : Scene
 {

@@ -12,6 +12,8 @@ namespace AeroliteSharpEngine.AeroMath
         public float Magnitude => MathF.Sqrt(X * X + Y * Y);
 
         public float MagnitudeSquared => X * X + Y * Y;
+        
+        public static AeroVec2 Zero => new AeroVec2(0, 0);
 
         #endregion
 

@@ -1,10 +1,10 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Collisions;
+using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes.Interfaces;
 
-namespace AeroliteSharpEngine.Collision
+namespace AeroliteSharpEngine.Collisions
 {
     public enum CollisionSystemType
     {
@@ -77,8 +77,9 @@ namespace AeroliteSharpEngine.Collision
             _narrowPhase = narrowPhaseAlgorithm;
         }
 
-        public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject> objects)
+        public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject>? objects)
         {
+            if(objects == null) return [];
             if (ValidateConvexShapes)
             {
                 ValidateNewShapes(objects);
@@ -89,14 +90,14 @@ namespace AeroliteSharpEngine.Collision
 
             // First broad phase: Spatial partitioning
             _spatialBroadPhase.Update(objects);
-            var spatialPairs = _spatialBroadPhase.FindPotentialCollisions(objects);
+            var spatialPairs = _spatialBroadPhase.FindPotentialCollisions(objects).ToList();
 
-            if(spatialPairs != null && spatialPairs.Count() > 0) 
+            if(spatialPairs.Count != 0) 
             {
                 foreach (var (objA, objB) in spatialPairs)
                 {
                     // Only add pairs that pass AABB test
-                    if (AABBTest.TestIntersection(objA, objB))
+                    if (BoundingAreaTest.TestIntersection(objA, objB))
                     {
                         _potentialPairs.Add((objA, objB));
                     }
@@ -118,22 +119,18 @@ namespace AeroliteSharpEngine.Collision
 
         private void ValidateNewShapes(IReadOnlyList<IPhysicsObject> objects)
         {
-            if (_collisionSystemType == CollisionSystemType.ConvexOnly)
+            if (_collisionSystemType != CollisionSystemType.ConvexOnly) return;
+            foreach (var obj in objects)
             {
-                foreach (var obj in objects)
+                // Only validate objects we haven't seen before
+                if (obj is not AeroBody2D body || _validatedConvexObjectIds.Contains(body.Id)) continue;
+                if (body.Shape is not IConvexShape)
                 {
-                    // Only validate objects we haven't seen before
-                    if (obj is AeroBody2D body && !_validatedConvexObjectIds.Contains(body.Id))
-                    {
-                        if (!(body.Shape is IConvexShape))
-                        {
-                            throw new InvalidOperationException(
-                                $"Object {obj} uses non-convex shape {body.Shape.GetType().Name} " +
-                                "but the collision system is configured for convex-only shapes.");
-                        }
-                        _validatedConvexObjectIds.Add(body.Id);
-                    }
+                    throw new InvalidOperationException(
+                        $"Object {obj} uses non-convex shape {body.Shape.GetType().Name} " +
+                        "but the collision system is configured for convex-only shapes.");
                 }
+                _validatedConvexObjectIds.Add(body.Id);
             }
         }
     }

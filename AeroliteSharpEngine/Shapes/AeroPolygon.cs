@@ -106,10 +106,10 @@ public class AeroPolygon : AeroShape2D
 
     public override void UpdateVertices(float angle, AeroVec2 position)
     {
-        if (!_verticesDirty && lastAngle == angle && lastPosition == position)
+        if (!_verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition == position)
             return;
 
-        for (int i = 0; i < _localVertices.Count; i++)
+        for (var i = 0; i < _localVertices.Count; i++)
         {
             _worldVertices[i] = _localVertices[i].Rotate(angle) + position;
         }

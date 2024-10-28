@@ -23,8 +23,6 @@ public class AeroWorld2D : IAeroPhysicsWorld
     private readonly CollisionSystem _collisionSystem;
     private List<CollisionManifold> _currentFrameCollisions;
 
-    private bool _performanceMonitoringEnabled;
-
     public AeroWorld2D(float gravity = 9.8f, CollisionSystemType collisionSystemType = CollisionSystemType.ConvexOnly)
     {
         Gravity = gravity;
@@ -39,20 +37,18 @@ public class AeroWorld2D : IAeroPhysicsWorld
         _collisionSystem = new CollisionSystem(collisionSystemType, broadPhase, narrowPhase);
         _currentFrameCollisions = new List<CollisionManifold>();
 
-        _performanceMonitoringEnabled = true; ;
+        PerformanceMonitoringEnabled = true; ;
     }
 
     public float Gravity { get; set; }
 
     public IReadOnlyList<IPhysicsObject> GetObjects() => _physicsObjects;
+    
+    public IReadOnlyList<IBody2D> GetBodies() => _physicsObjects.OfType<IBody2D>().ToList();
 
     public IReadOnlyList<CollisionManifold> GetCollisions() => _currentFrameCollisions;
 
-    public bool PerformanceMonitoringEnabled
-    {
-        get => _performanceMonitoringEnabled;
-        set => _performanceMonitoringEnabled = value;
-    }
+    public bool PerformanceMonitoringEnabled { get; set; }
 
     public void ClearWorld()
     {
@@ -72,16 +68,15 @@ public class AeroWorld2D : IAeroPhysicsWorld
     {
         _physicsObjects.Add(physicsObject);
 
-        if(_performanceMonitoringEnabled)
+        if (!PerformanceMonitoringEnabled) return;
+        switch (physicsObject)
         {
-            if (physicsObject is AeroBody2D)
-            {
+            case AeroBody2D:
                 _bodyCount++;
-            }
-            else if (physicsObject is AeroParticle2D)
-            {
+                break;
+            case AeroParticle2D:
                 _particleCount++;
-            }
+                break;
         }
     }
 
@@ -97,7 +92,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
 
     public void Update(float dt)
     {
-        if(_performanceMonitoringEnabled)
+        if(PerformanceMonitoringEnabled)
             _performanceMonitor.BeginStep();
 
         _currentFrameCollisions = _collisionSystem.DetectCollisions(_physicsObjects);
@@ -106,10 +101,8 @@ public class AeroWorld2D : IAeroPhysicsWorld
         _forceRegistry.UpdateForces(dt);
 
         // Update all physics objects
-        foreach (var physicsObject in _physicsObjects)
+        foreach (var physicsObject in _physicsObjects.Where(physicsObject => !physicsObject.IsStatic))
         {
-            if (physicsObject.IsStatic) continue;
-
             // Apply world gravity
             if (Gravity != 0)
             {
@@ -128,7 +121,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
             _integrator.IntegrateAngular(physicsObject, dt);
         }
 
-        if(_performanceMonitoringEnabled)
+        if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(_bodyCount, _particleCount);
     }
 }

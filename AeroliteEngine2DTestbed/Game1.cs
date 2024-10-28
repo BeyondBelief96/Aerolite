@@ -10,7 +10,7 @@ namespace AeroliteEngine2DTestbed
 {
     public class Game1 : Game
     {
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private Scene _currentScene;
         private Screen _screen;
         private Sprites _sprites;
@@ -36,7 +36,7 @@ namespace AeroliteEngine2DTestbed
             _sprites = new Sprites(this);
             _shapes = new Shapes(this);
             
-            _currentScene = new SolarSystemScene(this, _screen, _sprites, _shapes);
+            _currentScene = new ShapeScene(this, _screen, _sprites, _shapes);
             base.Initialize();
         }
 

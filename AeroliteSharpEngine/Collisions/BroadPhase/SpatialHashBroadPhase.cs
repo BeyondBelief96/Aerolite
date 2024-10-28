@@ -12,7 +12,7 @@ namespace AeroliteSharpEngine.Collisions.BroadPhase
     {
         public IEnumerable<(IPhysicsObject, IPhysicsObject)> FindPotentialCollisions(IReadOnlyList<IPhysicsObject> objects)
         {
-            return null;
+            return [];
         }
 
         public void Update(IReadOnlyList<IPhysicsObject> objects)
