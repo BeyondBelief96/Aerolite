@@ -1,6 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 
-namespace AeroliteSharpEngine.Collisions.Interfaces;
+namespace AeroliteSharpEngine.Collisions.Detection.Interfaces;
 
 /// <summary>
 /// Base interface for all bounding areas

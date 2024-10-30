@@ -1,6 +1,6 @@
 ﻿using AeroliteSharpEngine.Collision;
 
-namespace AeroliteSharpEngine.Collisions
+namespace AeroliteSharpEngine.Collisions.Detection
 {
     /// <summary>
     /// Factory for creating appropriate collision detectors based on shape requirements

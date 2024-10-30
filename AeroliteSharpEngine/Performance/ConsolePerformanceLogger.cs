@@ -1,5 +1,7 @@
-﻿using AeroliteSharpEngine.Interfaces;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using AeroliteSharpEngine.Interfaces;
+
+namespace AeroliteSharpEngine.Performance;
 
 public class ConsolePerformanceLogger : IPerformanceMonitor
 {
@@ -7,12 +9,11 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
     private int _frameCount;
     private readonly Stopwatch _frameTimer;
     private readonly Stopwatch _stepTimer;
-    private double _lastFps;
     private double _lastAverageStepTime;
     private int _bodyCount;
     private int _particleCount;
     private readonly Queue<double> _stepTimes;
-    private const int SAMPLE_SIZE = 60; // Keep last 60 frames of data
+    private const int SampleSize = 60; // Keep last 60 frames of data
 
     public ConsolePerformanceLogger()
     {
@@ -23,7 +24,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
     }
 
     public bool IsRunning { get; private set; }
-    public double FPS => _lastFps;
+    public double FPS { get; private set; }
     public double AverageStepTime => _lastAverageStepTime;
     public int BodyCount => _bodyCount;
     public int ParticleCount => _particleCount;
@@ -41,7 +42,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
         double stepTime = _stepTimer.Elapsed.TotalMilliseconds;
 
         _stepTimes.Enqueue(stepTime);
-        if (_stepTimes.Count > SAMPLE_SIZE)
+        if (_stepTimes.Count > SampleSize)
             _stepTimes.Dequeue();
 
         _bodyCount = bodyCount;
@@ -52,7 +53,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
         // Update stats every second
         if (_frameTimer.ElapsedMilliseconds >= 1000)
         {
-            _lastFps = _frameCount / (_frameTimer.ElapsedMilliseconds / 1000.0);
+            FPS = _frameCount / (_frameTimer.ElapsedMilliseconds / 1000.0);
             _lastAverageStepTime = _accumulatedTime / _frameCount;
 
             Console.WriteLine(GetStatsString());
@@ -66,7 +67,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
 
     private string GetStatsString()
     {
-        return $"FPS: {_lastFps:F1}\n" +
+        return $"FPS: {FPS:F1}\n" +
                $"Step Time: {_lastAverageStepTime:F3}ms\n" +
                $"Bodies: {_bodyCount}\n" +
                $"Particles: {_particleCount}";

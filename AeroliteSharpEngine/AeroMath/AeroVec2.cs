@@ -2,17 +2,36 @@
 
 namespace AeroliteSharpEngine.AeroMath
 {
+    /// <summary>
+    /// Represents a 2-Dimensional vector in cartesian coordinates.
+    /// </summary>
     public struct AeroVec2 : IEquatable<AeroVec2>
     {
         #region Properties
+        
+        /// <summary>
+        /// The X coordinate of the vector.
+        /// </summary>
         public float X { get; set; }
-
+        
+        /// <summary>
+        /// The Y component of the vector.
+        /// </summary>
         public float Y { get; set; }
-
+        
+        /// <summary>
+        /// The length of the vector.
+        /// </summary>
         public float Magnitude => MathF.Sqrt(X * X + Y * Y);
-
+        
+        /// <summary>
+        /// The squared length of the vector.
+        /// </summary>
         public float MagnitudeSquared => X * X + Y * Y;
         
+        /// <summary>
+        /// Returns a zero vector.
+        /// </summary>
         public static AeroVec2 Zero => new AeroVec2(0, 0);
 
         #endregion

@@ -2,9 +2,11 @@
 using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.BroadPhase;
+using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Interfaces;
+using AeroliteSharpEngine.Performance;
 
 namespace AeroliteSharpEngine.Core;
 
@@ -21,7 +23,6 @@ public class AeroWorld2D : IAeroPhysicsWorld
     private readonly IPerformanceMonitor _performanceMonitor;
 
     private readonly CollisionSystem _collisionSystem;
-    private List<CollisionManifold> _currentFrameCollisions;
 
     public AeroWorld2D(float gravity = 9.8f, CollisionSystemType collisionSystemType = CollisionSystemType.ConvexOnly)
     {
@@ -35,7 +36,6 @@ public class AeroWorld2D : IAeroPhysicsWorld
         var broadPhase = new SpatialHashBroadPhase();
         var narrowPhase = CollisionDetectorFactory.CreateNarrowPhase(collisionSystemType);
         _collisionSystem = new CollisionSystem(collisionSystemType, broadPhase, narrowPhase);
-        _currentFrameCollisions = new List<CollisionManifold>();
 
         PerformanceMonitoringEnabled = true; ;
     }
@@ -46,7 +46,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
     
     public IReadOnlyList<IBody2D> GetBodies() => _physicsObjects.OfType<IBody2D>().ToList();
 
-    public IReadOnlyList<CollisionManifold> GetCollisions() => _currentFrameCollisions;
+    public IEnumerable<CollisionManifold> GetCollisions() => _collisionSystem.Collisions;
 
     public bool PerformanceMonitoringEnabled { get; set; }
 
@@ -55,8 +55,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
         _physicsObjects.Clear();
         _globalForces.Clear();
         _forceRegistry.Clear();
-        _currentFrameCollisions.Clear();
-        _collisionSystem.ClearValidationCache();
+        _collisionSystem.Clear();
     }
 
     public void SetIntegrator(IIntegrator integrator)
@@ -95,7 +94,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.BeginStep();
 
-        _currentFrameCollisions = _collisionSystem.DetectCollisions(_physicsObjects);
+        var potentialCollisionPairs = _collisionSystem.DetectCollisions(_physicsObjects);
 
         // Updates any forces registered to specific physics objects
         _forceRegistry.UpdateForces(dt);

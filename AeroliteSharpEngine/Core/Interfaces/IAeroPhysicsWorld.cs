@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Collisions;
+using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.Core.Interfaces;
@@ -38,7 +39,7 @@ public interface IAeroPhysicsWorld
     /// Returns an iterable list of the current collisions for current time step of the world.
     /// </summary>
     /// <returns></returns>
-    IReadOnlyList<CollisionManifold> GetCollisions();
+    IEnumerable<CollisionManifold> GetCollisions();
 
     /// <summary>
     /// Allows a user to register a force generator with a specific physics object. 

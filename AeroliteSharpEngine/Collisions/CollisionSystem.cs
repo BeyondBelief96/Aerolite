@@ -1,5 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collision;
+using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes.Interfaces;
@@ -10,19 +11,6 @@ namespace AeroliteSharpEngine.Collisions
     {
         ConvexOnly, // Optimized for convex shapes only
         General, // Handles both convex and concave shapes. Less optimized due to having to handle the concave case.
-    }
-
-    /// <summary>
-    /// Represents the result of a collision test between two objects
-    /// </summary>
-    public struct CollisionManifold
-    {
-        public bool HasCollision;
-        public AeroVec2 Normal;
-        public float Depth;
-        public AeroVec2 Point;
-        public IPhysicsObject ObjectA;
-        public IPhysicsObject ObjectB;
     }
 
     /// <summary>
@@ -42,9 +30,9 @@ namespace AeroliteSharpEngine.Collisions
             _collisionSystemType = type;
             _spatialBroadPhase = spatialBroadPhase;
             _narrowPhase = narrowPhase;
-            _collisions = new List<CollisionManifold>();
-            _potentialPairs = new HashSet<(IPhysicsObject, IPhysicsObject)>();
-            _validatedConvexObjectIds = new HashSet<int>();
+            _collisions = [];
+            _potentialPairs = [];
+            _validatedConvexObjectIds = [];
 
             if (type == CollisionSystemType.ConvexOnly)
             {
@@ -56,15 +44,21 @@ namespace AeroliteSharpEngine.Collisions
         /// Marks the collision system to validate for convex shapes. Defaults to true for <see cref="CollisionSystemType.ConvexOnly"/>
         /// however can be manually toggled off if performance is needed.
         /// </summary>
-        public bool ValidateConvexShapes { get; set; }
+        private bool ValidateConvexShapes { get; set; }
+        
+        /// <summary>
+        /// The current frame collisions the engine has detected.
+        /// </summary>
+        public IEnumerable<CollisionManifold> Collisions => _collisions;
 
 
         /// <summary>
         /// Used to clear convex object validation cache.
         /// </summary>
-        public void ClearValidationCache()
+        public void Clear()
         {
             _validatedConvexObjectIds.Clear();
+            _collisions.Clear();
         }
 
         public void SetBroadPhase(IBroadPhase broadPhaseAlgorithm)
@@ -97,7 +91,7 @@ namespace AeroliteSharpEngine.Collisions
                 foreach (var (objA, objB) in spatialPairs)
                 {
                     // Only add pairs that pass AABB test
-                    if (BoundingAreaTest.TestIntersection(objA, objB))
+                    if (BoundingAreaTests.TestIntersection(objA, objB))
                     {
                         _potentialPairs.Add((objA, objB));
                     }
