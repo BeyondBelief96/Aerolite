@@ -9,21 +9,22 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core.Interfaces;
 
 public class SolarSystemScene : Scene
 {
-    private const float GRAVITATIONAL_CONSTANT = 0.1f;  // Reduced from 1e-8
-    private const float SUN_MASS = 1000f;              // Reduced from 10000
-    private const float PLANET_MASS = 1f;              // Base mass for planets
-    private const float ASTEROID_MASS = 0.1f;          // Small mass for asteroids
-    private const float ORBIT_SPEED_MULTIPLIER = 1.0f; 
+    private const float GravitationalConstant = 0.1f;  // Reduced from 1e-8
+    private const float SunMass = 1000f;              // Reduced from 10000
+    private const float PlanetMass = 1f;              // Base mass for planets
+    private const float AsteroidMass = 0.1f;          // Small mass for asteroids
+    private const float OrbitSpeedMultiplier = 1.0f; 
 
-    private IAeroPhysicsWorld _world;
+    private readonly IAeroPhysicsWorld _world;
     private AeroParticle2D _sun;
-    private List<AeroParticle2D> _planets;
-    private List<AeroParticle2D> _asteroids;
-    private Random _random = new Random();
+    private readonly List<AeroParticle2D> _planets;
+    private readonly List<AeroParticle2D> _asteroids;
+    private readonly Random _random = new Random();
 
     private readonly Color[] _planetColors = new Color[]
     {
@@ -38,25 +39,25 @@ public class SolarSystemScene : Scene
     };
 
     // Planet configuration
-    private readonly (float radius, float mass, float size)[] PLANET_CONFIGS = new[]
+    private readonly (float radius, float mass, float size)[] planetConfigs = new[]
     {
-        (100f, PLANET_MASS * 0.4f, 5f),    // Mercury
-        (150f, PLANET_MASS * 0.8f, 8f),    // Venus
-        (200f, PLANET_MASS * 1.0f, 8f),    // Earth
-        (250f, PLANET_MASS * 0.5f, 6f),    // Mars
-        (350f, PLANET_MASS * 4.0f, 20f),   // Jupiter
-        (450f, PLANET_MASS * 3.0f, 16f),   // Saturn
-        (550f, PLANET_MASS * 2.0f, 12f),   // Uranus
-        (650f, PLANET_MASS * 2.0f, 12f)    // Neptune
+        (100f, PlanetMass * 0.4f, 5f),    // Mercury
+        (150f, PlanetMass * 0.8f, 8f),    // Venus
+        (200f, PlanetMass * 1.0f, 8f),    // Earth
+        (250f, PlanetMass * 0.5f, 6f),    // Mars
+        (350f, PlanetMass * 4.0f, 20f),   // Jupiter
+        (450f, PlanetMass * 3.0f, 16f),   // Saturn
+        (550f, PlanetMass * 2.0f, 12f),   // Uranus
+        (650f, PlanetMass * 2.0f, 12f)    // Neptune
     };
 
     public SolarSystemScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
     {
-        _world = new AeroWorld2D(0); // No global gravity
-        _world.SetIntegrator(new EulerIntegrator());
-        _planets = new List<AeroParticle2D>();
-        _asteroids = new List<AeroParticle2D>();
+        var config = AeroWorldConfiguration.Default.WithGravity(0.0f);
+        _world = new AeroWorld2D(config); // No global gravity
+        _planets = [];
+        _asteroids = [];
 
         InitializeSolarSystem();
     }
@@ -64,28 +65,28 @@ public class SolarSystemScene : Scene
     private void InitializeSolarSystem()
     {
         // Create sun with adjusted mass
-        _sun = new AeroParticle2D(_screen.Width / 2, _screen.Height / 2, SUN_MASS);
-        _sun.Radius = 40;
-        _sun.Damping = 1.0f; // No damping for orbital mechanics
+        _sun = new AeroParticle2D(_screen.Width / 2, _screen.Height / 2, SunMass, 40.0f)
+        {
+            Damping = 1.0f // No damping for orbital mechanics
+        };
         _world.AddPhysicsObject(_sun);
 
         // Create planets using configurations
-        for (int i = 0; i < PLANET_CONFIGS.Length; i++)
+        for (int i = 0; i < planetConfigs.Length; i++)
         {
-            var (orbitRadius, mass, size) = PLANET_CONFIGS[i];
+            var (orbitRadius, mass, size) = planetConfigs[i];
             float angle = (float)(_random.NextDouble() * MathHelper.TwoPi);
 
             float x = _sun.Position.X + orbitRadius * (float)Math.Cos(angle);
             float y = _sun.Position.Y + orbitRadius * (float)Math.Sin(angle);
 
-            var planet = new AeroParticle2D(x, y, mass);
-            planet.Radius = size;
+            var planet = new AeroParticle2D(x, y, mass, size);
             planet.Damping = 1.0f; // No damping for orbital mechanics
 
             // Calculate initial velocity for circular orbit
             // v = sqrt(GM/r) where G is grav constant, M is central mass, r is radius
-            float orbitSpeed = ORBIT_SPEED_MULTIPLIER *
-                (float)Math.Sqrt((GRAVITATIONAL_CONSTANT * SUN_MASS) / orbitRadius);
+            float orbitSpeed = OrbitSpeedMultiplier *
+                (float)Math.Sqrt((GravitationalConstant * SunMass) / orbitRadius);
 
             AeroVec2 initialVelocity = new AeroVec2(
                 -orbitSpeed * (float)Math.Sin(angle),
@@ -96,12 +97,12 @@ public class SolarSystemScene : Scene
             _world.AddPhysicsObject(planet);
             _planets.Add(planet);
 
-            var gravityGen = new GravitationalForceGenerator(_sun, GRAVITATIONAL_CONSTANT);
+            var gravityGen = new GravitationalForceGenerator(_sun, GravitationalConstant);
             _world.AddForceGenerator(planet, gravityGen);
         }
 
         // Add asteroids with adjusted mass
-        AddAsteroidBelt(300, 320, 50, ASTEROID_MASS);
+        AddAsteroidBelt(300, 320, 50, AsteroidMass);
     }
 
     private void AddAsteroidBelt(float minRadius, float maxRadius, int count, float mass)
@@ -114,13 +115,12 @@ public class SolarSystemScene : Scene
             float x = _sun.Position.X + radius * (float)Math.Cos(angle);
             float y = _sun.Position.Y + radius * (float)Math.Sin(angle);
 
-            var asteroid = new AeroParticle2D(x, y, mass);
-            asteroid.Radius = 1 + (float)_random.NextDouble() * 2;
+            var asteroid = new AeroParticle2D(x, y, mass, 1 + (float)_random.NextDouble() * 2);
             asteroid.Damping = 1.0f; // No damping for orbital mechanics
 
             // Calculate proper orbital velocity
-            float orbitSpeed = ORBIT_SPEED_MULTIPLIER *
-                (float)Math.Sqrt((GRAVITATIONAL_CONSTANT * SUN_MASS) / radius);
+            float orbitSpeed = OrbitSpeedMultiplier *
+                (float)Math.Sqrt((GravitationalConstant * SunMass) / radius);
 
             asteroid.Velocity = new AeroVec2(
                 -orbitSpeed * (float)Math.Sin(angle),
@@ -130,7 +130,7 @@ public class SolarSystemScene : Scene
             _world.AddPhysicsObject(asteroid);
             _asteroids.Add(asteroid);
 
-            var gravityGen = new GravitationalForceGenerator(_sun, GRAVITATIONAL_CONSTANT);
+            var gravityGen = new GravitationalForceGenerator(_sun, GravitationalConstant);
             _world.AddForceGenerator(asteroid, gravityGen);
         }
     }
@@ -152,11 +152,11 @@ public class SolarSystemScene : Scene
         _shapes.Begin(_camera);
 
         // Draw orbit trails
-        for (int i = 0; i < _planets.Count; i++)
+        foreach (var planet in _planets)
         {
             float orbitRadius = Vector2.Distance(
                 new Vector2(_sun.Position.X, _sun.Position.Y),
-                new Vector2(_planets[i].Position.X, _planets[i].Position.Y)
+                new Vector2(planet.Position.X, planet.Position.Y)
             );
 
             // Convert sun's screen position to render position
@@ -181,7 +181,7 @@ public class SolarSystemScene : Scene
                 _screen.Width,
                 _screen.Height
             ),
-            _sun.Radius,
+            ((AeroCircle)_sun.Shape).Radius,
             32,
             Color.Yellow
         );
@@ -195,7 +195,7 @@ public class SolarSystemScene : Scene
                     _screen.Width,
                     _screen.Height
                 ),
-                _planets[i].Radius,
+                ((AeroCircle)_planets[i].Shape).Radius,
                 16,
                 _planetColors[i]
             );
@@ -210,7 +210,7 @@ public class SolarSystemScene : Scene
                     _screen.Width,
                     _screen.Height
                 ),
-                asteroid.Radius,
+                ((AeroCircle)asteroid.Shape).Radius,
                 8,
                 new Color(180, 180, 180)
             );

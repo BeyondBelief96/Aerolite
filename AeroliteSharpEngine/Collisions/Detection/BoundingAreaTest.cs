@@ -19,16 +19,16 @@ public static class BoundingAreaTests
     {
         return (a, b) switch
         {
-            (AABB2D aabb1, AABB2D aabb2) => TestAABBAABB(aabb1, aabb2),
-            (AABB2D aabb, BoundingCircle circle) => TestAABBCircle(aabb, circle),
-            (BoundingCircle circle, AABB2D aabb) => TestAABBCircle(aabb, circle),
-            (BoundingCircle circle1, BoundingCircle circle2) => TestCircleCircle(circle1, circle2),
+            (AABB2D aabb1, AABB2D aabb2) => TestIntersection(aabb1, aabb2),
+            (AABB2D aabb, BoundingCircle circle) => TestIntersection(aabb, circle),
+            (BoundingCircle circle, AABB2D aabb) => TestIntersection(aabb, circle),
+            (BoundingCircle circle1, BoundingCircle circle2) => TestIntersection(circle1, circle2),
             _ => throw new ArgumentException("Unknown bounding area combination")
         };
     }
 
     // Individual test implementations
-    private static bool TestAABBAABB(AABB2D a, AABB2D b)
+    private static bool TestIntersection(AABB2D a, AABB2D b)
     {
         var dx = Math.Abs(a.Center.X - b.Center.X);
         var dy = Math.Abs(a.Center.Y - b.Center.Y);
@@ -37,16 +37,16 @@ public static class BoundingAreaTests
                dy <= (a.HalfExtents.Y + b.HalfExtents.Y);
     }
     
-    private static bool TestCircleCircle(BoundingCircle a, BoundingCircle b)
+    private static bool TestIntersection(BoundingCircle a, BoundingCircle b)
     {
         var distanceSquared = (a.Center - b.Center).MagnitudeSquared;
         var radiusSum = a.Radius + b.Radius;
         return distanceSquared <= radiusSum * radiusSum;
     }
     
-    private static bool TestAABBCircle(AABB2D aabb, BoundingCircle circle)
+    private static bool TestIntersection(AABB2D aabb, BoundingCircle circle)
     {
-        // Find closest point on AABB to circle center
+        // Find the closest point on AABB to circle center
         var closestX = Math.Max(aabb.Center.X - aabb.HalfExtents.X, 
             Math.Min(circle.Center.X, aabb.Center.X + aabb.HalfExtents.X));
         var closestY = Math.Max(aabb.Center.Y - aabb.HalfExtents.Y, 
@@ -60,7 +60,7 @@ public static class BoundingAreaTests
     }
 
     // High level test with caching and early out
-    public static bool TestIntersection(IPhysicsObject a, IPhysicsObject b)
+    public static bool TestIntersection(IPhysicsObject2D a, IPhysicsObject2D b)
     {
         // Early out - rough distance check
         var centerDistance = (b.Position - a.Position).MagnitudeSquared;
@@ -78,7 +78,7 @@ public static class BoundingAreaTests
         return boundA.Intersects(boundB);
     }
 
-    private static IBoundingArea GetOrCreateBoundingArea(IPhysicsObject obj)
+    private static IBoundingArea GetOrCreateBoundingArea(IPhysicsObject2D obj)
     {
         if (BoundingAreaCache.TryGetValue(obj.Id, out var cached))
         {
@@ -101,7 +101,7 @@ public static class BoundingAreaTests
         return newBound;
     }
 
-    private static IBoundingArea CreateBoundingArea(IPhysicsObject obj)
+    private static IBoundingArea CreateBoundingArea(IPhysicsObject2D obj)
     {
         return obj switch
         {
@@ -110,15 +110,15 @@ public static class BoundingAreaTests
                 AeroCircle => BoundingCircle.CreateFromShape(body.Shape, body.Position),
                 _ => AABB2D.CreateFromShape(body.Shape, body.Position)
             },
-            AeroParticle2D particle => new BoundingCircle(particle.Position, particle.Radius),
+            AeroParticle2D particle => new BoundingCircle(particle.Position, (particle.Shape as AeroCircle)!.Radius),
             _ => throw new ArgumentException($"Unknown physics object type: {obj.GetType()}")
         };
     }
 
-    private static float GetMaxExtent(IPhysicsObject obj)
+    private static float GetMaxExtent(IPhysicsObject2D obj)
     {
         if (obj is AeroParticle2D particle)
-            return particle.Radius;
+            return ((particle.Shape as AeroCircle)!).Radius;
 
         if (obj is AeroBody2D body)
         {

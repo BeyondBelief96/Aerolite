@@ -5,7 +5,7 @@ namespace AeroliteSharpEngine.Core.Interfaces
     /// <summary>
     /// Represents a 2-Dimensional rigid body. This body can have both linear and angular motion.
     /// </summary>
-    public interface IBody2D : IPhysicsObject
+    public interface IBody2D : IPhysicsObject2D
     {
         /// <summary>
         /// Physical property of the body that determines how "bouncy" the body is.
@@ -51,11 +51,6 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// 1 / Inertia. Caching this speeds up calculations.
         /// </summary>
         float InverseInertia { get; }
-
-        /// <summary>
-        /// The shape of the body.
-        /// </summary>
-        AeroShape2D Shape { get; }
 
         /// <summary>
         /// Applies the given torque to the body changing its angular acceleration.

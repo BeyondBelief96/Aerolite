@@ -36,7 +36,7 @@ public class AeroRegularPolygon : AeroPolygon, IConvexShape
         SideLength = 2 * radius * MathF.Sin(MathF.PI / numberOfSides);
 
         // Force recalculation of cached properties now that we have our properties set
-        needsUpdate = true;
+        NeedsUpdate = true;
         UpdateCachedProperties();
     }
 
@@ -61,14 +61,14 @@ public class AeroRegularPolygon : AeroPolygon, IConvexShape
     protected override void UpdateArea()
     {
         // Calculate area using properties not cached values
-        cachedArea = 0.5f * NumberOfSides * Radius * Radius *
+        CachedArea = 0.5f * NumberOfSides * Radius * Radius *
                     MathF.Sin(2 * MathF.PI / NumberOfSides);
     }
 
     protected override void UpdateMomentOfInertia()
     {
         // Calculate moment using properties not cached values
-        cachedMomentOfInertia = (1.0f / 6.0f) * NumberOfSides * Radius * Radius *
+        CachedMomentOfInertia = (1.0f / 6.0f) * NumberOfSides * Radius * Radius *
                                (1 + MathF.Cos(MathF.PI / NumberOfSides));
     }
 
@@ -81,10 +81,10 @@ public class AeroRegularPolygon : AeroPolygon, IConvexShape
 
     public override float GetMomentOfInertia(float mass)
     {
-        if (needsUpdate)
+        if (NeedsUpdate)
         {
             UpdateCachedProperties();
         }
-        return mass * cachedMomentOfInertia;
+        return mass * CachedMomentOfInertia;
     }
 }

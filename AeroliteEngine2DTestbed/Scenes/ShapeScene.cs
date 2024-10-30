@@ -1,14 +1,16 @@
-﻿using AeroliteEngine2DTestbed.Helpers;
-using AeroliteEngine2DTestbed.Scenes;
-using AeroliteSharpEngine.AeroMath;
-using Flat.Graphics;
-using Flat.Input;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using AeroliteEngine2DTestbed.Helpers;
+using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Shapes;
+using Flat.Graphics;
+using Flat.Input;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
+
+namespace AeroliteEngine2DTestbed.Scenes;
 
 public class ShapeScene : Scene
 {
@@ -23,16 +25,16 @@ public class ShapeScene : Scene
         Color.Violet
     };
 
-    private AeroWorld2D world;
-    private List<(AeroBody2D body, Color color)> bodies;
-    private Random random;
-    private const float SPAWN_FORCE = 500f;
+    private readonly AeroWorld2D world;
+    private readonly List<(AeroBody2D body, Color color)> bodies;
+    private readonly Random random;
+    private const float SpawnForce = 500f;
     private int colorIndex = 0;
 
     public ShapeScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
     {
-        world = new AeroWorld2D(0.0f);
+        world = new AeroWorld2D();
         bodies = new List<(AeroBody2D, Color)>();
         random = new Random();
 
@@ -105,7 +107,7 @@ public class ShapeScene : Scene
                 _screen.Height
             );
             Vector2 direction = Vector2.Normalize(mouseScreenPos - center);
-            Vector2 velocity = direction * SPAWN_FORCE;
+            Vector2 velocity = direction * SpawnForce;
 
             // Create shape at render position
             SpawnShapeAtMouse(mouseScreenPos, new AeroVec2(velocity.X, velocity.Y));

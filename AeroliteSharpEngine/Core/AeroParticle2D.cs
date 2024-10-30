@@ -1,5 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Interfaces;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core
 {
@@ -9,15 +10,12 @@ namespace AeroliteSharpEngine.Core
     /// forces from other particles. Particles are point like masses with all of their
     /// mass concentrated at the center of the particle.
     /// </summary>
-    public class AeroParticle2D : Physics2DObjectBase
+    public class AeroParticle2D : Physics2DObject2DBase
     {
-        public float Radius { get; set; }
-
-        public AeroParticle2D(float x, float y, float mass) : base(mass)
+        public AeroParticle2D(float x, float y, float mass, float radius = 5.0f) : base(mass, new AeroCircle(radius))
         {
             Position = new AeroVec2(x, y);
             PreviousPosition = new AeroVec2(x, y);
-            Radius = 5;
         }
     }
 }

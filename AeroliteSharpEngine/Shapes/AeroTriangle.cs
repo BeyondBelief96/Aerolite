@@ -1,7 +1,9 @@
 ﻿// Then fix the AeroTriangle class
+
 using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Shapes.Interfaces;
-using AeroliteSharpEngine.Shapes;
+
+namespace AeroliteSharpEngine.Shapes;
 
 public class AeroTriangle : AeroPolygon, IConvexShape
 {
@@ -24,7 +26,7 @@ public class AeroTriangle : AeroPolygon, IConvexShape
     /// <summary>
     /// Creates a triangle from three explicit vertices
     /// </summary>
-    public AeroTriangle(AeroVec2 v1, AeroVec2 v2, AeroVec2 v3)
+    private AeroTriangle(AeroVec2 v1, AeroVec2 v2, AeroVec2 v3)
         : base(new[] { v1, v2, v3 })
     {
         if (LocalVertices.Count != 3)
@@ -76,17 +78,17 @@ public class AeroTriangle : AeroPolygon, IConvexShape
         };
     }
 
-    protected override void UpdateCachedProperties()
+    protected sealed override void UpdateCachedProperties()
     {
         var v1 = LocalVertices[0];
         var v2 = LocalVertices[1];
         var v3 = LocalVertices[2];
 
         // Calculate area using cross product
-        cachedArea = Math.Abs((v2 - v1).Cross(v3 - v1)) / 2.0f;
+        CachedArea = Math.Abs((v2 - v1).Cross(v3 - v1)) / 2.0f;
 
         // Calculate centroid (average of vertices)
-        cachedCentroid = (v1 + v2 + v3) / 3.0f;
+        CachedCentroid = (v1 + v2 + v3) / 3.0f;
 
         // Calculate moment of inertia
         float a = (v2 - v1).Magnitude;
@@ -94,8 +96,8 @@ public class AeroTriangle : AeroPolygon, IConvexShape
         float c = (v1 - v3).Magnitude;
 
         // I = (a² + b² + c²) / 36 for a triangle about its centroid
-        cachedMomentOfInertia = (a * a + b * b + c * c) / 36.0f;
-        needsUpdate = false;
+        CachedMomentOfInertia = (a * a + b * b + c * c) / 36.0f;
+        NeedsUpdate = false;
     }
 
     public override ShapeType GetShapeType()

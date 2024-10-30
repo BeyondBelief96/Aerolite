@@ -1,4 +1,4 @@
-﻿using AeroliteSharpEngine.Collision;
+﻿using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions.Detection
 {

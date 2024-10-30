@@ -22,19 +22,19 @@ namespace AeroliteSharpEngine.ForceGenerators
             this.k2 = k2;
         }
 
-        public void UpdateForce(IPhysicsObject physicsObject, float dt)
+        public void UpdateForce(IPhysicsObject2D physicsObject2D, float dt)
         {
-            if (physicsObject.IsStatic) return;
+            if (physicsObject2D.IsStatic) return;
 
             AeroVec2 dragForce = new AeroVec2();
 
             // Calculate the drag coefficient
-            float dragCoefficient = k1 * physicsObject.Velocity.Magnitude + k2 * physicsObject.Velocity.MagnitudeSquared;
+            float dragCoefficient = k1 * physicsObject2D.Velocity.Magnitude + k2 * physicsObject2D.Velocity.MagnitudeSquared;
 
             // Apply force to object.
             dragForce.Normalize();
             dragForce *= -dragCoefficient;
-            physicsObject.ApplyForce(dragForce);
+            physicsObject2D.ApplyForce(dragForce);
         }
     }
 }

@@ -15,8 +15,8 @@ namespace AeroliteSharpEngine.Interfaces
         /// Implementations of this interface will calculate their
         /// forces and apply them to the given object.
         /// </summary>
-        /// <param name="physicsObject"></param>
+        /// <param name="physicsObject2D"></param>
         /// <param name="dt"></param>
-        void UpdateForce(IPhysicsObject physicsObject, float dt);
+        void UpdateForce(IPhysicsObject2D physicsObject2D, float dt);
     }
 }

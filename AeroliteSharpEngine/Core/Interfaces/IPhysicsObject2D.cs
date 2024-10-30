@@ -1,4 +1,5 @@
 ﻿using AeroliteSharpEngine.AeroMath;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core.Interfaces
 {
@@ -6,7 +7,7 @@ namespace AeroliteSharpEngine.Core.Interfaces
     /// Represents a basic physics object (body or particle) that interacts
     /// with other physics objects in the engine.
     /// </summary>
-    public interface IPhysicsObject
+    public interface IPhysicsObject2D
     {
         /// <summary>
         /// Unique identifier for this physics object.
@@ -44,9 +45,13 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// </summary>
         AeroVec2 NetForce { get; set; }
 
-
         /// <summary>
-        /// The mass of the object, concetrated at its center.
+        /// Represents the geometrical shape of the object in the physics simulation world.
+        /// </summary>
+        AeroShape2D Shape { get; }
+        
+        /// <summary>
+        /// The mass of the object, concentrated at its center.
         /// </summary>
         float Mass { get; }
 

@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Shapes;
 using AeroliteSharpEngine.Shapes.Interfaces;
+
+namespace AeroliteSharpEngine.Shapes;
 
 public class AeroBox : AeroPolygon, IConvexShape
 {
@@ -20,27 +21,27 @@ public class AeroBox : AeroPolygon, IConvexShape
         float halfWidth = width * 0.5f;
         float halfHeight = height * 0.5f;
         return new List<AeroVec2>
-            {
-                new AeroVec2(-halfWidth, -halfHeight),  // Bottom left
-                new AeroVec2(halfWidth, -halfHeight),   // Bottom right
-                new AeroVec2(halfWidth, halfHeight),    // Top right
-                new AeroVec2(-halfWidth, halfHeight)    // Top left
-            };
+        {
+            new AeroVec2(-halfWidth, -halfHeight),  // Bottom left
+            new AeroVec2(halfWidth, -halfHeight),   // Bottom right
+            new AeroVec2(halfWidth, halfHeight),    // Top right
+            new AeroVec2(-halfWidth, halfHeight)    // Top left
+        };
     }
 
-    protected override void UpdateCachedProperties()
+    protected sealed override void UpdateCachedProperties()
     {
         // Area of a rectangle
-        cachedArea = Width * Height;
+        CachedArea = Width * Height;
 
         // Centroid is at origin for a centered rectangle
-        cachedCentroid = new AeroVec2(0, 0);
+        CachedCentroid = new AeroVec2(0, 0);
 
         // Moment of inertia for a rectangle about its center
         // I = (width² + height²) / 12  (without mass)
-        cachedMomentOfInertia = (Width * Width + Height * Height) / 12.0f;
+        CachedMomentOfInertia = (Width * Width + Height * Height) / 12.0f;
 
-        needsUpdate = false;
+        NeedsUpdate = false;
     }
 
     public override ShapeType GetShapeType()

@@ -5,10 +5,10 @@ namespace AeroliteSharpEngine.Integrators
 {
     public class EulerIntegrator : IIntegrator
     {
-        public void IntegrateAngular(IPhysicsObject physicsObject, float dt)
+        public void IntegrateAngular(IPhysicsObject2D physicsObject2D, float dt)
         {
             // Integration for 2-D bodies (angular motion)
-            if (physicsObject is IBody2D body)
+            if (physicsObject2D is IBody2D body)
             {
                 body.AngularAcceleration = body.NetTorque * body.InverseInertia;
                 body.AngularVelocity += body.AngularAcceleration * dt;
@@ -19,15 +19,15 @@ namespace AeroliteSharpEngine.Integrators
             }
         }
 
-        public void IntegrateLinear(IPhysicsObject physicsObject, float dt)
+        public void IntegrateLinear(IPhysicsObject2D physicsObject2D, float dt)
         {
-            if (physicsObject.IsStatic) return;
+            if (physicsObject2D.IsStatic) return;
 
-            physicsObject.Acceleration = physicsObject.NetForce * physicsObject.InverseMass;
-            physicsObject.Velocity += physicsObject.Acceleration * dt;
-            physicsObject.Position += physicsObject.Velocity * dt;
-            physicsObject.Velocity *= MathF.Pow(physicsObject.Damping, dt);
-            physicsObject.ClearForces();
+            physicsObject2D.Acceleration = physicsObject2D.NetForce * physicsObject2D.InverseMass;
+            physicsObject2D.Velocity += physicsObject2D.Acceleration * dt;
+            physicsObject2D.Position += physicsObject2D.Velocity * dt;
+            physicsObject2D.Velocity *= MathF.Pow(physicsObject2D.Damping, dt);
+            physicsObject2D.ClearForces();
         }
     }
 }

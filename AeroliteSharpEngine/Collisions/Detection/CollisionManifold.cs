@@ -31,10 +31,10 @@ public struct CollisionManifold
     /// <summary>
     /// The first object in the collision.
     /// </summary>
-    public IPhysicsObject ObjectA;
+    public IPhysicsObject2D Object2DA;
     
     /// <summary>
     /// The second object in the collision.
     /// </summary>
-    public IPhysicsObject ObjectB;
+    public IPhysicsObject2D Object2DB;
 }

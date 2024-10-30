@@ -10,15 +10,15 @@ namespace AeroliteSharpEngine.Interfaces
         /// <summary>
         /// Performs the integration scheme for linear dynamic equations.
         /// </summary>
-        /// <param name="physicsObject"></param>
+        /// <param name="physicsObject2D"></param>
         /// <param name="dt"></param>
-        void IntegrateLinear(IPhysicsObject physicsObject, float dt);
+        void IntegrateLinear(IPhysicsObject2D physicsObject2D, float dt);
 
         /// <summary>
         /// Performs the integration scheme for angular dynmaic equations.
         /// </summary>
         /// <param name="PhysicsObject"></param>
         /// <param name="dt"></param>
-        void IntegrateAngular(IPhysicsObject physicsObject, float dt);
+        void IntegrateAngular(IPhysicsObject2D physicsObject2D, float dt);
     }
 }

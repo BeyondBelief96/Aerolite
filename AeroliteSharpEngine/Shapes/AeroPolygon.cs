@@ -1,31 +1,33 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Shapes;
+
+namespace AeroliteSharpEngine.Shapes;
 
 /// <summary>
 /// Base polygon class that can represent any polygon, convex or concave
 /// </summary>
 public class AeroPolygon : AeroShape2D
 {
-    protected List<AeroVec2> _localVertices;  // Vertices in local space
-    protected List<AeroVec2> _worldVertices;  // Transformed vertices in world space
-    protected bool _verticesDirty;            // Flag to indicate if vertices need updating
-    protected float lastAngle;
-    protected AeroVec2 lastPosition;
+    private readonly List<AeroVec2> _localVertices;  // Vertices in local space
+    private readonly List<AeroVec2> _worldVertices;  // Transformed vertices in world space
+    private bool verticesDirty;            // Flag to indicate if vertices need updating
+    private float lastAngle;
+    private AeroVec2 lastPosition;
 
-    public IReadOnlyList<AeroVec2> LocalVertices => _localVertices;
+    protected IReadOnlyList<AeroVec2> LocalVertices => _localVertices;
     public IReadOnlyList<AeroVec2> WorldVertices => _worldVertices;
 
-    public AeroPolygon(IEnumerable<AeroVec2> vertices)
+    protected AeroPolygon(IEnumerable<AeroVec2> vertices)
     {
-        _localVertices = new List<AeroVec2>(vertices);
-        _worldVertices = new List<AeroVec2>(vertices);
+        var verticesVec2 = vertices as AeroVec2[] ?? vertices.ToArray();
+        _localVertices = [..verticesVec2];
+        _worldVertices = [..verticesVec2];
 
         if (_localVertices.Count < 3)
         {
             throw new ArgumentException("Polygon must have at least 3 vertices");
         }
 
-        _verticesDirty = true;
+        verticesDirty = true;
         UpdateCachedProperties();
     }
 
@@ -34,7 +36,7 @@ public class AeroPolygon : AeroShape2D
         UpdateArea();
         UpdateCentroid();
         UpdateMomentOfInertia();
-        needsUpdate = false;
+        NeedsUpdate = false;
     }
 
     protected virtual void UpdateArea()
@@ -46,7 +48,7 @@ public class AeroPolygon : AeroShape2D
             int j = (i + 1) % _localVertices.Count;
             area += _localVertices[i].Cross(_localVertices[j]);
         }
-        cachedArea = Math.Abs(area) / 2;
+        CachedArea = Math.Abs(area) / 2;
     }
 
     protected virtual void UpdateCentroid()
@@ -69,7 +71,7 @@ public class AeroPolygon : AeroShape2D
             centroid /= 6 * signedArea;
         }
 
-        cachedCentroid = centroid;
+        CachedCentroid = centroid;
     }
 
     protected virtual void UpdateMomentOfInertia()
@@ -81,15 +83,15 @@ public class AeroPolygon : AeroShape2D
         for (int i = 1; i < _localVertices.Count - 1; i++)
         {
             var triangle = new[] {
-                    _localVertices[0],
-                    _localVertices[i],
-                    _localVertices[i + 1]
-                };
+                _localVertices[0],
+                _localVertices[i],
+                _localVertices[i + 1]
+            };
 
             totalMoment += CalculateTriangleMomentOfInertia(triangle);
         }
 
-        cachedMomentOfInertia = totalMoment;
+        CachedMomentOfInertia = totalMoment;
     }
 
     private float CalculateTriangleMomentOfInertia(AeroVec2[] triangleVertices)
@@ -106,7 +108,7 @@ public class AeroPolygon : AeroShape2D
 
     public override void UpdateVertices(float angle, AeroVec2 position)
     {
-        if (!_verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition == position)
+        if (!verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition == position)
             return;
 
         for (var i = 0; i < _localVertices.Count; i++)
@@ -114,7 +116,7 @@ public class AeroPolygon : AeroShape2D
             _worldVertices[i] = _localVertices[i].Rotate(angle) + position;
         }
 
-        _verticesDirty = false;
+        verticesDirty = false;
         lastAngle = angle;
         lastPosition = position;
     }
@@ -126,8 +128,8 @@ public class AeroPolygon : AeroShape2D
 
     public override float GetMomentOfInertia(float mass)
     {
-        if (needsUpdate)
+        if (NeedsUpdate)
             UpdateCachedProperties();
-        return mass * cachedMomentOfInertia;
+        return mass * CachedMomentOfInertia;
     }
 }

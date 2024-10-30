@@ -15,16 +15,16 @@ public class AeroCircle : AeroShape2D, IConvexShape
     protected override void UpdateCachedProperties()
     {
         // Area of a circle
-        cachedArea = MathF.PI * Radius * Radius;
+        CachedArea = MathF.PI * Radius * Radius;
 
         // Centroid is at origin
-        cachedCentroid = new AeroVec2(0, 0);
+        CachedCentroid = new AeroVec2(0, 0);
 
         // Moment of inertia for a circle about its center
         // I = r² / 2  (without mass)
-        cachedMomentOfInertia = (Radius * Radius) / 2.0f;
+        CachedMomentOfInertia = (Radius * Radius) / 2.0f;
 
-        needsUpdate = false;
+        NeedsUpdate = false;
     }
 
     public override ShapeType GetShapeType()
@@ -34,27 +34,27 @@ public class AeroCircle : AeroShape2D, IConvexShape
 
     public override float GetMomentOfInertia(float mass)
     {
-        if (needsUpdate) UpdateCachedProperties();
-        return mass * cachedMomentOfInertia;
+        if (NeedsUpdate) UpdateCachedProperties();
+        return mass * CachedMomentOfInertia;
     }
 
     public override void UpdateVertices(float angle, AeroVec2 position)
     {
         // Circles don't need vertex updates since they're defined by radius
         // But we might want to update the center position if needed
-        cachedCentroid = position;
+        CachedCentroid = position;
     }
 
     public bool ContainsPoint(AeroVec2 point)
     {
-        return (point - cachedCentroid).MagnitudeSquared <= Radius * Radius;
+        return (point - CachedCentroid).MagnitudeSquared <= Radius * Radius;
     }
 
     public AeroVec2 GetPointOnCircle(float angle)
     {
         return new AeroVec2(
-            cachedCentroid.X + Radius * MathF.Cos(angle),
-            cachedCentroid.Y + Radius * MathF.Sin(angle)
+            CachedCentroid.X + Radius * MathF.Cos(angle),
+            CachedCentroid.Y + Radius * MathF.Sin(angle)
         );
     }
 }

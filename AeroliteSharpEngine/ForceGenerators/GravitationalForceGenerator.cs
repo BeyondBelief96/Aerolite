@@ -4,22 +4,22 @@ using AeroliteSharpEngine.Interfaces;
 
 public class GravitationalForceGenerator : IForceGenerator
 {
-    private IPhysicsObject _other;
+    private IPhysicsObject2D _other;
     private float _gravitationalConstant;
     private const float MIN_DISTANCE = 50f; // Increased minimum distance
     private const float MIN_DISTANCE_SQUARED = MIN_DISTANCE * MIN_DISTANCE;
 
-    public GravitationalForceGenerator(IPhysicsObject other, float gravitationalConstant)
+    public GravitationalForceGenerator(IPhysicsObject2D other, float gravitationalConstant)
     {
         _other = other;
         _gravitationalConstant = gravitationalConstant;
     }
 
-    public void UpdateForce(IPhysicsObject physicsObject, float dt)
+    public void UpdateForce(IPhysicsObject2D physicsObject2D, float dt)
     {
-        if (physicsObject.IsStatic || _other.IsStatic) return;
+        if (physicsObject2D.IsStatic || _other.IsStatic) return;
 
-        AeroVec2 direction = _other.Position - physicsObject.Position;
+        AeroVec2 direction = _other.Position - physicsObject2D.Position;
         float distanceSquared = direction.MagnitudeSquared;
 
         // If objects are too close, skip the force calculation
@@ -28,7 +28,7 @@ public class GravitationalForceGenerator : IForceGenerator
         // Clamp the distance to prevent extreme forces
         distanceSquared = Math.Max(distanceSquared, MIN_DISTANCE_SQUARED);
 
-        float forceMagnitude = _gravitationalConstant * (physicsObject.Mass * _other.Mass) / distanceSquared;
+        float forceMagnitude = _gravitationalConstant * (physicsObject2D.Mass * _other.Mass) / distanceSquared;
 
         // Calculate force direction
         float distance = (float)Math.Sqrt(distanceSquared);
@@ -37,6 +37,6 @@ public class GravitationalForceGenerator : IForceGenerator
             direction.Y / distance * forceMagnitude
         );
 
-        physicsObject.ApplyForce(force);
+        physicsObject2D.ApplyForce(force);
     }
 }

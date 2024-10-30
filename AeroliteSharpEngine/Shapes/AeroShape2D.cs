@@ -9,9 +9,9 @@ namespace AeroliteSharpEngine.Shapes
     {
         Circle = 0,
         Box = 1,
-        Triangle,
-        RegularPolygon = 2,
-        Polygon = 3,
+        Triangle = 2,
+        RegularPolygon = 3,
+        Polygon = 4,
     }
 
     /// <summary>
@@ -20,34 +20,29 @@ namespace AeroliteSharpEngine.Shapes
     public abstract class AeroShape2D
     {
         // Cached properties
-        protected float cachedArea;
-        protected float cachedMomentOfInertia;
-        protected AeroVec2 cachedCentroid;
-        protected bool needsUpdate;
-
-        protected AeroShape2D()
-        {
-            needsUpdate = true;
-        }
-
+        protected float CachedArea;
+        protected float CachedMomentOfInertia;
+        protected AeroVec2 CachedCentroid;
+        protected bool NeedsUpdate = true;
+        
         public float Area
         {
             get
             {
-                if (needsUpdate) UpdateCachedProperties();
-                return cachedArea;
+                if (NeedsUpdate) UpdateCachedProperties();
+                return CachedArea;
             }
-            protected set => cachedArea = value;
+            protected set => CachedArea = value;
         }
 
         public AeroVec2 Centroid
         {
             get
             {
-                if (needsUpdate) UpdateCachedProperties();
-                return cachedCentroid;
+                if (NeedsUpdate) UpdateCachedProperties();
+                return CachedCentroid;
             }
-            protected set => cachedCentroid = value;
+            protected set => CachedCentroid = value;
         }
 
 

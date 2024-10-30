@@ -1,77 +1,36 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions
 {
-    public enum CollisionSystemType
-    {
-        ConvexOnly, // Optimized for convex shapes only
-        General, // Handles both convex and concave shapes. Less optimized due to having to handle the concave case.
-    }
-
     /// <summary>
     /// Main collision detection system that coordinates broad and narrow phase
     /// </summary>
-    public class CollisionSystem
+    public class CollisionSystem(CollisionSystemConfiguration collisionSystemConfiguration) : ICollisionSystem
     {
-        private readonly CollisionSystemType _collisionSystemType;
-        private IBroadPhase _spatialBroadPhase;
-        private INarrowPhase _narrowPhase;
-        private readonly List<CollisionManifold> _collisions;
-        private readonly HashSet<(IPhysicsObject, IPhysicsObject)> _potentialPairs;
-        private readonly HashSet<int> _validatedConvexObjectIds;  // Cache for validated objects
+        private readonly List<CollisionManifold> _collisions = [];
+        private readonly HashSet<(IPhysicsObject2D, IPhysicsObject2D)> _potentialPairs = [];
+        private readonly HashSet<int> _validatedConvexObjectIds = [];  // Cache for validated objects
 
-        public CollisionSystem(CollisionSystemType type, IBroadPhase spatialBroadPhase, INarrowPhase narrowPhase)
-        {
-            _collisionSystemType = type;
-            _spatialBroadPhase = spatialBroadPhase;
-            _narrowPhase = narrowPhase;
-            _collisions = [];
-            _potentialPairs = [];
-            _validatedConvexObjectIds = [];
+        public CollisionSystemConfiguration Configuration { get; } = collisionSystemConfiguration;
 
-            if (type == CollisionSystemType.ConvexOnly)
-            {
-                ValidateConvexShapes = true;
-            }
-        }
+        public bool ValidateConvexShapes { get; set; }
 
-        /// <summary>
-        /// Marks the collision system to validate for convex shapes. Defaults to true for <see cref="CollisionSystemType.ConvexOnly"/>
-        /// however can be manually toggled off if performance is needed.
-        /// </summary>
-        private bool ValidateConvexShapes { get; set; }
-        
-        /// <summary>
-        /// The current frame collisions the engine has detected.
-        /// </summary>
         public IEnumerable<CollisionManifold> Collisions => _collisions;
 
-
-        /// <summary>
-        /// Used to clear convex object validation cache.
-        /// </summary>
+        public IEnumerable<(IPhysicsObject2D, IPhysicsObject2D)> PotentialPairs => _potentialPairs;
+        
         public void Clear()
         {
             _validatedConvexObjectIds.Clear();
             _collisions.Clear();
         }
 
-        public void SetBroadPhase(IBroadPhase broadPhaseAlgorithm)
-        {
-            _spatialBroadPhase = broadPhaseAlgorithm;
-        }
-
-        public void SetNarrowPhase(INarrowPhase narrowPhaseAlgorithm)
-        {
-            _narrowPhase = narrowPhaseAlgorithm;
-        }
-
-        public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject>? objects)
+        public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject2D>? objects)
         {
             if(objects == null) return [];
             if (ValidateConvexShapes)
@@ -83,37 +42,31 @@ namespace AeroliteSharpEngine.Collisions
             _potentialPairs.Clear();
 
             // First broad phase: Spatial partitioning
-            _spatialBroadPhase.Update(objects);
-            var spatialPairs = _spatialBroadPhase.FindPotentialCollisions(objects).ToList();
-
-            if(spatialPairs.Count != 0) 
+            Configuration.BroadPhase.Update(objects);
+            var spatialPairs = Configuration.BroadPhase.FindPotentialCollisions().ToList();
+            
+            if (spatialPairs.Count == 0) return _collisions;
+            foreach (var (objA, objB) in spatialPairs)
             {
-                foreach (var (objA, objB) in spatialPairs)
-                {
-                    // Only add pairs that pass AABB test
-                    if (BoundingAreaTests.TestIntersection(objA, objB))
-                    {
-                        _potentialPairs.Add((objA, objB));
-                    }
-                }
+                _potentialPairs.Add((objA, objB));
             }
 
             // Narrow phase testing
-            foreach (var (objA, objB) in _potentialPairs)
-            {
-                var manifold = _narrowPhase.TestCollision(objA, objB);
-                if (manifold.HasCollision)
-                {
-                    _collisions.Add(manifold);
-                }
-            }
+            // foreach (var (objA, objB) in _potentialPairs)
+            // {
+            //     var manifold = NarrowPhase.TestCollision(objA, objB);
+            //     if (manifold.HasCollision)
+            //     {
+            //         _collisions.Add(manifold);
+            //     }
+            // }
 
             return _collisions;
         }
 
-        private void ValidateNewShapes(IReadOnlyList<IPhysicsObject> objects)
+        private void ValidateNewShapes(IReadOnlyList<IPhysicsObject2D> objects)
         {
-            if (_collisionSystemType != CollisionSystemType.ConvexOnly) return;
+            if (Configuration.Type != CollisionSystemType.ConvexOnly) return;
             foreach (var obj in objects)
             {
                 // Only validate objects we haven't seen before

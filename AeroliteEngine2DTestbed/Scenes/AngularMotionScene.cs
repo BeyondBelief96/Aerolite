@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using AeroliteEngine2DTestbed.Helpers;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
+using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
 using Flat.Input;
 using Microsoft.Xna.Framework;
@@ -20,7 +22,8 @@ public class AngularMotionScene : Scene
     public AngularMotionScene(Game game, Screen screen, Sprites sprites, Shapes shapes) 
         : base(game, screen, sprites, shapes)
     {
-        _world = new AeroWorld2D(0.0f);
+        var config = AeroWorldConfiguration.Default.WithGravity(0.0f);
+        _world = new AeroWorld2D(config);
         CreateTestBodies();
     }
 

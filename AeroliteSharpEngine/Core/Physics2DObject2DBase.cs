@@ -1,15 +1,16 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Core.Interfaces;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core
 {
     /// <summary>
     /// Base class that implements the ID system and common IPhysicsObject properties
     /// </summary>
-    public abstract class Physics2DObjectBase : IPhysicsObject
+    public abstract class Physics2DObject2DBase : IPhysicsObject2D
     {
-        private static int nextId;
-        private static readonly object idLock = new object();
+        private static int _nextId;
+        private static readonly object IdLock = new object();
 
         /// <summary>
         /// Unique identifier for this physics object
@@ -25,13 +26,14 @@ namespace AeroliteSharpEngine.Core
         public float InverseMass { get; protected set; }
         public bool IsStatic { get; set; }
         public bool HasFiniteMass => InverseMass != 0.0f;
+        public AeroShape2D Shape { get; private set; }
 
-        protected Physics2DObjectBase(float mass)
+        protected Physics2DObject2DBase(float mass, AeroShape2D shape)
         {
             // Generate unique ID
-            lock (idLock)
+            lock (IdLock)
             {
-                Id = ++nextId;
+                Id = ++_nextId;
             }
 
             // Initialize physics properties
@@ -52,6 +54,7 @@ namespace AeroliteSharpEngine.Core
             Acceleration = new AeroVec2();
             NetForce = new AeroVec2();
             Damping = 0.99f;
+            Shape = shape;
         }
 
         public virtual void ApplyForce(AeroVec2 force)
@@ -79,7 +82,7 @@ namespace AeroliteSharpEngine.Core
         public override bool Equals(object? obj)
         {
             if (obj == null) return false;
-            if (obj is Physics2DObjectBase other)
+            if (obj is Physics2DObject2DBase other)
             {
                 return Id == other.Id;
             }

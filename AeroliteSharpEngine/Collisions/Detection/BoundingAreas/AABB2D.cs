@@ -44,7 +44,14 @@ public struct AABB2D : IBoundingArea
                 return new AABB2D(
                     position,
                     new AeroVec2(circle.Radius, circle.Radius));
-
+            case AeroBox box:
+            {
+                // For boxes, we can calculate directly without needing to check vertices
+                return new AABB2D(
+                    position,
+                    new AeroVec2(box.Width * 0.5f, box.Height * 0.5f)
+                );
+            }
             case AeroPolygon polygon:
             {
                 var worldVerts = polygon.WorldVertices;

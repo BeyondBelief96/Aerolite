@@ -1,8 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Collision;
 using AeroliteSharpEngine.Collisions;
-using AeroliteSharpEngine.Collisions.BroadPhase;
 using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Interfaces;
@@ -10,65 +9,60 @@ using AeroliteSharpEngine.Performance;
 
 namespace AeroliteSharpEngine.Core;
 
-public class AeroWorld2D : IAeroPhysicsWorld
+public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWorld
 {
-
     private int _bodyCount = 0;
     private int _particleCount = 0;
 
-    private readonly List<IPhysicsObject> _physicsObjects;
-    private readonly List<AeroVec2> _globalForces;
-    private readonly ForceRegistry _forceRegistry;
-    private IIntegrator _integrator;
-    private readonly IPerformanceMonitor _performanceMonitor;
+    private readonly List<IPhysicsObject2D> _physicsObjects = [];
+    private readonly List<AeroVec2> _globalForces = [];
+    private readonly ForceRegistry _forceRegistry = new();
+    private IIntegrator _integrator = configuration.Integrator;
+    private readonly IPerformanceMonitor _performanceMonitor = new ConsolePerformanceLogger();
+    private AeroWorldConfiguration _configuration = configuration;
 
-    private readonly CollisionSystem _collisionSystem;
+    public float Gravity { get; set; } = configuration.Gravity;
+    public ICollisionSystem CollisionSystem { get; private set; } = new CollisionSystem(configuration.CollisionSystemConfiguration);
+    public bool PerformanceMonitoringEnabled { get; set; } = configuration.EnablePerformanceMonitoring;
 
-    public AeroWorld2D(float gravity = 9.8f, CollisionSystemType collisionSystemType = CollisionSystemType.ConvexOnly)
+    // Default constructor
+    public AeroWorld2D() : this(AeroWorldConfiguration.Default)
     {
-        Gravity = gravity;
-        _physicsObjects = new List<IPhysicsObject>();
-        _integrator = new EulerIntegrator();
-        _globalForces = new List<AeroVec2>();
-        _forceRegistry = new ForceRegistry();
-        _performanceMonitor = new ConsolePerformanceLogger();
-
-        var broadPhase = new SpatialHashBroadPhase();
-        var narrowPhase = CollisionDetectorFactory.CreateNarrowPhase(collisionSystemType);
-        _collisionSystem = new CollisionSystem(collisionSystemType, broadPhase, narrowPhase);
-
-        PerformanceMonitoringEnabled = true; ;
     }
 
-    public float Gravity { get; set; }
+    public AeroWorldConfiguration GetConfiguration() => _configuration;
 
-    public IReadOnlyList<IPhysicsObject> GetObjects() => _physicsObjects;
+    public void UpdateConfiguration(AeroWorldConfiguration newConfig)
+    {
+        _configuration = newConfig;
+        Gravity = newConfig.Gravity;
+        _integrator = newConfig.Integrator;
+        PerformanceMonitoringEnabled = newConfig.EnablePerformanceMonitoring;
+        CollisionSystem = new CollisionSystem(newConfig.CollisionSystemConfiguration);
+    }
+
+    public IReadOnlyList<IPhysicsObject2D> GetObjects() => _physicsObjects;
     
     public IReadOnlyList<IBody2D> GetBodies() => _physicsObjects.OfType<IBody2D>().ToList();
 
-    public IEnumerable<CollisionManifold> GetCollisions() => _collisionSystem.Collisions;
-
-    public bool PerformanceMonitoringEnabled { get; set; }
+    public IEnumerable<CollisionManifold> GetCollisions() => CollisionSystem.Collisions;
 
     public void ClearWorld()
     {
         _physicsObjects.Clear();
         _globalForces.Clear();
         _forceRegistry.Clear();
-        _collisionSystem.Clear();
+        CollisionSystem.Clear();
+        _bodyCount = 0;
+        _particleCount = 0;
     }
 
-    public void SetIntegrator(IIntegrator integrator)
+    public void AddPhysicsObject(IPhysicsObject2D physicsObject2D)
     {
-        _integrator = integrator;
-    }
-
-    public void AddPhysicsObject(IPhysicsObject physicsObject)
-    {
-        _physicsObjects.Add(physicsObject);
+        _physicsObjects.Add(physicsObject2D);
 
         if (!PerformanceMonitoringEnabled) return;
-        switch (physicsObject)
+        switch (physicsObject2D)
         {
             case AeroBody2D:
                 _bodyCount++;
@@ -79,7 +73,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
         }
     }
 
-    public void AddForceGenerator(IPhysicsObject particle, IForceGenerator generator)
+    public void AddForceGenerator(IPhysicsObject2D particle, IForceGenerator generator)
     {
         _forceRegistry.Add(particle, generator);
     }
@@ -94,28 +88,23 @@ public class AeroWorld2D : IAeroPhysicsWorld
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.BeginStep();
 
-        var potentialCollisionPairs = _collisionSystem.DetectCollisions(_physicsObjects);
+        var potentialCollisionPairs = CollisionSystem.DetectCollisions(_physicsObjects);
 
-        // Updates any forces registered to specific physics objects
         _forceRegistry.UpdateForces(dt);
 
-        // Update all physics objects
         foreach (var physicsObject in _physicsObjects.Where(physicsObject => !physicsObject.IsStatic))
         {
-            // Apply world gravity
             if (Gravity != 0)
             {
                 var weight = new AeroVec2(0.0f, physicsObject.Mass * Gravity);
                 physicsObject.ApplyForce(weight);
             }
 
-            // Apply any global forces
             foreach (var force in _globalForces)
             {
                 physicsObject.ApplyForce(force);
             }
 
-            // Integrate the object
             _integrator.IntegrateLinear(physicsObject, dt);
             _integrator.IntegrateAngular(physicsObject, dt);
         }
