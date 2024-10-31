@@ -79,14 +79,23 @@ namespace AeroliteSharpEngine.Core
             return Id;
         }
 
+        public bool Equals(IPhysicsObject2D? other)
+        {
+            return other != null && Id == other.Id;
+        }
+
         public override bool Equals(object? obj)
         {
-            if (obj == null) return false;
             if (obj is Physics2DObject2DBase other)
             {
                 return Id == other.Id;
             }
             return false;
+        }
+
+        protected bool Equals(Physics2DObject2DBase other)
+        {
+            return Id == other.Id;
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.Performance;
@@ -24,7 +26,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
     }
 
     public bool IsRunning { get; private set; }
-    public double FPS { get; private set; }
+    public double Fps { get; private set; }
     public double AverageStepTime => _lastAverageStepTime;
     public int BodyCount => _bodyCount;
     public int ParticleCount => _particleCount;
@@ -36,7 +38,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
  
     }
 
-    public void EndStep(int bodyCount, int particleCount)
+    public void EndStep(IAeroPhysicsWorld world)
     {
         _stepTimer.Stop();
         double stepTime = _stepTimer.Elapsed.TotalMilliseconds;
@@ -45,15 +47,15 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
         if (_stepTimes.Count > SampleSize)
             _stepTimes.Dequeue();
 
-        _bodyCount = bodyCount;
-        _particleCount = particleCount;
+        _bodyCount = world.GetBodies().Count;
+        _particleCount = world.GetParticles().Count;
         _frameCount++;
         _accumulatedTime += stepTime;
 
         // Update stats every second
         if (_frameTimer.ElapsedMilliseconds >= 1000)
         {
-            FPS = _frameCount / (_frameTimer.ElapsedMilliseconds / 1000.0);
+            Fps = _frameCount / (_frameTimer.ElapsedMilliseconds / 1000.0);
             _lastAverageStepTime = _accumulatedTime / _frameCount;
 
             Console.WriteLine(GetStatsString());
@@ -67,7 +69,7 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
 
     private string GetStatsString()
     {
-        return $"FPS: {FPS:F1}\n" +
+        return $"FPS: {Fps:F1}\n" +
                $"Step Time: {_lastAverageStepTime:F3}ms\n" +
                $"Bodies: {_bodyCount}\n" +
                $"Particles: {_particleCount}";

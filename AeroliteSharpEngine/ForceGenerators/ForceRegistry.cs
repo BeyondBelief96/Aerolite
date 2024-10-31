@@ -1,46 +1,42 @@
 ﻿using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Interfaces;
 
+namespace AeroliteSharpEngine.ForceGenerators;
+
 internal class ForceRegistry
 {
-    protected struct ForceRegistration
+    protected struct ForceRegistration(IPhysicsObject2D obj, IForceGenerator gen)
     {
-        public IPhysicsObject2D Object2D;
-        public IForceGenerator Generator;
-
-        public ForceRegistration(IPhysicsObject2D obj, IForceGenerator gen)
-        {
-            Object2D = obj;
-            Generator = gen;
-        }
+        public readonly IPhysicsObject2D Object2D = obj;
+        public readonly IForceGenerator Generator = gen;
     }
 
-    protected List<ForceRegistration> registrations;
-
-    public ForceRegistry()
-    {
-        registrations = new List<ForceRegistration>();
-    }
+    protected readonly List<ForceRegistration> Registrations = [];
 
     public void Add(IPhysicsObject2D obj, IForceGenerator generator)
     {
-        registrations.Add(new ForceRegistration(obj, generator));
+        Registrations.Add(new ForceRegistration(obj, generator));
     }
 
-    public void Remove(IPhysicsObject2D obj, IForceGenerator generator)
+    public void RemoveRegistration(IPhysicsObject2D obj, IForceGenerator generator)
     {
-        registrations.RemoveAll(registration =>
-            registration.Object2D == obj && registration.Generator == generator);
+        Registrations.RemoveAll(registration =>
+            Equals(registration.Object2D, obj) && registration.Generator == generator);
+    }
+
+    public void RemoveObject(IPhysicsObject2D obj)
+    {
+        Registrations.RemoveAll(registration => Equals(registration.Object2D, obj));
     }
 
     public void Clear()
     {
-        registrations.Clear();
+        Registrations.Clear();
     }
 
     public void UpdateForces(float duration)
     {
-        foreach (var registration in registrations)
+        foreach (var registration in Registrations)
         {
             registration.Generator.UpdateForce(registration.Object2D, duration);
         }

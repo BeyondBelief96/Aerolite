@@ -1,5 +1,4 @@
-﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Collisions.Detection;
+﻿using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
@@ -52,14 +51,14 @@ namespace AeroliteSharpEngine.Collisions
             }
 
             // Narrow phase testing
-            // foreach (var (objA, objB) in _potentialPairs)
-            // {
-            //     var manifold = NarrowPhase.TestCollision(objA, objB);
-            //     if (manifold.HasCollision)
-            //     {
-            //         _collisions.Add(manifold);
-            //     }
-            // }
+            foreach (var (objA, objB) in _potentialPairs)
+            {
+                var manifold = Configuration.NarrowPhase.TestCollision(objA, objB);
+                if (manifold.HasCollision)
+                {
+                    _collisions.Add(manifold);
+                }
+            }
 
             return _collisions;
         }

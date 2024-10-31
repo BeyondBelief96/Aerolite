@@ -12,6 +12,6 @@ namespace AeroliteSharpEngine.Collisions.Detection.Interfaces
         /// <summary>
         /// Tests for collision between two physics objects and returns detailed collision information
         /// </summary>
-        CollisionManifold TestCollision(IPhysicsObject2D object2DA, IPhysicsObject2D object2DB);
+        CollisionManifold TestCollision(IPhysicsObject2D? objectA, IPhysicsObject2D? objectB);
     }
 }

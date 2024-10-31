@@ -7,7 +7,7 @@ namespace AeroliteSharpEngine.Core.Interfaces
     /// Represents a basic physics object (body or particle) that interacts
     /// with other physics objects in the engine.
     /// </summary>
-    public interface IPhysicsObject2D
+    public interface IPhysicsObject2D : IEquatable<IPhysicsObject2D>
     {
         /// <summary>
         /// Unique identifier for this physics object.

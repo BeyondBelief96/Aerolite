@@ -1,7 +1,4 @@
-﻿using AeroliteSharpEngine.Collisions;
-using AeroliteSharpEngine.Collisions.Detection;
-using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
-using AeroliteSharpEngine.Collisions.Detection.Interfaces;
+﻿using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Interfaces;
 
@@ -9,7 +6,7 @@ namespace AeroliteSharpEngine.Core;
 
 public struct AeroWorldConfiguration 
 {
-    public float Gravity { get; set; }
+    public float Gravity { get; private set; }
     
     public CollisionSystemConfiguration CollisionSystemConfiguration { get; private set; }
     public IIntegrator Integrator { get; private set; }

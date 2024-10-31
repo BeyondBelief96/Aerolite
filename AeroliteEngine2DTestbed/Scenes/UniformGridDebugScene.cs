@@ -20,8 +20,6 @@ namespace AeroliteEngine2DTestbed.Scenes;
 
 public class UniformGridDebugScene : Scene
 {
-    private TimeSpan lastLogTime = TimeSpan.Zero;
-    private readonly TimeSpan logInterval = TimeSpan.FromSeconds(1); // Adjust interval as needed
     private readonly Color[] cellColors = new[]
     {
         Color.Red,
@@ -144,20 +142,6 @@ public class UniformGridDebugScene : Scene
         if (world.CollisionSystem.Configuration.BroadPhase is UniformGrid grid)
         {
             potentialCollisions = grid.FindPotentialCollisions().ToList();
-
-            // Only log if enough time has passed
-            if (gameTime.TotalGameTime - lastLogTime >= logInterval)
-            {
-                Console.WriteLine($"\nPotential Collisions at time {gameTime.TotalGameTime.TotalSeconds:F1}s:");
-                Console.WriteLine($"Total pairs: {potentialCollisions.Count}");
-                
-                foreach (var (obj1, obj2) in potentialCollisions)
-                {
-                    Console.WriteLine($"Collision: {obj1.Shape.GetType().Name} <-> {obj2.Shape.GetType().Name}");
-                }
-
-                lastLogTime = gameTime.TotalGameTime;
-            }
         }
 
         world.Update((float)gameTime.ElapsedGameTime.TotalSeconds);

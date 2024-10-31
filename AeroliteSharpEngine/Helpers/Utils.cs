@@ -1,4 +1,7 @@
-﻿namespace AeroliteSharpEngine.Helpers;
+﻿using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Interfaces;
+
+namespace AeroliteSharpEngine.Helpers;
 
 internal static class Utils
 {

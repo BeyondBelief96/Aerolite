@@ -42,6 +42,12 @@ public interface IAeroPhysicsWorld
     IReadOnlyList<IBody2D> GetBodies();
 
     /// <summary>
+    /// Returns any physics object in the world that are of type <see cref="AeroParticle2D"/>
+    /// </summary>
+    /// <returns></returns>
+    IReadOnlyList<AeroParticle2D> GetParticles();
+
+    /// <summary>
     /// Returns an iterable list of the current collisions for current time step of the world.
     /// </summary>
     /// <returns></returns>
