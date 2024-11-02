@@ -1,4 +1,5 @@
-﻿using AeroliteSharpEngine.Core.Interfaces;
+﻿using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
+using AeroliteSharpEngine.Core.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions.Detection.Interfaces;
 

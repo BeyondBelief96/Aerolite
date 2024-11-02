@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Shapes;
 using AeroliteSharpEngine.Shapes.Interfaces;
+
+namespace AeroliteSharpEngine.Shapes;
 
 public class AeroCircle : AeroShape2D, IConvexShape
 {
@@ -12,7 +13,7 @@ public class AeroCircle : AeroShape2D, IConvexShape
         UpdateCachedProperties();
     }
 
-    protected override void UpdateCachedProperties()
+    protected sealed override void UpdateCachedProperties()
     {
         // Area of a circle
         CachedArea = MathF.PI * Radius * Radius;

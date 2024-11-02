@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Shapes.Interfaces;
-using AeroliteSharpEngine.Shapes;
+
+namespace AeroliteSharpEngine.Shapes;
 
 /// <summary>
 /// A regular polygon is a polygon that is direct equiangular (all angles are equal in measure) and equilateral (all sides have the same length). Regular polygons may be either convex, star or skew.
@@ -62,14 +63,14 @@ public class AeroRegularPolygon : AeroPolygon, IConvexShape
     {
         // Calculate area using properties not cached values
         CachedArea = 0.5f * NumberOfSides * Radius * Radius *
-                    MathF.Sin(2 * MathF.PI / NumberOfSides);
+                     MathF.Sin(2 * MathF.PI / NumberOfSides);
     }
 
     protected override void UpdateMomentOfInertia()
     {
         // Calculate moment using properties not cached values
         CachedMomentOfInertia = (1.0f / 6.0f) * NumberOfSides * Radius * Radius *
-                               (1 + MathF.Cos(MathF.PI / NumberOfSides));
+                                (1 + MathF.Cos(MathF.PI / NumberOfSides));
     }
 
     // No need to override UpdateCentroid as it's already at origin

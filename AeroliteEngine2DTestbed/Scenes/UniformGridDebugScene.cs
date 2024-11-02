@@ -167,7 +167,6 @@ public class UniformGridDebugScene : Scene
                 break;
     
             case AeroPolygon polygon:
-                polygon.UpdateVertices(body.Angle, body.Position);
                 var vertices = polygon.WorldVertices
                     .Select(v => CoordinateSystem.ScreenToRender(
                         new Vector2(v.X, v.Y),

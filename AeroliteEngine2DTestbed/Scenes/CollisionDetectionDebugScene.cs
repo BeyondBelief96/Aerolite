@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AeroliteEngine2DTestbed.Helpers;
 using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
@@ -32,8 +32,8 @@ public class CollisionDetectionDebugScene : Scene
     private bool showGrid = true;
     private bool showCollisionInfo = true;
     private readonly Random random;
-    private List<CollisionManifold> collisionManifolds;
-    private int currentMouseShapeIndex = 0;
+    private IEnumerable<CollisionManifold> collisionManifolds;
+    private int currentMouseShapeIndex = 1;
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
 
     public CollisionDetectionDebugScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
@@ -52,7 +52,7 @@ public class CollisionDetectionDebugScene : Scene
         var config = AeroWorldConfiguration.Default.WithPerformanceMonitoring(true);
         world = new AeroWorld2D(config);
         staticBodies = new List<(AeroBody2D, Color)>();
-        collisionManifolds = new List<CollisionManifold>();
+        collisionManifolds = [];
         random = new Random();
 
         PlaceStaticBodiesInGrid();
@@ -126,26 +126,27 @@ public class CollisionDetectionDebugScene : Scene
 
     private void DrawCollisionInfo(CollisionManifold manifold)
     {
-        var contactPoint = CoordinateSystem.ScreenToRender(
-            new Vector2(manifold.Point.X, manifold.Point.Y),
-            _screen.Width,
-            _screen.Height
-        );
+        if (!manifold.HasCollision || manifold.ContactPoints.Count == 0) return;
 
-        // Draw contact point
-        _shapes.DrawCircleFill(contactPoint, 5, 16, Color.Red);
+        // Draw each contact point
+        foreach (var contact in manifold.ContactPoints)
+        {
+            // Draw points on both bodies
+            var pointOnA = CoordinateSystem.ScreenToRender(
+                new Vector2(contact.PointOnA.X, contact.PointOnA.Y),
+                _screen.Width,
+                _screen.Height
+            );
+            var pointOnB = CoordinateSystem.ScreenToRender(
+                new Vector2(contact.PointOnB.X, contact.PointOnB.Y),
+                _screen.Width,
+                _screen.Height
+            );
 
-        // Draw penetration vector
-        var penetrationEnd = CoordinateSystem.ScreenToRender(
-            new Vector2(
-                manifold.Point.X + manifold.Normal.X * manifold.Depth,
-                manifold.Point.Y + manifold.Normal.Y * manifold.Depth
-            ),
-            _screen.Width,
-            _screen.Height
-        );
-
-        _shapes.DrawLine(contactPoint, penetrationEnd, Color.Red);
+            // Draw contact points
+            _shapes.DrawCircleFill(pointOnA, 3, 16, Color.Yellow); // Point on A
+            _shapes.DrawCircleFill(pointOnB, 3, 16, Color.Green);  // Point on B
+        }
     }
 
     public override void Update(GameTime gameTime)
@@ -174,7 +175,7 @@ public class CollisionDetectionDebugScene : Scene
             mouseBody.Position = new AeroVec2(mousePos.X, mousePos.Y);
 
             // Get collisions
-            collisionManifolds = world.CollisionSystem.DetectCollisions(world.GetObjects().ToList());
+            collisionManifolds = world.CollisionSystem.Collisions;
         }
 
         world.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
@@ -224,7 +225,7 @@ public class CollisionDetectionDebugScene : Scene
         foreach (var (body, color) in staticBodies)
         {
             bool inCollision = collisionManifolds.Any(m => 
-                Equals(m.Object2DA, body) || Equals(m.Object2DB, body) && m.HasCollision);
+                Equals(m.ObjectA, body) || Equals(m.ObjectB, body) && m.HasCollision);
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
             DrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
@@ -234,7 +235,7 @@ public class CollisionDetectionDebugScene : Scene
         if (mouseBody != null)
         {
             bool inCollision = collisionManifolds.Any(m => 
-                Equals(m.Object2DA, mouseBody) || Equals(m.Object2DB, mouseBody) && m.HasCollision);
+                Equals(m.ObjectA, mouseBody) || Equals(m.ObjectB, mouseBody) && m.HasCollision);
             
             DrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, _shapes, _screen);
         }

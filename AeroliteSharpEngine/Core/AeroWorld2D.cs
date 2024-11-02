@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.ForceGenerators;
@@ -100,6 +101,14 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
 
             _integrator.IntegrateLinear(physicsObject, dt);
             _integrator.IntegrateAngular(physicsObject, dt);
+            
+            physicsObject.UpdateGeometry();
+        }
+        
+        // Also update static bodies - they might be rotated/moved by the user
+        foreach (var physicsObject in _physicsObjects.Where(physicsObject => physicsObject.IsStatic))
+        {
+            physicsObject.UpdateGeometry();
         }
 
         if(PerformanceMonitoringEnabled)

@@ -7,6 +7,7 @@ namespace AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 /// <summary>
 /// Represents an axis-aligned bounding box using center-radius representation
 /// </summary>
+// ReSharper disable once InconsistentNaming
 public struct AABB2D : IBoundingArea
 {
     public AeroVec2 Center { get; private set; }
@@ -46,7 +47,6 @@ public struct AABB2D : IBoundingArea
                     new AeroVec2(circle.Radius, circle.Radius));
             case AeroBox box:
             {
-                // For boxes, we can calculate directly without needing to check vertices
                 return new AABB2D(
                     position,
                     new AeroVec2(box.Width * 0.5f, box.Height * 0.5f)

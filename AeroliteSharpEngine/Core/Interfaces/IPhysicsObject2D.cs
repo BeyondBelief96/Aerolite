@@ -81,5 +81,10 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// Removes all forces from the object.
         /// </summary>
         void ClearForces();
+
+        /// <summary>
+        /// Updates the underlying shape geometry that needs to be transformed based on the current simulation state.
+        /// </summary>
+        void UpdateGeometry();
     }
 }

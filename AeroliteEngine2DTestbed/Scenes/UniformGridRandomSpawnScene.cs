@@ -216,7 +216,6 @@ public class UniformGridRandomSpawnScene : Scene
                     break;
 
                 case AeroPolygon polygon:
-                    polygon.UpdateVertices(body.Angle, body.Position);
                     var vertices = polygon.WorldVertices
                         .Select(v => new Vector2(v.X, v.Y))
                         .ToArray();

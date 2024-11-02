@@ -3,15 +3,20 @@
 namespace AeroliteSharpEngine.Shapes;
 
 /// <summary>
-/// Base polygon class that can represent any polygon, convex or concave
+/// Base polygon class that can represent any polygon, convex or concave.
 /// </summary>
 public class AeroPolygon : AeroShape2D
 {
+    #region  Fields
+    
+    private bool? _isConvex;
     private readonly List<AeroVec2> _localVertices;  // Vertices in local space
     private readonly List<AeroVec2> _worldVertices;  // Transformed vertices in world space
     private bool verticesDirty;            // Flag to indicate if vertices need updating
     private float lastAngle;
     private AeroVec2 lastPosition;
+    
+    #endregion
 
     protected IReadOnlyList<AeroVec2> LocalVertices => _localVertices;
     public IReadOnlyList<AeroVec2> WorldVertices => _worldVertices;
@@ -31,7 +36,7 @@ public class AeroPolygon : AeroShape2D
         UpdateCachedProperties();
     }
 
-    protected override void UpdateCachedProperties()
+    protected sealed override void UpdateCachedProperties()
     {
         UpdateArea();
         UpdateCentroid();
@@ -93,22 +98,58 @@ public class AeroPolygon : AeroShape2D
 
         CachedMomentOfInertia = totalMoment;
     }
-
-    private float CalculateTriangleMomentOfInertia(AeroVec2[] triangleVertices)
+    
+    /// <summary>
+    /// Tests if the polygon is convex by checking that all vertices form internal angles less than 180 degrees
+    /// </summary>
+    /// <returns>True if the polygon is convex, false if it's concave</returns>
+    public bool IsConvex()
     {
-        // Calculate moment of inertia for a triangle about its centroid
-        float a = (triangleVertices[1] - triangleVertices[0]).Magnitude;
-        float b = (triangleVertices[2] - triangleVertices[1]).Magnitude;
-        float c = (triangleVertices[0] - triangleVertices[2]).Magnitude;
-        float area = Math.Abs((triangleVertices[1] - triangleVertices[0])
-            .Cross(triangleVertices[2] - triangleVertices[0])) / 2.0f;
+        // Return cached result if available
+        if (_isConvex.HasValue)
+            return _isConvex.Value;
 
-        return (a * a + b * b + c * c) * area / 36.0f;
+        bool? sign = null;
+        int n = _localVertices.Count;
+
+        // Check each vertex
+        for (int i = 0; i < n; i++)
+        {
+            // Get current vertex and next two vertices (wrapping around)
+            var current = _localVertices[i];
+            var next = _localVertices[(i + 1) % n];
+            var nextNext = _localVertices[(i + 2) % n];
+
+            // Create vectors for the two edges
+            var edge1 = next - current;
+            var edge2 = nextNext - next;
+
+            // Calculate cross product
+            float cross = edge1.Cross(edge2);
+
+            if (Math.Abs(cross) < float.Epsilon)
+                continue; // Skip if edges are parallel
+
+            // Check if we need to establish the sign
+            if (!sign.HasValue)
+            {
+                sign = cross > 0;
+            }
+            // If sign changes, the polygon is concave
+            else if ((cross > 0) != sign.Value)
+            {
+                _isConvex = false;
+                return false;
+            }
+        }
+
+        _isConvex = true;
+        return true;
     }
 
     public override void UpdateVertices(float angle, AeroVec2 position)
     {
-        if (!verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition == position)
+        if (!verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition.Equals(position))
             return;
 
         for (var i = 0; i < _localVertices.Count; i++)
@@ -131,5 +172,17 @@ public class AeroPolygon : AeroShape2D
         if (NeedsUpdate)
             UpdateCachedProperties();
         return mass * CachedMomentOfInertia;
+    }
+    
+    private float CalculateTriangleMomentOfInertia(AeroVec2[] triangleVertices)
+    {
+        // Calculate moment of inertia for a triangle about its centroid
+        float a = (triangleVertices[1] - triangleVertices[0]).Magnitude;
+        float b = (triangleVertices[2] - triangleVertices[1]).Magnitude;
+        float c = (triangleVertices[0] - triangleVertices[2]).Magnitude;
+        float area = Math.Abs((triangleVertices[1] - triangleVertices[0])
+            .Cross(triangleVertices[2] - triangleVertices[0])) / 2.0f;
+
+        return (a * a + b * b + c * c) * area / 36.0f;
     }
 }

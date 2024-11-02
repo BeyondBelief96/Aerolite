@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Interfaces;
 

@@ -1,5 +1,6 @@
 ﻿// First, let's define interfaces for broad and narrow phase collision detection
 
+using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Core.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions.Detection.Interfaces

@@ -9,7 +9,7 @@ public class CollisionSystemConfiguration
     /// <summary>
     /// The spatial broad phase algorithm to use.
     /// </summary>
-    public IBroadPhase BroadPhase { get; set; }
+    public IBroadPhase BroadPhase { get; private set; }
 
     /// <summary>
     /// The narrow phase collision system. This is determined based on <see cref="CollisionSystemType"/>.

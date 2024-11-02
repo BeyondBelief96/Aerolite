@@ -9,6 +9,7 @@ namespace AeroliteSharpEngine.Core
         public float Restitution { get; set; }
         public float Friction { get; set; }
         public float Angle { get; set; }
+        
         public float PreviousAngle { get; set; }
         public float AngularVelocity { get; set; }
         public float AngularAcceleration { get; set; }
@@ -43,6 +44,14 @@ namespace AeroliteSharpEngine.Core
         {
             if (IsStatic) return;
             NetTorque = 0.0f;
+        }
+
+        public override void UpdateGeometry()
+        {
+            if (Shape is AeroPolygon polygon)
+            {
+                Shape.UpdateVertices(Angle, Position);
+            }
         }
     }
 }

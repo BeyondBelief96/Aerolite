@@ -35,14 +35,12 @@ public static class DrawingHelpers
                 break;
 
             case AeroPolygon polygon:
-                polygon.UpdateVertices(body.Angle, body.Position);
                 var vertices = polygon.WorldVertices
                     .Select(v => CoordinateSystem.ScreenToRender(
                         new Vector2(v.X, v.Y),
                         screen.Width,
                         screen.Height))
                     .ToArray();
-
                 for (var i = 0; i < vertices.Length - 2; i++)
                 {
                     shapes.DrawTriangleFill(

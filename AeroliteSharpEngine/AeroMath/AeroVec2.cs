@@ -55,6 +55,12 @@ namespace AeroliteSharpEngine.AeroMath
             Y += v.Y;
             return this;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AeroVec2 Add(AeroVec2 v1, AeroVec2 v2)
+        {
+            return new AeroVec2(v1.X + v2.X, v1.Y + v2.Y);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AeroVec2 Subtract(AeroVec2 v)
@@ -62,6 +68,12 @@ namespace AeroliteSharpEngine.AeroMath
             X -= v.X;
             Y -= v.Y;
             return this;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static AeroVec2 Subtract(AeroVec2 v1, AeroVec2 v2)
+        {
+            return new AeroVec2(v1.X - v2.X, v1.Y - v2.Y);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -100,16 +112,25 @@ namespace AeroliteSharpEngine.AeroMath
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public AeroVec2 Normal() => new AeroVec2(Y, X - X).UnitVector();
+        public AeroVec2 Normal() => new AeroVec2(-Y, X).UnitVector();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Dot(AeroVec2 v) => X * v.X + Y * v.Y;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Dot(AeroVec2 v1, AeroVec2 v2) => v1.X * v2.X + v1.Y * v2.Y;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float Cross(AeroVec2 v) => X * v.Y - Y * v.X;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Cross(AeroVec2 v1, AeroVec2 v2) => v1.Y * v2.X - v1.X * v2.Y;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float DistanceTo(AeroVec2 v) => (v - this).Magnitude;
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float DistanceTo(AeroVec2 v1, AeroVec2 v2) => (v1 - v2).Magnitude;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AeroVec2 Rotate(float angle)

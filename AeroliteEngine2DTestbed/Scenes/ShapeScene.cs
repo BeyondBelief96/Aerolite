@@ -164,8 +164,6 @@ public class ShapeScene : Scene
                     break;
 
                 case AeroPolygon polygon:
-                    polygon.UpdateVertices(body.Angle, body.Position);
-
                     var renderVertices = polygon.WorldVertices.Select(v =>
                         CoordinateSystem.ScreenToRender(
                             new Vector2(v.X, v.Y),

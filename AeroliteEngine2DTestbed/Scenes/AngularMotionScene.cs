@@ -142,7 +142,6 @@ public class AngularMotionScene : Scene
                 break;
 
             case AeroPolygon polygon:
-                polygon.UpdateVertices(body.Angle, body.Position);
                 // Transform all polygon vertices to render space
                 var vertices = polygon.WorldVertices
                     .Select(v => CoordinateSystem.ScreenToRender(

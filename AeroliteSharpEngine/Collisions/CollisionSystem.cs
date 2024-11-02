@@ -1,7 +1,9 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
+using AeroliteSharpEngine.Shapes;
 using AeroliteSharpEngine.Shapes.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions
@@ -11,17 +13,25 @@ namespace AeroliteSharpEngine.Collisions
     /// </summary>
     public class CollisionSystem(CollisionSystemConfiguration collisionSystemConfiguration) : ICollisionSystem
     {
+        #region Fields
+        
         private readonly List<CollisionManifold> _collisions = [];
         private readonly HashSet<(IPhysicsObject2D, IPhysicsObject2D)> _potentialPairs = [];
         private readonly HashSet<int> _validatedConvexObjectIds = [];  // Cache for validated objects
+        
+        #endregion
+        
+        #region Properties
 
         public CollisionSystemConfiguration Configuration { get; } = collisionSystemConfiguration;
-
-        public bool ValidateConvexShapes { get; set; }
 
         public IEnumerable<CollisionManifold> Collisions => _collisions;
 
         public IEnumerable<(IPhysicsObject2D, IPhysicsObject2D)> PotentialPairs => _potentialPairs;
+        
+        #endregion
+        
+        #region Public Methods
         
         public void Clear()
         {
@@ -32,7 +42,7 @@ namespace AeroliteSharpEngine.Collisions
         public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject2D>? objects)
         {
             if(objects == null) return [];
-            if (ValidateConvexShapes)
+            if (Configuration.ValidateConvexShapes)
             {
                 ValidateNewShapes(objects);
             }
@@ -62,6 +72,10 @@ namespace AeroliteSharpEngine.Collisions
 
             return _collisions;
         }
+        
+        #endregion
+        
+        #region Private Methods
 
         private void ValidateNewShapes(IReadOnlyList<IPhysicsObject2D> objects)
         {
@@ -72,12 +86,18 @@ namespace AeroliteSharpEngine.Collisions
                 if (obj is not AeroBody2D body || _validatedConvexObjectIds.Contains(body.Id)) continue;
                 if (body.Shape is not IConvexShape)
                 {
-                    throw new InvalidOperationException(
-                        $"Object {obj} uses non-convex shape {body.Shape.GetType().Name} " +
-                        "but the collision system is configured for convex-only shapes.");
+                    if (body.Shape is AeroPolygon polygon && !polygon.IsConvex()) continue;
+                    {
+                        throw new InvalidOperationException(
+                            $"Object {obj} uses non-convex shape" +
+                            "but the collision system is configured for convex-only shapes.");
+                    }
+                    
                 }
                 _validatedConvexObjectIds.Add(body.Id);
             }
         }
+        
+        #endregion
     }
 }

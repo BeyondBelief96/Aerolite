@@ -67,11 +67,10 @@ namespace AeroliteSharpEngine.Core
         {
             NetForce = new AeroVec2();
         }
-
-        // Override to provide custom cleanup if needed
-        public virtual void Dispose()
+        
+        public virtual void UpdateGeometry()
         {
-            // Cleanup code here if needed
+            // Base implementation does nothing since not all physics objects need geometry updates e.g. particles
         }
 
         public override int GetHashCode()
