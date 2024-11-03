@@ -24,8 +24,8 @@ namespace AeroliteSharpEngine.Core
         public AeroVec2 NetForce { get; set; }
         public float Mass { get; protected set; }
         public float InverseMass { get; protected set; }
-        public bool IsStatic { get; set; }
-        public bool HasFiniteMass => InverseMass != 0.0f;
+        public bool IsStatic { get; private set; }
+        public bool HasFiniteMass => !AeroMathExtensions.AreEqual(InverseMass, 0.0f);
         public AeroShape2D Shape { get; private set; }
 
         protected Physics2DObject2DBase(float mass, AeroShape2D shape)

@@ -96,9 +96,13 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             {
                 physicsObject.ApplyForce(force);
             }
-
-            _integrator.IntegrateLinear(physicsObject, dt);
-            _integrator.IntegrateAngular(physicsObject, dt);
+            
+            // Only integrate if the bodies are non-static.
+            if (!physicsObject.IsStatic)
+            {
+                _integrator.IntegrateLinear(physicsObject, dt);
+                _integrator.IntegrateAngular(physicsObject, dt);
+            }
             
             physicsObject.UpdateGeometry();
         }
@@ -109,7 +113,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             physicsObject.UpdateGeometry();
         }
         
-        var collisions = CollisionSystem.DetectCollisions(_physicsObjects);
+        CollisionSystem.HandleCollisions(_physicsObjects);
 
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);

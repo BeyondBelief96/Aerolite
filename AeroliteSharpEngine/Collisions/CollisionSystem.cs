@@ -39,9 +39,9 @@ namespace AeroliteSharpEngine.Collisions
             _collisions.Clear();
         }
 
-        public List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject2D>? objects)
+        public void HandleCollisions(IReadOnlyList<IPhysicsObject2D>? objects)
         {
-            if(objects == null) return [];
+            if (objects == null) return;
             if (Configuration.ValidateConvexShapes)
             {
                 ValidateNewShapes(objects);
@@ -53,8 +53,8 @@ namespace AeroliteSharpEngine.Collisions
             // First broad phase: Spatial partitioning
             Configuration.BroadPhase.Update(objects);
             var spatialPairs = Configuration.BroadPhase.FindPotentialCollisions().ToList();
-            
-            if (spatialPairs.Count == 0) return _collisions;
+
+            if (spatialPairs.Count == 0) return;
             foreach (var (objA, objB) in spatialPairs)
             {
                 _potentialPairs.Add((objA, objB));
@@ -69,8 +69,9 @@ namespace AeroliteSharpEngine.Collisions
                     _collisions.Add(manifold);
                 }
             }
-
-            return _collisions;
+            
+            // Resolve collisions
+            Configuration.CollisionResolver.ResolveCollisions(_collisions);
         }
         
         #endregion

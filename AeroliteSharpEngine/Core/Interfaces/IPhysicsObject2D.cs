@@ -61,10 +61,10 @@ namespace AeroliteSharpEngine.Core.Interfaces
         float InverseMass { get; }
 
         /// <summary>
-        /// Determines if this object is considered static. Static objects do not move and
-        /// integration steps are not performed.
+        /// Returns whether the object is considered static. Static objects are created by setting the mass
+        /// to zero exactly. Static objects do not participate in integration and collision resolution.
         /// </summary>
-        bool IsStatic { get; set; }
+        bool IsStatic { get; }
 
         /// <summary>
         /// Returns whether this object has a non-infinite mass (0.0 is infinite).

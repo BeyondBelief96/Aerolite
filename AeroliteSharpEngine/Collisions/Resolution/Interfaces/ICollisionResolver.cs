@@ -11,6 +11,5 @@ public interface ICollisionResolver
     /// Resolves collisions based on the provided collision manifolds
     /// </summary>
     /// <param name="collisionManifolds">List of collision manifolds to resolve</param>
-    /// <param name="dt">Time step delta</param>
-    void ResolveCollisions(IReadOnlyList<CollisionManifold> collisionManifolds, float dt);
+    void ResolveCollisions(IReadOnlyList<CollisionManifold> collisionManifolds);
 }

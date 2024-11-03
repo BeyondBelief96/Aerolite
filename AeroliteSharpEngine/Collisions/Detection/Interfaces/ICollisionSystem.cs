@@ -33,5 +33,5 @@ public interface ICollisionSystem
     /// </summary>
     /// <param name="objects"></param>
     /// <returns>The collision manifolds which contain collision information.</returns>
-    List<CollisionManifold> DetectCollisions(IReadOnlyList<IPhysicsObject2D> objects);
+    void HandleCollisions(IReadOnlyList<IPhysicsObject2D> objects);
 }

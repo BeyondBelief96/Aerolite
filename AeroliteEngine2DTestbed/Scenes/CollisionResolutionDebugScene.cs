@@ -43,12 +43,9 @@ namespace AeroliteEngine2DTestbed.Scenes
             centerCircle = new AeroBody2D(
                 screen.Width / 2,
                 screen.Height / 2,
-                100.0f, // Heavy mass for stability
+                0.0f, // Heavy mass for stability
                 new AeroCircle(100) // Large radius
-            )
-            {
-                IsStatic = true // Make it immovable
-            };
+            );
             
             world.AddPhysicsObject(centerCircle);
             
@@ -76,10 +73,7 @@ namespace AeroliteEngine2DTestbed.Scenes
         private void SpawnShapeAtPosition(float x, float y)
         {
             var (_, creator) = shapeCreators[currentShapeIndex];
-            var body = new AeroBody2D(x, y, 1.0f, creator(x, y))
-            {
-                IsStatic = false,
-            };
+            var body = new AeroBody2D(x, y, 1.0f, creator(x, y));
 
             world.AddPhysicsObject(body);
         }
@@ -93,44 +87,24 @@ namespace AeroliteEngine2DTestbed.Scenes
             // Draw center circle
             if (centerCircle != null)
             {
-                DrawingHelpers.DrawBody(centerCircle, centerColor, _shapes, _screen);
+                AeroDrawingHelpers.DrawBody(centerCircle, centerColor, _shapes, _screen);
             }
+            
+            AeroDrawingHelpers.DrawGrid(_screen, _shapes, 100);
 
             // Draw all other bodies
             foreach (var body in world.GetObjects())
             {
-                if (body != centerCircle)
+                if (!body.Equals(centerCircle))
                 {
-                    DrawingHelpers.DrawBody(body as AeroBody2D, spawnedColor, _shapes, _screen);
+                    AeroDrawingHelpers.DrawBody(body as AeroBody2D, spawnedColor, _shapes, _screen);
                 }
             }
 
             // Draw collision contact points
             foreach (var manifold in world.CollisionSystem.Collisions)
             {
-                // if (!manifold.HasCollision) continue;
-                //
-                // // Draw contact points
-                // var pointA = CoordinateSystem.ScreenToRender(
-                //     new Vector2(manifold.PointOnA.X, manifold.PointOnA.Y),
-                //     _screen.Width,
-                //     _screen.Height);
-                //
-                // var pointB = CoordinateSystem.ScreenToRender(
-                //     new Vector2(manifold.PointOnB.X, manifold.PointOnB.Y),
-                //     _screen.Width,
-                //     _screen.Height);
-                //
-                // // Draw points and normal
-                // _shapes.DrawCircleFill(pointA, 4, 16, Color.Yellow);
-                // _shapes.DrawCircleFill(pointB, 4, 16, Color.Red);
-                //
-                // // Draw collision normal
-                // _shapes.DrawLine(
-                //     pointA,
-                //     pointA + new Vector2(manifold.Normal.X, manifold.Normal.Y) * 30,
-                //     Color.Green
-                // );
+                AeroDrawingHelpers.DrawCollisionInfo(manifold, _screen, _shapes);
             }
 
             _shapes.End();

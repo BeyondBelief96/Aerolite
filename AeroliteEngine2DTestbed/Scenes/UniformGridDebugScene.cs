@@ -59,10 +59,7 @@ public class UniformGridDebugScene : Scene
     private void CreateMouseBody()
     {
         // Create a body that will follow the mouse
-        mouseBody = new AeroBody2D(0, 0, 1.0f, new AeroRegularPolygon(5, 50))
-        {
-            IsStatic = false // So it can move
-        };
+        mouseBody = new AeroBody2D(0, 0, 1.0f, new AeroRegularPolygon(5, 50));
         world.AddPhysicsObject(mouseBody);
     }
 
@@ -87,12 +84,11 @@ public class UniformGridDebugScene : Scene
                 // Randomly choose shape type
                 AeroBody2D body = random.Next(3) switch
                 {
-                    0 => new AeroBody2D(x, y, 1.0f, new AeroCircle(15)),
-                    1 => new AeroBody2D(x, y, 1.0f, new AeroBox(50, 50)),
-                    _ => new AeroBody2D(x, y, 1.0f, new AeroTriangle(50, 50))
+                    0 => new AeroBody2D(x, y, 0.0f, new AeroCircle(15)),
+                    1 => new AeroBody2D(x, y, 0.0f, new AeroBox(50, 50)),
+                    _ => new AeroBody2D(x, y, 0.0f, new AeroTriangle(50, 50))
                 };
-
-                body.IsStatic = true; // Make it stay in place
+                
                 Color color = cellColors[random.Next(cellColors.Length)];
                 staticBodies.Add((body, color));
                 world.AddPhysicsObject(body);

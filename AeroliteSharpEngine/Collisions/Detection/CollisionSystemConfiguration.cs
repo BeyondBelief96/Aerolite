@@ -1,6 +1,8 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
+using AeroliteSharpEngine.Collisions.Resolution.Interfaces;
+using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 
 namespace AeroliteSharpEngine.Collisions.Detection;
 
@@ -23,6 +25,11 @@ public class CollisionSystemConfiguration
     public CollisionSystemType Type { get; private set; }
     
     /// <summary>
+    /// The collision resolver implementation to use for resolving contacts between bodies.
+    /// </summary>
+    public ICollisionResolver CollisionResolver { get; private set; }
+    
+    /// <summary>
     /// The type of bounding area to use for early out collision detection tests.
     /// </summary>
     public BoundingAreaType BoundingAreaType { get; private set; }
@@ -33,11 +40,12 @@ public class CollisionSystemConfiguration
     /// </summary>
     public bool ValidateConvexShapes { get; private set; }
 
-    public CollisionSystemConfiguration(CollisionSystemType type, IBroadPhase broadPhase, BoundingAreaType boundingAreaType = BoundingAreaType.AABB,  bool validateConvexShapes = false)
+    public CollisionSystemConfiguration(CollisionSystemType type, IBroadPhase broadPhase, ICollisionResolver collisionResolver, BoundingAreaType boundingAreaType = BoundingAreaType.AABB,  bool validateConvexShapes = false)
     {
         Type = type;
         BroadPhase = broadPhase;
         BoundingAreaType = boundingAreaType;
+        CollisionResolver = collisionResolver;
         if (type == CollisionSystemType.ConvexOnly)
         {
             ValidateConvexShapes = validateConvexShapes;
@@ -84,6 +92,17 @@ public class CollisionSystemConfiguration
     }
     
     /// <summary>
+    /// Creates an instance of <see cref="CollisionSystemConfiguration"/> with the given <see cref="ICollisionResolver"/>
+    /// </summary>
+    /// <param name="collisionResolver">The collision resolver implementation to use.</param>
+    /// <returns></returns>
+    public CollisionSystemConfiguration WithCollisionResolver(ICollisionResolver collisionResolver)
+    {
+        CollisionResolver = collisionResolver;
+        return this;
+    }
+    
+    /// <summary>
     /// Create the engine's collision system with default values. These include:
     /// 1. Supporting only convex shapes.
     /// 2. A uniform grid with 100x100 cell width for broad phase testing.
@@ -92,6 +111,6 @@ public class CollisionSystemConfiguration
     /// <returns></returns>
     public static CollisionSystemConfiguration Default()
     {
-        return new CollisionSystemConfiguration(CollisionSystemType.ConvexOnly, new UniformGrid(BoundingAreaType.AABB));
+        return new CollisionSystemConfiguration(CollisionSystemType.ConvexOnly, new UniformGrid(BoundingAreaType.AABB), new ProjectionCollisionResolver());
     }
 }
