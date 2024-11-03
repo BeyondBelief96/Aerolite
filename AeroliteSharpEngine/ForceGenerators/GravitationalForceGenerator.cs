@@ -2,6 +2,8 @@
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Interfaces;
 
+namespace AeroliteSharpEngine.ForceGenerators;
+
 public class GravitationalForceGenerator : IForceGenerator
 {
     private IPhysicsObject2D _other;
@@ -23,7 +25,7 @@ public class GravitationalForceGenerator : IForceGenerator
         float distanceSquared = direction.MagnitudeSquared;
 
         // If objects are too close, skip the force calculation
-        if (distanceSquared < float.Epsilon) return;
+        if (AeroMathExtensions.IsNearlyZero(distanceSquared)) return;
 
         // Clamp the distance to prevent extreme forces
         distanceSquared = Math.Max(distanceSquared, MIN_DISTANCE_SQUARED);

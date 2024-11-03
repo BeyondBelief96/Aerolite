@@ -87,28 +87,22 @@ namespace AeroliteSharpEngine.AeroMath
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Normalize()
         {
-            float magnitude = Magnitude;
-            if (magnitude > float.Epsilon) // Use epsilon instead of just 0
-            {
-                X /= magnitude;
-                Y /= magnitude;
-            }
-            else
+            if (AeroMathExtensions.IsNearlyZero(Magnitude)) // Use epsilon instead of just 0
             {
                 X = 0;
                 Y = 0;
+            }
+            else
+            {
+                X /= Magnitude;
+                Y /= Magnitude;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public AeroVec2 UnitVector()
         {
-            float magnitude = Magnitude;
-            if (magnitude > float.Epsilon)
-            {
-                return new AeroVec2(X / magnitude, Y / magnitude);
-            }
-            return new AeroVec2(0, 0);
+            return AeroMathExtensions.IsNearlyZero(Magnitude) ? new AeroVec2(0, 0) : new AeroVec2(X / Magnitude, Y / Magnitude);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -144,7 +138,7 @@ namespace AeroliteSharpEngine.AeroMath
         
         public readonly bool Equals(AeroVec2 other)
         {
-            return X.Equals(other.X) && Y.Equals(other.Y);
+            return AeroMathExtensions.AreEqual(X, other.X) && AeroMathExtensions.AreEqual(Y, other.Y);
         }
 
         #endregion

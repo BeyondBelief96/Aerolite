@@ -82,8 +82,6 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.BeginStep();
 
-        var potentialCollisionPairs = CollisionSystem.DetectCollisions(_physicsObjects);
-
         _forceRegistry.UpdateForces(dt);
 
         foreach (var physicsObject in _physicsObjects.Where(physicsObject => !physicsObject.IsStatic))
@@ -110,6 +108,8 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         {
             physicsObject.UpdateGeometry();
         }
+        
+        var collisions = CollisionSystem.DetectCollisions(_physicsObjects);
 
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);

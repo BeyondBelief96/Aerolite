@@ -33,7 +33,7 @@ public class CollisionDetectionDebugScene : Scene
     private bool showCollisionInfo = true;
     private readonly Random random;
     private IEnumerable<CollisionManifold> collisionManifolds;
-    private int currentMouseShapeIndex = 1;
+    private int currentMouseShapeIndex = 0;
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
 
     public CollisionDetectionDebugScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
@@ -49,7 +49,7 @@ public class CollisionDetectionDebugScene : Scene
             ("Hexagon", (x, y) => new AeroRegularPolygon(6, 30))
         };
 
-        var config = AeroWorldConfiguration.Default.WithPerformanceMonitoring(true);
+        var config = AeroWorldConfiguration.Default.WithPerformanceMonitoring(false);
         world = new AeroWorld2D(config);
         staticBodies = new List<(AeroBody2D, Color)>();
         collisionManifolds = [];
@@ -126,27 +126,29 @@ public class CollisionDetectionDebugScene : Scene
 
     private void DrawCollisionInfo(CollisionManifold manifold)
     {
-        if (!manifold.HasCollision || manifold.ContactPoints.Count == 0) return;
+        if (!manifold.HasCollision) return;
 
-        // Draw each contact point
-        foreach (var contact in manifold.ContactPoints)
-        {
-            // Draw points on both bodies
-            var pointOnA = CoordinateSystem.ScreenToRender(
-                new Vector2(contact.PointOnA.X, contact.PointOnA.Y),
-                _screen.Width,
-                _screen.Height
-            );
-            var pointOnB = CoordinateSystem.ScreenToRender(
-                new Vector2(contact.PointOnB.X, contact.PointOnB.Y),
-                _screen.Width,
-                _screen.Height
-            );
+        // Draw points on both bodies
+        var pointOnA = CoordinateSystem.ScreenToRender(
+            new Vector2(manifold.Contact.StartPoint.X, manifold.Contact.StartPoint.Y),
+            _screen.Width,
+            _screen.Height);
 
-            // Draw contact points
-            _shapes.DrawCircleFill(pointOnA, 3, 16, Color.Yellow); // Point on A
-            _shapes.DrawCircleFill(pointOnB, 3, 16, Color.Green);  // Point on B
-        }
+        var pointOnB = CoordinateSystem.ScreenToRender(
+            new Vector2(manifold.Contact.EndPoint.X, manifold.Contact.EndPoint.Y),
+            _screen.Width,
+            _screen.Height);
+
+        // Draw contact points
+        _shapes.DrawCircleFill(pointOnA, 3, 16, Color.Red); // Point on A
+        _shapes.DrawCircleFill(pointOnB, 3, 16, Color.Purple);  // Point on B
+
+        // Draw normal vector with arrow head
+        var normalVector = new Vector2(manifold.Normal.X, manifold.Normal.Y);
+        var normalEnd = pointOnB + normalVector * 10;
+
+        // Draw main line
+        _shapes.DrawLine(pointOnB, normalEnd, Color.Green);
     }
 
     public override void Update(GameTime gameTime)
@@ -172,6 +174,7 @@ public class CollisionDetectionDebugScene : Scene
         if (mouseBody != null)
         {
             Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+            mouseBody.Angle += (float)gameTime.ElapsedGameTime.TotalSeconds;
             mouseBody.Position = new AeroVec2(mousePos.X, mousePos.Y);
 
             // Get collisions

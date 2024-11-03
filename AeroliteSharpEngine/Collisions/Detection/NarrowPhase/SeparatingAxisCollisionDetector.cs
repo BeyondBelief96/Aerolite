@@ -63,7 +63,8 @@ public static class SeparatingAxisCollisionDetector
 
             if (!overlap.hasOverlap)
                 return (false, 0, AeroVec2.Zero);
-
+            
+            // The minimum separation gives us the deepest amount of penetration.
             if (overlap.amount < minPenetration)
             {
                 minPenetration = overlap.amount;
@@ -100,6 +101,8 @@ public static class SeparatingAxisCollisionDetector
     /// <summary>
     /// Projects vertices onto an axis and returns min/max values
     /// </summary>
+    /// <param name="vertices">The vertices to project.</param>
+    /// <param name="axis">The axis to project on.</param>
     private static (float min, float max) ProjectVertices(
         IReadOnlyList<AeroVec2> vertices,
         AeroVec2 axis)
@@ -156,12 +159,7 @@ public static class SeparatingAxisCollisionDetector
         // Find the closest edge of B to this point
         var closestEdgePoint = PrimitiveUtilities.FindClosestEdgePoint(verticesB, deepestPoint);
 
-        return new ContactPoint
-        {
-            PointOnA = deepestPoint,
-            PointOnB = closestEdgePoint,
-            Depth = depth
-        };
+        return new ContactPoint();
     }
 
     /// <summary>

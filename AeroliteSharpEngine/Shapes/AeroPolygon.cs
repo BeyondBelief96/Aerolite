@@ -36,7 +36,7 @@ public class AeroPolygon : AeroShape2D
         UpdateCachedProperties();
     }
 
-    protected sealed override void UpdateCachedProperties()
+    protected override void UpdateCachedProperties()
     {
         UpdateArea();
         UpdateCentroid();
@@ -71,7 +71,7 @@ public class AeroPolygon : AeroShape2D
         }
 
         signedArea /= 2;
-        if (Math.Abs(signedArea) > float.Epsilon)
+        if (AeroMathExtensions.IsNearlyZero(signedArea))
         {
             centroid /= 6 * signedArea;
         }
@@ -127,7 +127,7 @@ public class AeroPolygon : AeroShape2D
             // Calculate cross product
             float cross = edge1.Cross(edge2);
 
-            if (Math.Abs(cross) < float.Epsilon)
+            if (AeroMathExtensions.IsNearlyZero(cross))
                 continue; // Skip if edges are parallel
 
             // Check if we need to establish the sign
@@ -149,7 +149,7 @@ public class AeroPolygon : AeroShape2D
 
     public override void UpdateVertices(float angle, AeroVec2 position)
     {
-        if (!verticesDirty && Math.Abs(lastAngle - angle) < float.Epsilon && lastPosition.Equals(position))
+        if (!verticesDirty && AeroMathExtensions.IsNearlyZero(lastAngle - angle) && lastPosition.Equals(position))
             return;
 
         for (var i = 0; i < _localVertices.Count; i++)

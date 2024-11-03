@@ -39,12 +39,12 @@ public class ConvexShapeCollisionDetector : INarrowPhase
         {
             ObjectA = bodyA,
             ObjectB = bodyB,
-            HasCollision = false,
-            ContactPoints = new List<ContactPoint>()
+            HasCollision = false
         };
 
-        var normal = bodyB.Position - bodyA.Position;
-        var distanceSquared = normal.MagnitudeSquared;
+        // Vector from center of A to center of B
+        var ab = bodyB.Position - bodyA.Position;
+        var distanceSquared = ab.MagnitudeSquared;
         var radiusSum = circleA.Radius + circleB.Radius;
 
         if (distanceSquared > radiusSum * radiusSum)
@@ -52,36 +52,21 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             return manifold;
         }
 
-        var distance = MathF.Sqrt(distanceSquared);
-
-        // Handle case where circles are exactly on top of each other
-        if (distance == 0)
+        var distance = ab.Magnitude;
+        if (AeroMathExtensions.IsNearlyZero(distance))
         {
             manifold.HasCollision = true;
-            manifold.Normal = new AeroVec2(1, 0); // Arbitrary direction
-            manifold.ContactPoints.Add(new ContactPoint
+            manifold.Normal = new AeroVec2(-1, 0); // Arbitrary direction but pointing toward A
+            manifold.Contact = new ContactPoint
             {
-                PointOnA = bodyA.Position + new AeroVec2(circleA.Radius, 0),
-                PointOnB = bodyB.Position + new AeroVec2(circleB.Radius, 0),
+                StartPoint = bodyB.Position - new AeroVec2(circleB.Radius, 0),
+                EndPoint = bodyA.Position + new AeroVec2(circleA.Radius, 0),
                 Depth = radiusSum
-            });
+            };
             return manifold;
         }
 
         manifold.HasCollision = true;
-        manifold.Normal = normal / distance; // Normalized
-        var depth = radiusSum - distance;
-
-        // For circles, there's always exactly one contact point
-        var contactOnA = bodyA.Position + manifold.Normal * circleA.Radius;
-        var contactOnB = bodyB.Position - manifold.Normal * circleB.Radius;
-
-        manifold.ContactPoints.Add(new ContactPoint
-        {
-            PointOnA = contactOnA,
-            PointOnB = contactOnB,
-            Depth = depth
-        });
 
         return manifold;
     }
@@ -97,7 +82,6 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             ObjectA = bodyA,
             ObjectB = bodyB,
             HasCollision = false,
-            ContactPoints = []
         };
         
         var (hasCollision, normal, depth, contactPoint) = SeparatingAxisCollisionDetector.TestPolygonPolygon(
@@ -107,7 +91,6 @@ public class ConvexShapeCollisionDetector : INarrowPhase
 
         manifold.HasCollision = true;
         manifold.Normal = normal;
-        manifold.ContactPoints.Add(contactPoint);
 
         return manifold;
     }
@@ -123,7 +106,6 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             ObjectA = circleBody,
             ObjectB = polygonBody,
             HasCollision = false,
-            ContactPoints = []
         };
 
         // TODO: Implement circle-polygon collision test

@@ -4,41 +4,55 @@ using AeroliteSharpEngine.Core.Interfaces;
 namespace AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives 
 {
     /// <summary>
-    /// Represents the complete collision information between two objects
+    /// Represents contact information between two colliding bodies at a specific point
     /// </summary>
-    public struct CollisionManifold 
+    public struct ContactPoint(AeroVec2 startPoint, AeroVec2 endPoint)
     {
         /// <summary>
-        /// Whether a collision was detected
+        /// The point of contact inside objectA, that lies on objectB.
+        /// </summary>
+        public AeroVec2 StartPoint = startPoint;
+    
+        /// <summary>
+        /// The point of contact inside objectB that lies on objectA.
+        /// </summary>
+        public AeroVec2 EndPoint = endPoint;
+    
+        /// <summary>
+        /// The penetration depth between the start and end contact points.
+        /// </summary>
+        public float Depth;
+    }
+
+    /// <summary>
+    /// Represents the complete collision information between two objects. Only valid if HasCollision is true.
+    /// </summary>
+    public struct CollisionManifold(ContactPoint contact, IPhysicsObject2D objectA, IPhysicsObject2D objectB)
+    {
+        /// <summary>
+        /// Whether a collision has been detected between the two objects
         /// </summary>
         public bool HasCollision;
-
+    
         /// <summary>
-        /// The collision normal pointing from object B to object A
+        /// The first object in the collision
+        /// </summary>
+        public IPhysicsObject2D ObjectA = objectA;
+    
+        /// <summary>
+        /// The second object in the collision
+        /// </summary>
+        public IPhysicsObject2D ObjectB = objectB;
+    
+        /// <summary>
+        /// The collision normal vector, pointing from the point inside objectA towards objectB.
         /// </summary>
         public AeroVec2 Normal;
-
+    
         /// <summary>
-        /// The first object involved in the collision
+        /// The points of contact between the two bodies
         /// </summary>
-        public IPhysicsObject2D ObjectA;
-
-        /// <summary>
-        /// The second object involved in the collision
-        /// </summary>
-        public IPhysicsObject2D ObjectB;
-
-        /// <summary>
-        /// The contact points generated for this collision.
-        /// For circle-circle collisions this will typically be 1 point.
-        /// For polygon collisions this can be 1-2 points.
-        /// </summary>
-        public List<ContactPoint> ContactPoints;
-
-        /// <summary>
-        /// The maximum penetration depth across all contact points
-        /// </summary>
-        public float MaxDepth => ContactPoints.Count > 0 ? 
-            ContactPoints.Max(cp => cp.Depth) : 0;
+        public ContactPoint Contact = contact;
     }
+
 }

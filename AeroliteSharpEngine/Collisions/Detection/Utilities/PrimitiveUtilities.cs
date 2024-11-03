@@ -102,7 +102,7 @@ public static class PrimitiveUtilities
             float denominator = AeroVec2.Cross(a, b);
 
             // Check if lines are parallel
-            if (Math.Abs(denominator) < float.Epsilon)
+            if (AeroMathExtensions.IsNearlyZero(denominator))
             {
                 return false;
             }
