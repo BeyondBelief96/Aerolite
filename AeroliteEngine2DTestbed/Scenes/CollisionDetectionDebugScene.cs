@@ -138,17 +138,15 @@ public class CollisionDetectionDebugScene : Scene
             new Vector2(manifold.Contact.EndPoint.X, manifold.Contact.EndPoint.Y),
             _screen.Width,
             _screen.Height);
+        
+        var normalEndPoint = CoordinateSystem.ScreenToRender(
+            new Vector2(manifold.Contact.StartPoint.X + manifold.Normal.X * 15, manifold.Contact.StartPoint.Y + manifold.Normal.Y * 15),
+            _screen.Width, _screen.Height);
 
         // Draw contact points
-        _shapes.DrawCircleFill(pointOnA, 3, 16, Color.Red); // Point on A
-        _shapes.DrawCircleFill(pointOnB, 3, 16, Color.Purple);  // Point on B
-
-        // Draw normal vector with arrow head
-        var normalVector = new Vector2(manifold.Normal.X, manifold.Normal.Y);
-        var normalEnd = pointOnB + normalVector * 10;
-
-        // Draw main line
-        _shapes.DrawLine(pointOnB, normalEnd, Color.Green);
+        _shapes.DrawCircleFill(pointOnA, 3, 16, Color.Magenta); // Point on A
+        _shapes.DrawCircleFill(pointOnB, 3, 16, Color.Magenta);  // Point on B
+        _shapes.DrawLine(pointOnA, normalEndPoint, Color.Magenta);
     }
 
     public override void Update(GameTime gameTime)

@@ -144,16 +144,30 @@ namespace AeroliteSharpEngine.AeroMath
         #endregion
 
         #region Operator Overloads
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator +(AeroVec2 a, AeroVec2 b) => new AeroVec2(a.X + b.X, a.Y + b.Y);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator -(AeroVec2 a, AeroVec2 b) => new AeroVec2(a.X - b.X, a.Y - b.Y);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator *(AeroVec2 v, float s) => new AeroVec2(v.X * s, v.Y * s);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator *(float s, AeroVec2 v) => new AeroVec2(v.X * s, v.Y * s);
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator *(AeroVec2 v, int i) => new AeroVec2(v.X * i, v.Y * i);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator *( int i, AeroVec2 v) => new AeroVec2(v.X * i, v.Y * i);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator /(AeroVec2 v, float s) => new AeroVec2(v.X / s, v.Y / s);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static AeroVec2 operator -(AeroVec2 v) => new AeroVec2(-v.X, -v.Y);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(AeroVec2 lhs, AeroVec2 rhs) => lhs.Equals(rhs);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(AeroVec2 lhs, AeroVec2 rhs) => !lhs.Equals(rhs);
 
         public readonly override bool Equals(object? obj)

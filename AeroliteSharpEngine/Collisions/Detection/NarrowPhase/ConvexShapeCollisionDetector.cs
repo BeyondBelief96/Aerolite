@@ -46,7 +46,8 @@ public class ConvexShapeCollisionDetector : INarrowPhase
         var ab = bodyB.Position - bodyA.Position;
         var distanceSquared = ab.MagnitudeSquared;
         var radiusSum = circleA.Radius + circleB.Radius;
-
+        
+        // If true, then no collision is detected, early return.
         if (distanceSquared > radiusSum * radiusSum)
         {
             return manifold;
@@ -65,8 +66,17 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             };
             return manifold;
         }
-
+        
+        // Compute contact information
         manifold.HasCollision = true;
+        manifold.Normal = ab.UnitVector();
+        manifold.Contact = new ContactPoint()
+        {
+            StartPoint = bodyB.Position - manifold.Normal * circleB.Radius,
+            EndPoint = bodyA.Position + manifold.Normal * circleA.Radius,
+        };
+        
+        manifold.Contact.Depth = (manifold.Contact.EndPoint - manifold.Contact.StartPoint).Magnitude;
 
         return manifold;
     }
