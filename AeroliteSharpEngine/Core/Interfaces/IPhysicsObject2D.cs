@@ -18,6 +18,16 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// Damping constant to help mitigate numerical errors.
         /// </summary>
         float Damping { get; set; }
+        
+        /// <summary>
+        /// Represents the coefficient of restitution of the object. Ranges between 0 - 1;
+        /// </summary>
+        float Restitution { get; set; }
+        
+        /// <summary>
+        /// Represents the coefficient of friction of the object. 
+        /// </summary>
+        float Friction { get; set; }
 
         /// <summary>
         /// The position of the objects center of mass.
@@ -76,6 +86,12 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// </summary>
         /// <param name="force"></param>
         void ApplyForce(AeroVec2 force);
+        
+        /// <summary>
+        /// Applies an impulse to the object changing its velocity instantaneously. 
+        /// </summary>
+        /// <param name="j"></param>
+        void ApplyImpulse(AeroVec2 j);
 
         /// <summary>
         /// Removes all forces from the object.

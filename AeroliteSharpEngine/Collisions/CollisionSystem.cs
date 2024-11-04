@@ -41,7 +41,7 @@ namespace AeroliteSharpEngine.Collisions
 
         public void HandleCollisions(IReadOnlyList<IPhysicsObject2D>? objects)
         {
-            if (objects == null) return;
+            if (objects == null || objects.Count == 0) return;
             if (Configuration.ValidateConvexShapes)
             {
                 ValidateNewShapes(objects);
@@ -49,7 +49,7 @@ namespace AeroliteSharpEngine.Collisions
 
             _collisions.Clear();
             _potentialPairs.Clear();
-
+            
             // First broad phase: Spatial partitioning
             Configuration.BroadPhase.Update(objects);
             var spatialPairs = Configuration.BroadPhase.FindPotentialCollisions().ToList();
@@ -71,6 +71,8 @@ namespace AeroliteSharpEngine.Collisions
             }
             
             // Resolve collisions
+            if(_collisions.Count == 0) return;
+            
             Configuration.CollisionResolver.ResolveCollisions(_collisions);
         }
         

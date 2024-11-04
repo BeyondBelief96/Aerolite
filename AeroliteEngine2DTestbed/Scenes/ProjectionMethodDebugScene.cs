@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using AeroliteEngine2DTestbed.Helpers;
+using AeroliteSharpEngine.Collisions.Detection;
+using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
@@ -10,7 +12,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace AeroliteEngine2DTestbed.Scenes
 {
-    public class CollisionResolutionTestScene : Scene
+    public class ProjectionMethodDebugScene : Scene
     {
         private readonly AeroWorld2D world;
         private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
@@ -19,7 +21,7 @@ namespace AeroliteEngine2DTestbed.Scenes
         private readonly Color centerColor = new Color(100, 150, 255);
         private readonly Color spawnedColor = new Color(255, 150, 100);
 
-        public CollisionResolutionTestScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
+        public ProjectionMethodDebugScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
             : base(game, screen, sprites, shapes)
         {
             // Create shape creators
@@ -35,7 +37,9 @@ namespace AeroliteEngine2DTestbed.Scenes
             // Initialize world with no gravity
             var config = AeroWorldConfiguration.Default
                 .WithGravity(0)
-                .WithPerformanceMonitoring(true);
+                .WithPerformanceMonitoring(true)
+                .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
+                    .WithCollisionResolver(new ProjectionCollisionResolver()));
             
             world = new AeroWorld2D(config);
             

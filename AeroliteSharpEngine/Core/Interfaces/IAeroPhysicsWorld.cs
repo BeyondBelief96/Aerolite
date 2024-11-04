@@ -33,8 +33,12 @@ public interface IAeroPhysicsWorld
     /// <summary>
     /// Returns an iterable list of the current objects present in the world.
     /// </summary>
-    /// <returns></returns>
     IReadOnlyList<IPhysicsObject2D> GetObjects();
+    
+    /// <summary>
+    /// Returns an enumerable list of non-static physics objects in the world.
+    /// </summary>
+    IReadOnlyList<IPhysicsObject2D> GetDynamicObjects();
 
     /// <summary>
     /// Returns any physics objects in the world that implement <see cref="IBody2D"/>

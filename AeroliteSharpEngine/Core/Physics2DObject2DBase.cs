@@ -9,14 +9,26 @@ namespace AeroliteSharpEngine.Core
     /// </summary>
     public abstract class Physics2DObject2DBase : IPhysicsObject2D
     {
+        #region Fields
+        
         private static int _nextId;
         private static readonly object IdLock = new object();
-
-        /// <summary>
-        /// Unique identifier for this physics object
-        /// </summary>
+        
+        #endregion
+        
+        #region Properties
+        
         public int Id { get; }
         public float Damping { get; set; }
+
+        private float _restitution;
+        public float Restitution
+        {
+            get => _restitution;
+            set => _restitution = AeroMathExtensions.Clamp(value, 0, 1);
+        }
+
+        public float Friction { get; set; }
         public AeroVec2 Position { get; set; }
         public AeroVec2 PreviousPosition { get; set; }
         public AeroVec2 Velocity { get; set; }
@@ -27,8 +39,10 @@ namespace AeroliteSharpEngine.Core
         public bool IsStatic { get; private set; }
         public bool HasFiniteMass => !AeroMathExtensions.AreEqual(InverseMass, 0.0f);
         public AeroShape2D Shape { get; private set; }
+        
+        #endregion
 
-        protected Physics2DObject2DBase(float mass, AeroShape2D shape)
+        protected Physics2DObject2DBase(float mass, AeroShape2D shape, float restitution = 0.5f, float friction = 0.5f)
         {
             // Generate unique ID
             lock (IdLock)
@@ -54,6 +68,8 @@ namespace AeroliteSharpEngine.Core
             Acceleration = new AeroVec2();
             NetForce = new AeroVec2();
             Damping = 0.99f;
+            Restitution = restitution;
+            Friction = friction;
             Shape = shape;
         }
 
@@ -66,6 +82,11 @@ namespace AeroliteSharpEngine.Core
         public virtual void ClearForces()
         {
             NetForce = new AeroVec2();
+        }
+
+        public virtual void ApplyImpulse(AeroVec2 j)
+        {
+            Velocity += j * InverseMass;
         }
         
         public virtual void UpdateGeometry()

@@ -17,7 +17,8 @@ namespace AeroliteSharpEngine.Core
         public float Inertia { get; private set; }
         public float InverseInertia { get; private set; }
 
-        public AeroBody2D(float x, float y, float mass, AeroShape2D shape) : base(mass, shape)
+        public AeroBody2D(float x, float y, float mass, AeroShape2D shape, 
+            float restitution = 0.5f, float friction = 0.5f) : base(mass, shape, restitution, friction)
         {
             Position = new AeroVec2(x, y);
             PreviousPosition = new AeroVec2(x, y);
@@ -28,10 +29,6 @@ namespace AeroliteSharpEngine.Core
             {
                 InverseInertia = 1.0f / Inertia;
             }
-
-            // Set defaults
-            Restitution = 0.5f;
-            Friction = 0.2f;
         }
 
         public void ApplyTorque(float torque)

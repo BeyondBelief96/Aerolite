@@ -17,6 +17,13 @@ public static class AeroMathExtensions
     /// </summary>
     private const float DefaultTolerance = FloatEpsilon * 10f;
 
+    public static float Clamp(float value, float min, float max)
+    {
+        if (value < min) value = min;
+        if(value > max) value = max;
+        return value;
+    }
+    
     /// <summary>
     /// Determines if a float value is nearly zero within a specified tolerance
     /// </summary>

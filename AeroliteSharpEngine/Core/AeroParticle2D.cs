@@ -12,7 +12,8 @@ namespace AeroliteSharpEngine.Core
     /// </summary>
     public class AeroParticle2D : Physics2DObject2DBase
     {
-        public AeroParticle2D(float x, float y, float mass, float radius = 5.0f) : base(mass, new AeroCircle(radius))
+        public AeroParticle2D(float x, float y, float mass, 
+            float restitution = 0.5f, float friction = 0.5f, float radius = 5.0f) : base(mass, new AeroCircle(radius), restitution, friction)
         {
             Position = new AeroVec2(x, y);
             PreviousPosition = new AeroVec2(x, y);

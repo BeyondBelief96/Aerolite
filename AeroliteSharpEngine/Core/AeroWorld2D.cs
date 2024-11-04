@@ -41,6 +41,8 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
 
     public IReadOnlyList<IPhysicsObject2D> GetObjects() => _physicsObjects;
     
+    public IReadOnlyList<IPhysicsObject2D> GetDynamicObjects() => _physicsObjects.Where(x => !x.IsStatic).ToList();
+    
     public IReadOnlyList<IBody2D> GetBodies() => _physicsObjects.OfType<IBody2D>().ToList();
     
     public IReadOnlyList<AeroParticle2D> GetParticles() => _physicsObjects.OfType<AeroParticle2D>().ToList();
@@ -113,7 +115,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             physicsObject.UpdateGeometry();
         }
         
-        CollisionSystem.HandleCollisions(_physicsObjects);
+        CollisionSystem.HandleCollisions(GetDynamicObjects());
 
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);
