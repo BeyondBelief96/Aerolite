@@ -1,15 +1,17 @@
-﻿using AeroliteSharpEngine.AeroMath;
-using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using AeroliteSharpEngine.AeroMath;
+using Microsoft.Xna.Framework;
+
+namespace AeroliteEngine2DTestbed.Helpers;
 
 public static class RandomUtils
 {
-    private static Random random = new Random();
+    private static readonly Random Random = new Random();
 
     public static float Range(float min, float max)
     {
-        return (float)(random.NextDouble() * (max - min) + min);
+        return (float)(Random.NextDouble() * (max - min) + min);
     }
 
     public static Vector2 RandomDirection()
@@ -40,7 +42,7 @@ public static class RandomUtils
 
     public static float RandomFloat(float min, float max)
     {
-        return (float)(random.NextDouble() * (max - min) + min);
+        return (float)(Random.NextDouble() * (max - min) + min);
     }
 
     public static int[] TriangulatePolygon(int vertexCount)
