@@ -74,7 +74,7 @@ public class CollisionDetectionDebugScene : Scene
         if (mouseBody == null) return;
         
         // Remove current mouse body
-        world.RemoveObject(mouseBody);
+        world.RemovePhysicsObject(mouseBody);
 
         // Cycle to next shape
         currentMouseShapeIndex = (currentMouseShapeIndex + 1) % shapeCreators.Count;

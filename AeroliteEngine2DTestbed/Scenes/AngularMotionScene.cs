@@ -73,7 +73,7 @@ public class AngularMotionScene : Scene
         // Toggle rotation direction with space
         if (keyboard.IsKeyClicked(Keys.Space))
         {
-            foreach (var body in _world.GetBodies())
+            foreach (var body in _world.GetDynamicBodies())
             {
                 _bodyTorques[body] *= -1;  // Reverse the stored torque
             }
@@ -82,7 +82,7 @@ public class AngularMotionScene : Scene
         // Reset rotations with R
         if (keyboard.IsKeyClicked(Keys.R))
         {
-            foreach (var body in _world.GetBodies())
+            foreach (var body in _world.GetDynamicBodies())
             {
                 body.Angle = 0;
                 body.AngularVelocity = 0;
@@ -107,7 +107,7 @@ public class AngularMotionScene : Scene
     
     _shapes.Begin(_camera);
     
-    foreach (var body in _world.GetBodies())
+    foreach (var body in _world.GetDynamicBodies())
     {
         // Transform body position to render space
         var renderPos = CoordinateSystem.ScreenToRender(

@@ -118,6 +118,10 @@ public class ImpulseMethodDebugScene : Scene
             Restitution = 0.3f, // Some bounce
             Friction = 0.5f, // Some friction
         };
+        
+        Random rand = new Random();
+        float vx = (float)(rand.NextDouble() - 0.5) * 500; // Random X velocity
+        body.Velocity = new AeroVec2(vx, 0);
 
         world.AddPhysicsObject(body);
     }

@@ -142,79 +142,7 @@ public class UniformGridDebugScene : Scene
 
         world.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
-
-    private void DrawBody(AeroBody2D body, Color color)
-    {
-        // Transform position to render coordinates
-        Vector2 renderPos = CoordinateSystem.ScreenToRender(
-            new Vector2(body.Position.X, body.Position.Y), 
-            _screen.Width, 
-            _screen.Height
-        );
     
-        switch (body.Shape)
-        {
-            case AeroCircle circle:
-                _shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
-                break;
-    
-            case AeroBox box:
-                _shapes.DrawBoxFill(renderPos, box.Width, box.Height, body.Angle, color);
-                break;
-    
-            case AeroPolygon polygon:
-                var vertices = polygon.WorldVertices
-                    .Select(v => CoordinateSystem.ScreenToRender(
-                        new Vector2(v.X, v.Y),
-                        _screen.Width,
-                        _screen.Height))
-                    .ToArray();
-    
-                // Draw filled polygon
-                for (var i = 0; i < vertices.Length - 2; i++)
-                {
-                    _shapes.DrawTriangleFill(
-                        vertices[0],
-                        vertices[i + 1],
-                        vertices[i + 2],
-                        color
-                    );
-                }
-                break;
-        }
-    }
-    
-    private void DrawBoundingArea(IBoundingArea boundingArea, Color color)
-    {
-        var pos = CoordinateSystem.ScreenToRender(
-            new Vector2(boundingArea.Center.X, boundingArea.Center.Y),
-            _screen.Width,
-            _screen.Height
-        );
-
-        switch (boundingArea)
-        {
-            case AABB2D aabb:
-                // Convert half extents to render coordinates
-                Vector2 halfExtents = new(aabb.HalfExtents.X, aabb.HalfExtents.Y);
-                _shapes.DrawBox(
-                    pos,
-                    halfExtents.X * 2, // Full width
-                    halfExtents.Y * 2, // Full height
-                    color
-                );
-                break;
-
-            case BoundingCircle circle:
-                _shapes.DrawCircle(
-                    pos,
-                    circle.Radius,
-                    32, // segments
-                    color
-                );
-                break;
-        }
-    }
     public override void Draw(GameTime gameTime)
     {
         _screen.Set();
@@ -224,45 +152,7 @@ public class UniformGridDebugScene : Scene
         // Draw grid with transformed coordinates
         if (showGrid)
         {
-            // Draw vertical grid lines
-            for (float x = 0; x < _screen.Width; x += cellSize)
-            {
-                var gridLineRenderXPosStart = CoordinateSystem.ScreenToRender(
-                    new Vector2(x, 0), 
-                    _screen.Width, 
-                    _screen.Height
-                );
-                var gridLineRenderXPosEnd = CoordinateSystem.ScreenToRender(
-                    new Vector2(x, _screen.Height), 
-                    _screen.Width, 
-                    _screen.Height
-                );
-                _shapes.DrawLine(
-                    gridLineRenderXPosStart,
-                    gridLineRenderXPosEnd,
-                    new Color(50, 50, 50)
-                );
-            }
-    
-            // Draw horizontal grid lines
-            for (float y = 0; y < _screen.Height; y += cellSize)
-            {
-                var gridLineRenderYPosStart = CoordinateSystem.ScreenToRender(
-                    new Vector2(0, y), 
-                    _screen.Width, 
-                    _screen.Height
-                );
-                var gridLineRenderYPosEnd = CoordinateSystem.ScreenToRender(
-                    new Vector2(_screen.Width, y), 
-                    _screen.Width, 
-                    _screen.Height
-                );
-                _shapes.DrawLine(
-                    gridLineRenderYPosStart,
-                    gridLineRenderYPosEnd,
-                    new Color(50, 50, 50)
-                );
-            }
+            AeroDrawingHelpers.DrawGrid(_screen, _shapes, cellSize);
         }
     
         // Draw static bodies
@@ -272,7 +162,7 @@ public class UniformGridDebugScene : Scene
                 Equals(pair.Item1, body) || Equals(pair.Item2, body));
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
-            DrawBody(body, drawColor);
+            AeroDrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
         }
     
         // Draw mouse body and its bounding area
@@ -281,12 +171,12 @@ public class UniformGridDebugScene : Scene
             bool inCollision = potentialCollisions.Any(pair => 
                 Equals(pair.Item1, mouseBody) || Equals(pair.Item2, mouseBody));
             
-            DrawBody(mouseBody, inCollision ? Color.White : Color.Orange);
+            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, _shapes, _screen);
             
             // Draw bounding area
             if (mouseBoundingArea != null)
             {
-                DrawBoundingArea(mouseBoundingArea, Color.Yellow * 0.5f);
+                AeroDrawingHelpers.DrawBoundingArea(mouseBoundingArea, Color.Yellow * 0.5f, _screen, _shapes);
             }
         }
     

@@ -1,6 +1,5 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions;
-using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core.Interfaces;
@@ -12,7 +11,8 @@ namespace AeroliteSharpEngine.Core;
 
 public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWorld
 {
-    private readonly List<IPhysicsObject2D> _physicsObjects = [];
+    private readonly List<IPhysicsObject2D> _dynamicObjects = [];
+    private readonly List<IPhysicsObject2D> _staticObjects = [];
     private readonly List<AeroVec2> _globalForces = [];
     private readonly ForceRegistry _forceRegistry = new();
     private IIntegrator _integrator = configuration.Integrator;
@@ -39,34 +39,50 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         CollisionSystem = new CollisionSystem(newConfig.CollisionSystemConfiguration);
     }
 
-    public IReadOnlyList<IPhysicsObject2D> GetObjects() => _physicsObjects;
+    public IReadOnlyList<IPhysicsObject2D> GetObjects() => _dynamicObjects.Concat(_staticObjects).ToList();
     
-    public IReadOnlyList<IPhysicsObject2D> GetDynamicObjects() => _physicsObjects.Where(x => !x.IsStatic).ToList();
+    public IReadOnlyList<IPhysicsObject2D> GetDynamicObjects() => _dynamicObjects.Where(x => !x.IsStatic).ToList();
     
-    public IReadOnlyList<IBody2D> GetBodies() => _physicsObjects.OfType<IBody2D>().ToList();
+    public IReadOnlyList<IPhysicsObject2D> GetStaticObjects() => _staticObjects.Where(x => !x.IsStatic).ToList();
     
-    public IReadOnlyList<AeroParticle2D> GetParticles() => _physicsObjects.OfType<AeroParticle2D>().ToList();
+    public IReadOnlyList<IBody2D> GetDynamicBodies() => _dynamicObjects.OfType<IBody2D>().ToList();
+    
+    public IReadOnlyList<AeroParticle2D> GetDynamicParticles() => _dynamicObjects.OfType<AeroParticle2D>().ToList();
 
     public IEnumerable<CollisionManifold> GetCollisions() => CollisionSystem.Collisions;
 
     public void ClearWorld()
     {
-        _physicsObjects.Clear();
+        _dynamicObjects.Clear();
+        _staticObjects.Clear();
         _globalForces.Clear();
         _forceRegistry.Clear();
         CollisionSystem.Clear();
     }
 
-    public void AddPhysicsObject(IPhysicsObject2D physicsObject2D)
+    public void ClearDynamicObjects()
     {
-        _physicsObjects.Add(physicsObject2D);
+        _dynamicObjects.Clear();
+        _globalForces.Clear();
+        _forceRegistry.Clear();
+        CollisionSystem.Clear();
+    }
+
+    public void AddPhysicsObject(IPhysicsObject2D obj)
+    {
+        if (obj.IsStatic)
+            _staticObjects.Add(obj);
+        else
+            _dynamicObjects.Add(obj);
     }
 
     // Remove by direct object reference
-    public void RemoveObject(IPhysicsObject2D physicsObject)
+    public void RemovePhysicsObject(IPhysicsObject2D obj)
     {
-        _physicsObjects.Remove(physicsObject);
-        _forceRegistry.RemoveObject(physicsObject);
+        if (obj.IsStatic)
+            _staticObjects.Remove(obj);
+        else
+            _dynamicObjects.Remove(obj);
     }
 
     public void AddForceGenerator(IPhysicsObject2D particle, IForceGenerator generator)
@@ -86,7 +102,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
 
         _forceRegistry.UpdateForces(dt);
 
-        foreach (var physicsObject in _physicsObjects.Where(physicsObject => !physicsObject.IsStatic))
+        foreach (var physicsObject in _dynamicObjects)
         {
             if (Gravity != 0)
             {
@@ -110,12 +126,14 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         }
         
         // Also update static bodies - they might be rotated/moved by the user
-        foreach (var physicsObject in _physicsObjects.Where(physicsObject => physicsObject.IsStatic))
+        foreach (var physicsObject in _dynamicObjects.Where(physicsObject => physicsObject.IsStatic))
         {
             physicsObject.UpdateGeometry();
         }
         
-        CollisionSystem.HandleCollisions(GetDynamicObjects());
+        //TODO: Maybe optimize how the collision system handles both static/dynamic objects.
+        // Currently this has allocate a new list in O(n) time each from which is not great.
+        CollisionSystem.HandleCollisions(GetObjects());
 
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);

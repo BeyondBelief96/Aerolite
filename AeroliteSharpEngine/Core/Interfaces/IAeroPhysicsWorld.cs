@@ -17,8 +17,7 @@ public interface IAeroPhysicsWorld
     /// during the time step update.
     /// </summary>
     float Gravity { get; set; }
-
-
+    
     /// <summary>
     /// Used to toggle performance monitoring for the physics engine.
     /// </summary>
@@ -31,7 +30,7 @@ public interface IAeroPhysicsWorld
     ICollisionSystem CollisionSystem { get; }
 
     /// <summary>
-    /// Returns an iterable list of the current objects present in the world.
+    /// Returns an iterable list of the current objects present in the world (static and dynamic).
     /// </summary>
     IReadOnlyList<IPhysicsObject2D> GetObjects();
     
@@ -39,18 +38,24 @@ public interface IAeroPhysicsWorld
     /// Returns an enumerable list of non-static physics objects in the world.
     /// </summary>
     IReadOnlyList<IPhysicsObject2D> GetDynamicObjects();
+    
+    /// <summary>
+    /// Returns an enumerable list of static physic objects in the world.
+    /// </summary>
+    /// <returns></returns>
+    IReadOnlyList<IPhysicsObject2D> GetStaticObjects();
 
     /// <summary>
     /// Returns any physics objects in the world that implement <see cref="IBody2D"/>
     /// </summary>
     /// <returns></returns>
-    IReadOnlyList<IBody2D> GetBodies();
+    IReadOnlyList<IBody2D> GetDynamicBodies();
 
     /// <summary>
     /// Returns any physics object in the world that are of type <see cref="AeroParticle2D"/>
     /// </summary>
     /// <returns></returns>
-    IReadOnlyList<AeroParticle2D> GetParticles();
+    IReadOnlyList<AeroParticle2D> GetDynamicParticles();
 
     /// <summary>
     /// Returns an iterable list of the current collisions for current time step of the world.
@@ -91,11 +96,22 @@ public interface IAeroPhysicsWorld
     /// </summary>
     /// <param name="physicsObject2D"></param>
     void AddPhysicsObject(IPhysicsObject2D physicsObject2D);
+    
+    /// <summary>
+    /// Removes a physics object from the world.
+    /// </summary>
+    /// <param name="physicsObject2D"></param>
+    void RemovePhysicsObject(IPhysicsObject2D physicsObject2D);
 
     /// <summary>
     /// Clears the world of all physics objects, and forces.
     /// </summary>
     void ClearWorld();
+
+    /// <summary>
+    /// Utility method to clear all dynamic (non-static) objects from the world.
+    /// </summary>
+    void ClearDynamicObjects();
 
     /// <summary>
     /// The main workhorse of the physics world. This simulates the current timestep for all current

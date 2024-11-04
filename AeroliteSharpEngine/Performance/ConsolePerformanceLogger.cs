@@ -47,8 +47,8 @@ public class ConsolePerformanceLogger : IPerformanceMonitor
         if (_stepTimes.Count > SampleSize)
             _stepTimes.Dequeue();
 
-        _bodyCount = world.GetBodies().Count;
-        _particleCount = world.GetParticles().Count;
+        _bodyCount = world.GetDynamicBodies().Count;
+        _particleCount = world.GetDynamicParticles().Count;
         _frameCount++;
         _accumulatedTime += stepTime;
 

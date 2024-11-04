@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
+using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
@@ -50,6 +52,38 @@ public static class AeroDrawingHelpers
                         color
                     );
                 }
+                break;
+        }
+    }
+    
+    public static void DrawBoundingArea(IBoundingArea boundingArea, Color color, Screen screen, Shapes shapes)
+    {
+        var pos = CoordinateSystem.ScreenToRender(
+            new Vector2(boundingArea.Center.X, boundingArea.Center.Y),
+            screen.Width,
+            screen.Height
+        );
+
+        switch (boundingArea)
+        {
+            case AABB2D aabb:
+                // Convert half extents to render coordinates
+                Vector2 halfExtents = new(aabb.HalfExtents.X, aabb.HalfExtents.Y);
+                shapes.DrawBox(
+                    pos,
+                    halfExtents.X * 2, // Full width
+                    halfExtents.Y * 2, // Full height
+                    color
+                );
+                break;
+
+            case BoundingCircle circle:
+                shapes.DrawCircle(
+                    pos,
+                    circle.Radius,
+                    32, // segments
+                    color
+                );
                 break;
         }
     }

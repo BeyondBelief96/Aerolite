@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AeroliteEngine2DTestbed.Helpers;
 using AeroliteSharpEngine.AeroMath;
+using AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
@@ -40,7 +41,7 @@ public class UniformGridRandomSpawnScene : Scene
     public UniformGridRandomSpawnScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
     {
-        world = new AeroWorld2D();
+        world = new AeroWorld2D(AeroWorldConfiguration.Default.WithPerformanceMonitoring(true));
         bodies = new List<(AeroBody2D, Color)>();
         random = new Random();
         potentialCollisions = [];
@@ -168,29 +169,7 @@ public class UniformGridRandomSpawnScene : Scene
         // Draw grid
         if (showGrid)
         {
-            // Draw vertical grid lines
-            for (float x = 0; x < _screen.Width; x += CellSize)
-            {
-                var gridLineRenderXPosStart = CoordinateSystem.ScreenToRender(new Vector2(x, 0), _screen.Width, _screen.Height);
-                var gridLineRenderXPosEnd = CoordinateSystem.ScreenToRender(new Vector2(x, _screen.Height), _screen.Width, _screen.Height);
-                _shapes.DrawLine(
-                    gridLineRenderXPosStart,
-                    gridLineRenderXPosEnd,
-                    new Color(50, 50, 50)
-                );
-            }
-
-            // Draw horizontal grid lines
-            for (float y = 0; y < _screen.Height; y += CellSize)
-            {
-                var gridLineRenderYPosStart = CoordinateSystem.ScreenToRender(new Vector2(0, y), _screen.Width, _screen.Height);
-                var gridLineRenderYPosEnd = CoordinateSystem.ScreenToRender(new Vector2(_screen.Width, y), _screen.Width, _screen.Height);
-                _shapes.DrawLine(
-                    gridLineRenderYPosStart,
-                    gridLineRenderYPosEnd,
-                    new Color(50, 50, 50)
-                );
-            }
+            AeroDrawingHelpers.DrawGrid(_screen, _shapes, CellSize);
         }
 
         // Draw all bodies
@@ -198,43 +177,16 @@ public class UniformGridRandomSpawnScene : Scene
         {
             // Check if this body is in any potential collision pairs
             bool inCollision = potentialCollisions.Any(pair => 
-                pair.Item1 == body || pair.Item2 == body);
+                pair.Item1.Equals(body) || pair.Item2.Equals(body));
             
             // Use brighter color for bodies in potential collisions
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 1.0f) : color;
 
-            Vector2 renderPos = CoordinateSystem.ScreenToRender( new Vector2(body.Position.X, body.Position.Y), _screen.Width, _screen.Height);
-
-            switch (body.Shape)
-            {
-                case AeroCircle circle:
-                    _shapes.DrawCircleFill(renderPos, circle.Radius, 32, drawColor);
-                    break;
-
-                case AeroBox box:
-                    _shapes.DrawBoxFill(renderPos, box.Width, box.Height, body.Angle, drawColor);
-                    break;
-
-                case AeroPolygon polygon:
-                    var vertices = polygon.WorldVertices
-                        .Select(v => new Vector2(v.X, v.Y))
-                        .ToArray();
-
-                    // Draw filled polygon
-                    for (var i = 0; i < vertices.Length - 2; i++)
-                    {
-                        _shapes.DrawTriangleFill(
-                            vertices[0],
-                            vertices[i + 1],
-                            vertices[i + 2],
-                            drawColor
-                        );
-                    }
-                    break;
-            }
+            AeroDrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
+            var boundingArea = AABB2D.CreateFromShape(body.Shape, body.Position);
+            AeroDrawingHelpers.DrawBoundingArea(boundingArea, Color.Yellow * 0.5f, _screen, _shapes);
         }
 
-        // Draw debug info
         _shapes.End();
         _screen.Unset();
         _screen.Present(_sprites);
