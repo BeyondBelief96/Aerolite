@@ -20,7 +20,11 @@ namespace AeroliteSharpEngine.Collisions.Detection.BroadPhase
         private readonly Dictionary<long, List<IPhysicsObject2D>> _grid = new();
         public void Update(IEnumerable<IPhysicsObject2D> objects)
         {
-            _grid.Clear();
+            // Only clear the underlying cell buckets, no need to clear cell hash each time.
+            foreach (var bucket in _grid.Values)
+            {
+                bucket.Clear();
+            }
 
             foreach (var obj in objects)
             {

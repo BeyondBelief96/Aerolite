@@ -52,10 +52,10 @@ namespace AeroliteSharpEngine.Collisions
             
             // First broad phase: Spatial partitioning
             Configuration.BroadPhase.Update(objects);
-            var spatialPairs = Configuration.BroadPhase.FindPotentialCollisions().ToList();
+            var potentialPairs = Configuration.BroadPhase.FindPotentialCollisions().ToList();
 
-            if (spatialPairs.Count == 0) return;
-            foreach (var (objA, objB) in spatialPairs)
+            if (potentialPairs.Count == 0) return;
+            foreach (var (objA, objB) in potentialPairs)
             {
                 _potentialPairs.Add((objA, objB));
             }

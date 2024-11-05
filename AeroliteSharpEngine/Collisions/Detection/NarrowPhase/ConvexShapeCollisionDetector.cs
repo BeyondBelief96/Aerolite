@@ -99,7 +99,7 @@ public class ConvexShapeCollisionDetector : INarrowPhase
         
         if(!hasCollision) return manifold;
 
-        manifold.HasCollision = true;
+        manifold.HasCollision = hasCollision;
         manifold.Normal = normal;
 
         return manifold;

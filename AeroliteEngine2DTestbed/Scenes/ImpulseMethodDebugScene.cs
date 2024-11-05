@@ -36,15 +36,22 @@ public class ImpulseMethodDebugScene : Scene
 
         // Initialize world with gravity
         var config = AeroWorldConfiguration.Default
-            .WithGravity(50)  // Standard gravity
+            .WithGravity(500.0f)  // Standard gravity
             .WithPerformanceMonitoring(true)
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
                 .WithCollisionResolver(new ImpulseMethodCollisionResolver()));
         
         world = new AeroWorld2D(config);
+        
+        // Simulate wind.
+        // world.AddGlobalForce(new AeroVec2(50.0f, 0.0f));
+        
+        // Add large static circle body in middle.
+        var staticCircle = new AeroBody2D(_screen.Width / 2, _screen.Height / 2, 0.0f, new AeroCircle(300.0f), 1.0f, 0.0f);
+        world.AddPhysicsObject(staticCircle);
 
         // Create static boundaries
-        CreateBoundaries(screen);
+        // CreateBoundaries(screen);
         
         _camera.Zoom = 1;
     }
@@ -112,15 +119,10 @@ public class ImpulseMethodDebugScene : Scene
     private void SpawnShapeAtPosition(float x, float y)
     {
         var (_, creator) = shapeCreators[currentShapeIndex];
-        var body = new AeroBody2D(x, y, 1.0f, creator(x, y))
-        {
-            // Set some default physical properties
-            Restitution = 0.3f, // Some bounce
-            Friction = 0.5f, // Some friction
-        };
+        var body = new AeroBody2D(x, y, 1.0f, creator(x, y), 1.0f);
         
         Random rand = new Random();
-        float vx = (float)(rand.NextDouble() - 0.5) * 500; // Random X velocity
+        float vx = 500.0f; // Random X velocity
         body.Velocity = new AeroVec2(vx, 0);
 
         world.AddPhysicsObject(body);

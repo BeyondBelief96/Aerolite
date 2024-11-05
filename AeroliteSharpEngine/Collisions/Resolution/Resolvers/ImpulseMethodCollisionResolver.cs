@@ -7,24 +7,28 @@ namespace AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 
 public class ImpulseMethodCollisionResolver : ICollisionResolver
 {
+    private readonly ProjectionCollisionResolver  _projectionResolver = new();
     public void ResolveCollisions(IReadOnlyList<CollisionManifold> collisionManifolds)
     {
+        _projectionResolver.ResolveCollisions(collisionManifolds);
         foreach (var collisionManifold in collisionManifolds)
         {
             DetermineLinearImpulse(collisionManifold);
         }
     }
 
-    private void DetermineLinearImpulse(CollisionManifold manifold)
+    private static void DetermineLinearImpulse(CollisionManifold manifold)
     {
         var objectA = manifold.ObjectA;
         var objectB = manifold.ObjectB;
         
         var e = Math.Min(manifold.ObjectA.Restitution, manifold.ObjectB.Restitution);
         var vRel = objectA.Velocity - objectB.Velocity;
+        var vRelNormal = vRel.Dot(manifold.Normal);
         
-        var impulseMagnitude = -(1 + e) * AeroVec2.Dot(vRel, manifold.Normal) / (objectA.InverseMass + objectB.InverseMass);
-        var jn = manifold.Normal * impulseMagnitude;
+        var impulseDirection = manifold.Normal;
+        var impulseMagnitude = (-(1 + e) * vRelNormal) / (objectA.InverseMass + objectB.InverseMass);
+        var jn = impulseDirection * impulseMagnitude;
         
         objectA.ApplyImpulse(jn);
         objectB.ApplyImpulse(-jn);

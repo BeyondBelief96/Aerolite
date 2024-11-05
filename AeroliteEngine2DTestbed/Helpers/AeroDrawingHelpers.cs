@@ -32,9 +32,10 @@ public static class AeroDrawingHelpers
                 shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
                 break;
 
-            case AeroBox box:
-                shapes.DrawBoxFill(renderPos, box.Width, box.Height, body.Angle, color);
-                break;
+            // The draw function rotates counter-clockwise, where my physics engine rotation is clockwise, so we negate the angle.
+            // case AeroBox box:
+            //     shapes.DrawBoxFill(renderPos, box.Width, box.Height, -body.Angle, color);
+            //     break;
 
             case AeroPolygon polygon:
                 var vertices = polygon.WorldVertices

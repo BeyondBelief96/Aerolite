@@ -86,17 +86,18 @@ namespace AeroliteSharpEngine.Core
 
         public virtual void ApplyImpulse(AeroVec2 j)
         {
+            if (IsStatic) return;
             Velocity += j * InverseMass;
         }
         
         public virtual void UpdateGeometry()
         {
-            // Base implementation does nothing since not all physics objects need geometry updates e.g. particles
+            // Base implementation does nothing since not all physics objects need geometry updates e.g. particles/circles
         }
 
         public override int GetHashCode()
         {
-            return Id;
+            return Id.GetHashCode();
         }
 
         public bool Equals(IPhysicsObject2D? other)

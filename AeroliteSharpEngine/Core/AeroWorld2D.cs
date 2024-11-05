@@ -115,18 +115,17 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
                 physicsObject.ApplyForce(force);
             }
             
-            // Only integrate if the bodies are non-static.
-            if (!physicsObject.IsStatic)
-            {
-                _integrator.IntegrateLinear(physicsObject, dt);
-                _integrator.IntegrateAngular(physicsObject, dt);
-            }
-            
-            physicsObject.UpdateGeometry();
+            _integrator.IntegrateLinear(physicsObject, dt);
+            _integrator.IntegrateAngular(physicsObject, dt);
         }
         
         // Also update static bodies - they might be rotated/moved by the user
-        foreach (var physicsObject in _dynamicObjects.Where(physicsObject => physicsObject.IsStatic))
+        foreach (var physicsObject in _staticObjects)
+        {
+            physicsObject.UpdateGeometry();
+        }
+        
+        foreach (var physicsObject in _dynamicObjects)
         {
             physicsObject.UpdateGeometry();
         }
@@ -134,7 +133,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         //TODO: Maybe optimize how the collision system handles both static/dynamic objects.
         // Currently this has allocate a new list in O(n) time each from which is not great.
         CollisionSystem.HandleCollisions(GetObjects());
-
+        
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);
     }

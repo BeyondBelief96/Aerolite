@@ -16,17 +16,17 @@ public class AeroBox : AeroPolygon, IConvexShape
         UpdateCachedProperties();
     }
 
-    private static IEnumerable<AeroVec2> CreateBoxVertices(float width, float height)
+    private static List<AeroVec2> CreateBoxVertices(float width, float height)
     {
         float halfWidth = width * 0.5f;
         float halfHeight = height * 0.5f;
-        return new List<AeroVec2>
-        {
-            new AeroVec2(-halfWidth, -halfHeight),  // Bottom left
-            new AeroVec2(halfWidth, -halfHeight),   // Bottom right
-            new AeroVec2(halfWidth, halfHeight),    // Top right
-            new AeroVec2(-halfWidth, halfHeight)    // Top left
-        };
+        return
+        [
+            new AeroVec2(-halfWidth, -halfHeight), // Bottom left
+            new AeroVec2(halfWidth, -halfHeight),  // Bottom right
+            new AeroVec2(halfWidth, halfHeight),   // Top right
+            new AeroVec2(-halfWidth, halfHeight),  // Top left
+        ];
     }
 
     protected sealed override void UpdateCachedProperties()
