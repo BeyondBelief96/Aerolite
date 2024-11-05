@@ -31,25 +31,25 @@ public class AngularMotionScene : Scene
     {
         // Create a circle
         var circle = new AeroCircle(30f);
-        var circleBody = new AeroBody2D(200, _screen.Height / 2, 1.0f, circle);
+        var circleBody = new AeroBody2D(200, Screen.Height / 2, 1.0f, circle);
         _world.AddPhysicsObject(circleBody);
         _bodyTorques[circleBody] = RotationForce;
 
         // Create a box
         var box = new AeroBox(60f, 60f);
-        var boxBody = new AeroBody2D(400, _screen.Height / 2, 1.0f, box);
+        var boxBody = new AeroBody2D(400, Screen.Height / 2, 1.0f, box);
         _world.AddPhysicsObject(boxBody);
         _bodyTorques[boxBody] = RotationForce;
         
         // Create a triangle
         var triangle = new AeroTriangle(100, 100);
-        var triangleBody = new AeroBody2D(600, _screen.Height / 2, 1.0f, triangle);
+        var triangleBody = new AeroBody2D(600, Screen.Height / 2, 1.0f, triangle);
         _world.AddPhysicsObject(triangleBody);
         _bodyTorques[triangleBody] = RotationForce;
 
         // Create a pentagon
         var pentagon = new AeroRegularPolygon(3, 50);
-        var pentagonBody = new AeroBody2D(800, _screen.Height / 2, 1.0f, pentagon);
+        var pentagonBody = new AeroBody2D(800, Screen.Height / 2, 1.0f, pentagon);
         _world.AddPhysicsObject(pentagonBody);
         _bodyTorques[pentagonBody] = RotationForce;
 
@@ -66,9 +66,9 @@ public class AngularMotionScene : Scene
         
         // Camera zoom controls
         if (keyboard.IsKeyDown(Keys.A))
-            _camera.IncZoom();
+            Camera.IncZoom();
         if (keyboard.IsKeyDown(Keys.Z))
-            _camera.DecZoom();
+            Camera.DecZoom();
 
         // Toggle rotation direction with space
         if (keyboard.IsKeyClicked(Keys.Space))
@@ -102,25 +102,25 @@ public class AngularMotionScene : Scene
 
     public override void Draw(GameTime gameTime)
 {
-    _screen.Set();
-    _game.GraphicsDevice.Clear(new Color(50, 60, 70));
+    Screen.Set();
+    Game.GraphicsDevice.Clear(new Color(50, 60, 70));
     
-    _shapes.Begin(_camera);
+    Shapes.Begin(Camera);
     
     foreach (var body in _world.GetDynamicBodies())
     {
         // Transform body position to render space
         var renderPos = CoordinateSystem.ScreenToRender(
             new Vector2(body.Position.X, body.Position.Y),
-            _screen.Width,
-            _screen.Height
+            Screen.Width,
+            Screen.Height
         );
 
         switch (body.Shape)
         {
             case AeroCircle circle:
                 // Draw circle with a radius line to show rotation
-                _shapes.DrawCircle(
+                Shapes.DrawCircle(
                     renderPos.X, 
                     renderPos.Y, 
                     circle.Radius, 
@@ -134,7 +134,7 @@ public class AngularMotionScene : Scene
                     renderPos.Y + circle.Radius * MathF.Sin(body.Angle)
                 );
                 
-                _shapes.DrawLine(
+                Shapes.DrawLine(
                     renderPos,
                     endPoint, 
                     Color.Red
@@ -146,26 +146,26 @@ public class AngularMotionScene : Scene
                 var vertices = polygon.WorldVertices
                     .Select(v => CoordinateSystem.ScreenToRender(
                         new Vector2(v.X, v.Y),
-                        _screen.Width,
-                        _screen.Height))
+                        Screen.Width,
+                        Screen.Height))
                     .ToList();
                 
                 // Draw polygon edges
-                _shapes.DrawPolygon(vertices.ToArray(), Color.White);
+                Shapes.DrawPolygon(vertices.ToArray(), Color.White);
                 
                 // Draw center point
-                _shapes.DrawCircleFill(renderPos.X, renderPos.Y, 2, 8, Color.Red);
+                Shapes.DrawCircleFill(renderPos.X, renderPos.Y, 2, 8, Color.Red);
                 break;
         }
     }
 
     // Optionally, draw the coordinate system axes for debugging
-    var (left, right, bottom, top) = CoordinateSystem.GetRenderBounds(_screen.Width, _screen.Height);
-    _shapes.DrawLine(new Vector2(left, 0), new Vector2(right, 0), Color.Yellow);  // X axis
-    _shapes.DrawLine(new Vector2(0, bottom), new Vector2(0, top), Color.Yellow);  // Y axis
+    var (left, right, bottom, top) = CoordinateSystem.GetRenderBounds(Screen.Width, Screen.Height);
+    Shapes.DrawLine(new Vector2(left, 0), new Vector2(right, 0), Color.Yellow);  // X axis
+    Shapes.DrawLine(new Vector2(0, bottom), new Vector2(0, top), Color.Yellow);  // Y axis
 
-    _shapes.End();
-    _screen.Unset();
-    _screen.Present(_sprites);
+    Shapes.End();
+    Screen.Unset();
+    Screen.Present(Sprites);
 }
 }

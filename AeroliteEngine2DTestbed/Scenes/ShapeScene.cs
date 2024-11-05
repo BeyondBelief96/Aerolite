@@ -39,7 +39,7 @@ public class ShapeScene : Scene
         random = new Random();
 
         // Set initial camera zoom
-        _camera.Zoom = 1;
+        Camera.Zoom = 1;
     }
 
     private Color GetRainbowColor()
@@ -92,19 +92,19 @@ public class ShapeScene : Scene
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
         // Camera controls
-        if (FlatKeyboard.Instance.IsKeyDown(Keys.A)) _camera.DecZoom();
-        if (FlatKeyboard.Instance.IsKeyDown(Keys.Z)) _camera.IncZoom();
+        if (FlatKeyboard.Instance.IsKeyDown(Keys.A)) Camera.DecZoom();
+        if (FlatKeyboard.Instance.IsKeyDown(Keys.Z)) Camera.IncZoom();
 
         if (FlatMouse.Instance.IsLeftMouseButtonPressed())
         {
             // Get raw screen mouse position
-            Vector2 mouseScreenPos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+            Vector2 mouseScreenPos = FlatMouse.Instance.GetMouseScreenPosition(Game, Screen);
 
             // Calculate direction and velocity based on render space coordinates
             Vector2 center = CoordinateSystem.ScreenToRender(
-                new Vector2(_screen.Width / 2, _screen.Height / 2),
-                _screen.Width,
-                _screen.Height
+                new Vector2(Screen.Width / 2, Screen.Height / 2),
+                Screen.Width,
+                Screen.Height
             );
             Vector2 direction = Vector2.Normalize(mouseScreenPos - center);
             Vector2 velocity = direction * SpawnForce;
@@ -119,12 +119,12 @@ public class ShapeScene : Scene
             if (!body.IsStatic)
             {
                 if (body.Position.X < 0)
-                    body.Position = new AeroVec2(_screen.Width, body.Position.Y);
-                if (body.Position.X > _screen.Width)
+                    body.Position = new AeroVec2(Screen.Width, body.Position.Y);
+                if (body.Position.X > Screen.Width)
                     body.Position = new AeroVec2(0, body.Position.Y);
                 if (body.Position.Y < 0)
-                    body.Position = new AeroVec2(body.Position.X, _screen.Height);
-                if (body.Position.Y > _screen.Height)
+                    body.Position = new AeroVec2(body.Position.X, Screen.Height);
+                if (body.Position.Y > Screen.Height)
                     body.Position = new AeroVec2(body.Position.X, 0);
             }
         }
@@ -134,27 +134,27 @@ public class ShapeScene : Scene
 
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+        Shapes.Begin(Camera);
 
         foreach (var (body, color) in bodies)
         {
             // Convert body position to render space
             Vector2 renderPos = CoordinateSystem.ScreenToRender(
                 new Vector2(body.Position.X, body.Position.Y),
-                _screen.Width,
-                _screen.Height
+                Screen.Width,
+                Screen.Height
             );
 
             switch (body.Shape)
             {
                 case AeroCircle circle:
-                    _shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
+                    Shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
                     break;
 
                 case AeroBox box:
-                    _shapes.DrawBoxFill(
+                    Shapes.DrawBoxFill(
                         renderPos,
                         box.Width,
                         box.Height,
@@ -167,33 +167,33 @@ public class ShapeScene : Scene
                     var renderVertices = polygon.WorldVertices.Select(v =>
                         CoordinateSystem.ScreenToRender(
                             new Vector2(v.X, v.Y),
-                            _screen.Width,
-                            _screen.Height
+                            Screen.Width,
+                            Screen.Height
                         )
                     ).ToArray();
 
                     // Draw vertices as points for debugging
                     foreach (var vertex in renderVertices)
                     {
-                        _shapes.DrawCircleFill(vertex, 5, 8, Color.Red);
+                        Shapes.DrawCircleFill(vertex, 5, 8, Color.Red);
                     }
 
                     // Draw lines between vertices
                     for (int i = 0; i < renderVertices.Length; i++)
                     {
                         int nextIndex = (i + 1) % renderVertices.Length;
-                        _shapes.DrawLine(renderVertices[i], renderVertices[nextIndex], color);
+                        Shapes.DrawLine(renderVertices[i], renderVertices[nextIndex], color);
                     }
 
                     // Draw center point
-                    _shapes.DrawCircleFill(renderPos, 5, 8, Color.Yellow);
+                    Shapes.DrawCircleFill(renderPos, 5, 8, Color.Yellow);
 
                     break;
             }
         }
 
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 }

@@ -44,7 +44,7 @@ public class CollisionDetectionDebugScene : Scene
         
         shapeCreators = new List<(string, Func<float, float, AeroShape2D>)>
         {
-            // ("Circle", (x, y) => new AeroCircle(25)),
+            ("Circle", (x, y) => new AeroCircle(25)),
             ("Box", (x, y) => new AeroBox(50, 50)),
             ("Triangle", (x, y) => new AeroRegularPolygon(3, 30)),
             ("Pentagon", (x, y) => new AeroRegularPolygon(5, 30)),
@@ -54,7 +54,7 @@ public class CollisionDetectionDebugScene : Scene
         PlaceStaticBodiesInGrid();
         CreateMouseBody();
         
-        _camera.Zoom = 1;
+        Camera.Zoom = 1;
     }
 
     private void CreateMouseBody()
@@ -88,8 +88,8 @@ public class CollisionDetectionDebugScene : Scene
     private void PlaceStaticBodiesInGrid()
     {
         // Calculate grid dimensions
-        int cols = (int)(_screen.Width / CellSize);
-        int rows = (int)(_screen.Height / CellSize);
+        int cols = (int)(Screen.Width / CellSize);
+        int rows = (int)(Screen.Height / CellSize);
 
         // Randomly place bodies in some cells (skip others to leave them empty)
         for (int col = 0; col < cols; col++)
@@ -104,7 +104,15 @@ public class CollisionDetectionDebugScene : Scene
                 float y = (row + 0.5f) * CellSize;
 
                 // Randomly choose shape type
-                AeroBody2D body = new AeroBody2D(x, y, 0.0f, shapeCreators[0].creator(x, y));
+                AeroBody2D body = random.Next(5) switch
+                {
+                    0 => new AeroBody2D(x, y, 0.0f, shapeCreators[0].creator(col, row)),
+                    1 => new AeroBody2D(x, y, 0.0f, shapeCreators[1].creator(col, row)),
+                    2 => new AeroBody2D(x, y, 0.0f, shapeCreators[2].creator(col, row)),
+                    3 => new AeroBody2D(x, y, 0.0f, shapeCreators[3].creator(col, row)),
+                    _ => new AeroBody2D(x, y, 0.0f, shapeCreators[4].creator(col, row)),
+                    
+                };
                 
                 Color color = shapeColors[random.Next(shapeColors.Length)];
                 staticBodies.Add((body, color));
@@ -135,7 +143,7 @@ public class CollisionDetectionDebugScene : Scene
         // Update mouse body position
         if (mouseBody != null)
         {
-            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(Game, Screen);
             mouseBody.Position = new AeroVec2(mousePos.X, mousePos.Y);
             mouseBody.Angle = 30.0f;
         }
@@ -145,14 +153,14 @@ public class CollisionDetectionDebugScene : Scene
     
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+        Shapes.Begin(Camera);
 
         // Draw grid
         if (showGrid)
         {
-            AeroDrawingHelpers.DrawGrid(_screen, _shapes, CellSize);
+            AeroDrawingHelpers.DrawGrid(Screen, Shapes, CellSize);
         }
 
         // Draw static bodies
@@ -162,7 +170,7 @@ public class CollisionDetectionDebugScene : Scene
                 Equals(m.ObjectA, body) || Equals(m.ObjectB, body) && m.HasCollision);
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
-            AeroDrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
         }
 
         // Draw mouse body
@@ -171,7 +179,7 @@ public class CollisionDetectionDebugScene : Scene
             bool inCollision = world.CollisionSystem.Collisions.Any(m => 
                 Equals(m.ObjectA, mouseBody) || Equals(m.ObjectB, mouseBody) && m.HasCollision);
             
-            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
         }
 
         // Draw collision information
@@ -179,12 +187,12 @@ public class CollisionDetectionDebugScene : Scene
         {
             foreach (var manifold in world.CollisionSystem.Collisions)
             {
-                AeroDrawingHelpers.DrawCollisionInfo(manifold, _screen, _shapes);
+                AeroDrawingHelpers.DrawCollisionInfo(manifold, Screen, Shapes);
             }
         }
 
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 }

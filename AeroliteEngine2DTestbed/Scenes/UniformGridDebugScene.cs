@@ -53,7 +53,7 @@ public class UniformGridDebugScene : Scene
         PlaceStaticBodiesInGrid();
         CreateMouseBody();
         
-        _camera.Zoom = 1;
+        Camera.Zoom = 1;
     }
 
     private void CreateMouseBody()
@@ -66,8 +66,8 @@ public class UniformGridDebugScene : Scene
     private void PlaceStaticBodiesInGrid()
     {
         // Calculate grid dimensions
-        int cols = (int)(_screen.Width / cellSize);
-        int rows = (int)(_screen.Height / cellSize);
+        int cols = (int)(Screen.Width / cellSize);
+        int rows = (int)(Screen.Height / cellSize);
 
         // Randomly place bodies in some cells (skip others to leave them empty)
         for (int col = 0; col < cols; col++)
@@ -127,7 +127,7 @@ public class UniformGridDebugScene : Scene
         // Update mouse body position
         if (mouseBody != null)
         {
-            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(Game, Screen);
             mouseBody.Position = new AeroVec2(mousePos.X, mousePos.Y);
             
             // Update bounding area
@@ -145,14 +145,14 @@ public class UniformGridDebugScene : Scene
     
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+        Shapes.Begin(Camera);
     
         // Draw grid with transformed coordinates
         if (showGrid)
         {
-            AeroDrawingHelpers.DrawGrid(_screen, _shapes, cellSize);
+            AeroDrawingHelpers.DrawGrid(Screen, Shapes, cellSize);
         }
     
         // Draw static bodies
@@ -162,7 +162,7 @@ public class UniformGridDebugScene : Scene
                 Equals(pair.Item1, body) || Equals(pair.Item2, body));
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
-            AeroDrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
         }
     
         // Draw mouse body and its bounding area
@@ -171,17 +171,17 @@ public class UniformGridDebugScene : Scene
             bool inCollision = potentialCollisions.Any(pair => 
                 Equals(pair.Item1, mouseBody) || Equals(pair.Item2, mouseBody));
             
-            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
             
             // Draw bounding area
             if (mouseBoundingArea != null)
             {
-                AeroDrawingHelpers.DrawBoundingArea(mouseBoundingArea, Color.Yellow * 0.5f, _screen, _shapes);
+                AeroDrawingHelpers.DrawBoundingArea(mouseBoundingArea, Color.Yellow * 0.5f, Screen, Shapes);
             }
         }
     
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 }

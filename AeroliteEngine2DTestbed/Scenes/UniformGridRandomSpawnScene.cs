@@ -47,7 +47,7 @@ public class UniformGridRandomSpawnScene : Scene
         potentialCollisions = [];
 
         // Set initial camera zoom
-        _camera.Zoom = 1;
+        Camera.Zoom = 1;
     }
 
     private Color GetRandomColor()
@@ -58,8 +58,8 @@ public class UniformGridRandomSpawnScene : Scene
     private void SpawnRandomShape()
     {
         // Random position within screen bounds
-        float x = random.Next(_screen.Width);
-        float y = random.Next(_screen.Height);
+        float x = random.Next(Screen.Width);
+        float y = random.Next(Screen.Height);
         
         // Random velocity
         float vx = random.Next(-200, 200);
@@ -148,12 +148,12 @@ public class UniformGridRandomSpawnScene : Scene
         {
             if (body.IsStatic) continue;
             if (body.Position.X < 0)
-                body.Position = new AeroVec2(_screen.Width, body.Position.Y);
-            if (body.Position.X > _screen.Width)
+                body.Position = new AeroVec2(Screen.Width, body.Position.Y);
+            if (body.Position.X > Screen.Width)
                 body.Position = new AeroVec2(0, body.Position.Y);
             if (body.Position.Y < 0)
-                body.Position = new AeroVec2(body.Position.X, _screen.Height);
-            if (body.Position.Y > _screen.Height)
+                body.Position = new AeroVec2(body.Position.X, Screen.Height);
+            if (body.Position.Y > Screen.Height)
                 body.Position = new AeroVec2(body.Position.X, 0);
         }
 
@@ -162,14 +162,14 @@ public class UniformGridRandomSpawnScene : Scene
 
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+        Shapes.Begin(Camera);
 
         // Draw grid
         if (showGrid)
         {
-            AeroDrawingHelpers.DrawGrid(_screen, _shapes, CellSize);
+            AeroDrawingHelpers.DrawGrid(Screen, Shapes, CellSize);
         }
 
         // Draw all bodies
@@ -182,13 +182,13 @@ public class UniformGridRandomSpawnScene : Scene
             // Use brighter color for bodies in potential collisions
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 1.0f) : color;
 
-            AeroDrawingHelpers.DrawBody(body, drawColor, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
             var boundingArea = AABB2D.CreateFromShape(body.Shape, body.Position);
-            AeroDrawingHelpers.DrawBoundingArea(boundingArea, Color.Yellow * 0.5f, _screen, _shapes);
+            AeroDrawingHelpers.DrawBoundingArea(boundingArea, Color.Yellow * 0.5f, Screen, Shapes);
         }
 
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 }

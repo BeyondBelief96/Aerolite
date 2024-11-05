@@ -53,7 +53,7 @@ namespace AeroliteEngine2DTestbed.Scenes
             
             world.AddPhysicsObject(centerCircle);
             
-            _camera.Zoom = 1;
+            Camera.Zoom = 1;
         }
 
         public override void Update(GameTime gameTime)
@@ -67,7 +67,7 @@ namespace AeroliteEngine2DTestbed.Scenes
             // Handle mouse click for spawning shapes
             if (FlatMouse.Instance.IsLeftMouseButtonPressed())
             {
-                Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+                Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(Game, Screen);
                 SpawnShapeAtPosition(mousePos.X, mousePos.Y);
             }
 
@@ -84,36 +84,36 @@ namespace AeroliteEngine2DTestbed.Scenes
 
         public override void Draw(GameTime gameTime)
         {
-            _screen.Set();
-            _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-            _shapes.Begin(_camera);
+            Screen.Set();
+            Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+            Shapes.Begin(Camera);
 
             // Draw center circle
             if (centerCircle != null)
             {
-                AeroDrawingHelpers.DrawBody(centerCircle, centerColor, _shapes, _screen);
+                AeroDrawingHelpers.DrawBody(centerCircle, centerColor, Shapes, Screen);
             }
             
-            AeroDrawingHelpers.DrawGrid(_screen, _shapes, 100);
+            AeroDrawingHelpers.DrawGrid(Screen, Shapes, 100);
 
             // Draw all other bodies
             foreach (var body in world.GetObjects())
             {
                 if (!body.Equals(centerCircle))
                 {
-                    AeroDrawingHelpers.DrawBody(body as AeroBody2D, spawnedColor, _shapes, _screen);
+                    AeroDrawingHelpers.DrawBody(body as AeroBody2D, spawnedColor, Shapes, Screen);
                 }
             }
 
             // Draw collision contact points
             foreach (var manifold in world.CollisionSystem.Collisions)
             {
-                AeroDrawingHelpers.DrawCollisionInfo(manifold, _screen, _shapes);
+                AeroDrawingHelpers.DrawCollisionInfo(manifold, Screen, Shapes);
             }
 
-            _shapes.End();
-            _screen.Unset();
-            _screen.Present(_sprites);
+            Shapes.End();
+            Screen.Unset();
+            Screen.Present(Sprites);
         }
     }
 }

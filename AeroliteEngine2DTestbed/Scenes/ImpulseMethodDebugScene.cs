@@ -47,13 +47,13 @@ public class ImpulseMethodDebugScene : Scene
         // world.AddGlobalForce(new AeroVec2(50.0f, 0.0f));
         
         // Add large static circle body in middle.
-        var staticCircle = new AeroBody2D(_screen.Width / 2, _screen.Height / 2, 0.0f, new AeroCircle(300.0f), 1.0f, 0.0f);
+        var staticCircle = new AeroBody2D(Screen.Width / 2, Screen.Height / 2, 0.0f, new AeroCircle(300.0f), 1.0f, 0.0f);
         world.AddPhysicsObject(staticCircle);
 
         // Create static boundaries
         // CreateBoundaries(screen);
         
-        _camera.Zoom = 1;
+        Camera.Zoom = 1;
     }
 
     private void CreateBoundaries(Screen screen)
@@ -103,7 +103,7 @@ public class ImpulseMethodDebugScene : Scene
         // Handle mouse click for spawning shapes
         if (FlatMouse.Instance.IsLeftMouseButtonPressed())
         {
-            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(_game, _screen);
+            Vector2 mousePos = FlatMouse.Instance.GetMouseScreenPosition(Game, Screen);
             SpawnShapeAtPosition(mousePos.X, mousePos.Y);
         }
 
@@ -135,27 +135,27 @@ public class ImpulseMethodDebugScene : Scene
 
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+        Shapes.Begin(Camera);
 
         // Draw static boundaries
         foreach (var body in world.GetObjects())
         {
             if (body is not AeroBody2D aeroBody) continue;
             Color color = aeroBody.IsStatic ? staticColor : dynamicColor;
-            AeroDrawingHelpers.DrawBody(aeroBody, color, _shapes, _screen);
+            AeroDrawingHelpers.DrawBody(aeroBody, color, Shapes, Screen);
         }
 
         // Draw collision contact points if in debug mode
         foreach (var manifold in world.CollisionSystem.Collisions)
         {
-            AeroDrawingHelpers.DrawCollisionInfo(manifold, _screen, _shapes);
+            AeroDrawingHelpers.DrawCollisionInfo(manifold, Screen, Shapes);
         }
         
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 
 }

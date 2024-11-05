@@ -67,7 +67,7 @@ public class SolarSystemScene : Scene
     private void InitializeSolarSystem()
     {
         // Create sun with adjusted mass
-        _sun = new AeroParticle2D(_screen.Width / 2, _screen.Height / 2, SunMass, 40.0f)
+        _sun = new AeroParticle2D(Screen.Width / 2, Screen.Height / 2, SunMass, 40.0f)
         {
             Damping = 1.0f // No damping for orbital mechanics
         };
@@ -141,17 +141,17 @@ public class SolarSystemScene : Scene
     {
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         // Camera controls
-        if (FlatKeyboard.Instance.IsKeyDown(Keys.A)) _camera.DecZoom();
-        if (FlatKeyboard.Instance.IsKeyDown(Keys.Z)) _camera.IncZoom();
+        if (FlatKeyboard.Instance.IsKeyDown(Keys.A)) Camera.DecZoom();
+        if (FlatKeyboard.Instance.IsKeyDown(Keys.Z)) Camera.IncZoom();
 
         _world.Update(dt);
     }
 
     public override void Draw(GameTime gameTime)
     {
-        _screen.Set();
-        _game.GraphicsDevice.Clear(new Color(2, 2, 10));
-        _shapes.Begin(_camera);
+        Screen.Set();
+        Game.GraphicsDevice.Clear(new Color(2, 2, 10));
+        Shapes.Begin(Camera);
 
         // Draw orbit trails
         foreach (var planet in _planets)
@@ -164,11 +164,11 @@ public class SolarSystemScene : Scene
             // Convert sun's screen position to render position
             Vector2 sunRenderPos = CoordinateSystem.ScreenToRender(
                 new Vector2(_sun.Position.X, _sun.Position.Y),
-                _screen.Width,
-                _screen.Height
+                Screen.Width,
+                Screen.Height
             );
 
-            _shapes.DrawCircle(
+            Shapes.DrawCircle(
                 sunRenderPos,
                 orbitRadius,
                 64,
@@ -177,11 +177,11 @@ public class SolarSystemScene : Scene
         }
 
         // Draw sun
-        _shapes.DrawCircleFill(
+        Shapes.DrawCircleFill(
             CoordinateSystem.ScreenToRender(
                 new Vector2(_sun.Position.X, _sun.Position.Y),
-                _screen.Width,
-                _screen.Height
+                Screen.Width,
+                Screen.Height
             ),
             ((AeroCircle)_sun.Shape).Radius,
             32,
@@ -191,11 +191,11 @@ public class SolarSystemScene : Scene
         // Draw planets
         for (int i = 0; i < _planets.Count; i++)
         {
-            _shapes.DrawCircleFill(
+            Shapes.DrawCircleFill(
                 CoordinateSystem.ScreenToRender(
                     new Vector2(_planets[i].Position.X, _planets[i].Position.Y),
-                    _screen.Width,
-                    _screen.Height
+                    Screen.Width,
+                    Screen.Height
                 ),
                 ((AeroCircle)_planets[i].Shape).Radius,
                 16,
@@ -206,11 +206,11 @@ public class SolarSystemScene : Scene
         // Draw asteroids
         foreach (var asteroid in _asteroids)
         {
-            _shapes.DrawCircleFill(
+            Shapes.DrawCircleFill(
                 CoordinateSystem.ScreenToRender(
                     new Vector2(asteroid.Position.X, asteroid.Position.Y),
-                    _screen.Width,
-                    _screen.Height
+                    Screen.Width,
+                    Screen.Height
                 ),
                 ((AeroCircle)asteroid.Shape).Radius,
                 8,
@@ -218,8 +218,8 @@ public class SolarSystemScene : Scene
             );
         }
 
-        _shapes.End();
-        _screen.Unset();
-        _screen.Present(_sprites);
+        Shapes.End();
+        Screen.Unset();
+        Screen.Present(Sprites);
     }
 }

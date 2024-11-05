@@ -21,56 +21,22 @@ public static class SeparatingAxisCollisionDetector
         IReadOnlyList<AeroVec2> verticesA,
         IReadOnlyList<AeroVec2> verticesB)
     {
-        for (int i = 0; i < verticesA.Count; i++)
-        {
-            var v1 = verticesA[i];
-            var v2 = verticesA[(i + 1) % verticesA.Count];
-            var edge = v2 - v1;
-            var axis = new AeroVec2(-edge.Y, edge.X).UnitVector();
-
-            var (minA, maxA) = ProjectVertices(verticesA, axis);
-            var (minB, maxB) = ProjectVertices(verticesB, axis);
-
-            if (minA >= maxB || minB >= maxA)
-            {
-                return (false, default, default, default);
-            }
-        }
-
-        for (int i = 0; i < verticesB.Count; i++)
-        {
-            var v1 = verticesB[i];
-            var v2 = verticesB[(i + 1) % verticesA.Count];
-            var edge = v2 - v1;
-            var axis = new AeroVec2(-edge.Y, edge.X);
-
-            var (minA, maxA) = ProjectVertices(verticesA, axis);
-            var (minB, maxB) = ProjectVertices(verticesB, axis);
-
-            if (minA >= maxB || minB >= maxA)
-            {
-                return (false, default, default, default);
-            }
-        }
+        // Test axes from both polygons
+        var resultA = CheckSeparatingAxes(verticesA, verticesB);
+        if (!resultA.hasCollision)
+            return (false, AeroVec2.Zero, 0, default);
         
-        return (true, default, default, default);
+        var resultB = CheckSeparatingAxes(verticesB, verticesA);
+        if (!resultB.hasCollision)
+            return (false, AeroVec2.Zero, 0, default);
         
-        // // Test axes from both polygons
-        // var resultA = CheckSeparatingAxes(verticesA, verticesB);
-        // if (!resultA.hasCollision)
-        //     return (false, AeroVec2.Zero, 0, default);
-        //
-        // var resultB = CheckSeparatingAxes(verticesB, verticesA);
-        // if (!resultB.hasCollision)
-        //     return (false, AeroVec2.Zero, 0, default);
-        //
-        // // Get the axis with minimum penetration
-        // var (normal, depth) = GetCollisionNormal(
-        //     resultA.penetration, resultA.normal,
-        //     resultB.penetration, resultB.normal,
-        //     verticesA, verticesB);
-        //
-        // return (true, normal, depth, new ContactPoint());
+        // Get the axis with minimum penetration
+        var (normal, depth) = GetCollisionNormal(
+            resultA.penetration, resultA.normal,
+            resultB.penetration, resultB.normal,
+            verticesA, verticesB);
+        
+        return (true, normal, depth, new ContactPoint());
     }
 
     /// <summary>
@@ -177,20 +143,6 @@ public static class SeparatingAxisCollisionDetector
         var next = vertices[(index + 1) % vertices.Count];
         var edge = next - current;
         
-        // Ensure consistent winding order for normals
-        var normal = new AeroVec2(-edge.Y, edge.X);
-        
-        // Verify the normal points outward
-        var center = PrimitiveUtilities.GetPolygonCenter(vertices);
-        var edgeCenter = (current + next) * 0.5f;
-        var toCenter = center - edgeCenter;
-        
-        // If normal points inward, flip it
-        if (AeroVec2.Dot(normal, toCenter) < 0)
-        {
-            normal = -normal;
-        }
-        
-        return normal.UnitVector();
+        return new AeroVec2(-edge.Y, edge.X).UnitVector();
     }
 }
