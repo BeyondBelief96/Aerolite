@@ -8,16 +8,6 @@ namespace AeroliteSharpEngine.Core.Interfaces
     public interface IBody2D : IPhysicsObject2D
     {
         /// <summary>
-        /// Physical property of the body that determines how "bouncy" the body is.
-        /// </summary>
-        float Restitution { get; set; }
-
-        /// <summary>
-        /// Physical property of the body that determines how much friction the body has when in contact with other bodies.
-        /// </summary>
-        float Friction { get; set; }
-
-        /// <summary>
         /// Angle of the body with respect to horizontal axis.
         /// </summary>
         float Angle { get; set; }

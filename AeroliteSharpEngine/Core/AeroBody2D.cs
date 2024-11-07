@@ -7,7 +7,6 @@ namespace AeroliteSharpEngine.Core
     public class AeroBody2D : Physics2DObject2DBase, IBody2D
     {
         public float Angle { get; set; }
-        
         public float PreviousAngle { get; set; }
         public float AngularVelocity { get; set; }
         public float AngularAcceleration { get; set; }

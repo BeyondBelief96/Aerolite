@@ -15,7 +15,6 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     private readonly List<IPhysicsObject2D> _staticObjects = [];
     private readonly List<AeroVec2> _globalForces = [];
     private readonly ForceRegistry _forceRegistry = new();
-    private IIntegrator _integrator = configuration.Integrator;
     private readonly IPerformanceMonitor _performanceMonitor = new ConsolePerformanceLogger();
     private AeroWorldConfiguration _configuration = configuration;
     
@@ -34,7 +33,6 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     {
         _configuration = newConfig;
         Gravity = newConfig.Gravity;
-        _integrator = newConfig.Integrator;
         PerformanceMonitoringEnabled = newConfig.EnablePerformanceMonitoring;
         CollisionSystem = new CollisionSystem(newConfig.CollisionSystemConfiguration);
     }
@@ -115,8 +113,8 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
                 physicsObject.ApplyForce(force);
             }
             
-            _integrator.IntegrateLinear(physicsObject, dt);
-            _integrator.IntegrateAngular(physicsObject, dt);
+            _configuration.Integrator.IntegrateLinear(physicsObject, dt);
+            _configuration.Integrator.IntegrateAngular(physicsObject, dt);
         }
         
         // Also update static bodies - they might be rotated/moved by the user

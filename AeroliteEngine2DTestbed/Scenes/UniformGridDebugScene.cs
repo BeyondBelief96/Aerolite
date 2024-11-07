@@ -143,12 +143,8 @@ public class UniformGridDebugScene : Scene
         world.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
     }
     
-    public override void Draw(GameTime gameTime)
+    protected override void DrawScene(GameTime gameTime)
     {
-        Screen.Set();
-        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        Shapes.Begin(Camera);
-    
         // Draw grid with transformed coordinates
         if (showGrid)
         {
@@ -179,9 +175,5 @@ public class UniformGridDebugScene : Scene
                 AeroDrawingHelpers.DrawBoundingArea(mouseBoundingArea, Color.Yellow * 0.5f, Screen, Shapes);
             }
         }
-    
-        Shapes.End();
-        Screen.Unset();
-        Screen.Present(Sprites);
     }
 }

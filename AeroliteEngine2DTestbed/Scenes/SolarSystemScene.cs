@@ -147,12 +147,8 @@ public class SolarSystemScene : Scene
         _world.Update(dt);
     }
 
-    public override void Draw(GameTime gameTime)
+    protected override void DrawScene(GameTime gameTime)
     {
-        Screen.Set();
-        Game.GraphicsDevice.Clear(new Color(2, 2, 10));
-        Shapes.Begin(Camera);
-
         // Draw orbit trails
         foreach (var planet in _planets)
         {
@@ -217,9 +213,5 @@ public class SolarSystemScene : Scene
                 new Color(180, 180, 180)
             );
         }
-
-        Shapes.End();
-        Screen.Unset();
-        Screen.Present(Sprites);
     }
 }

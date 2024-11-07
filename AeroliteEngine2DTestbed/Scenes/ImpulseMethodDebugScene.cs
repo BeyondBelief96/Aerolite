@@ -133,12 +133,8 @@ public class ImpulseMethodDebugScene : Scene
         world.ClearWorld(); 
     }
 
-    public override void Draw(GameTime gameTime)
+    protected override void DrawScene(GameTime gameTime)
     {
-        Screen.Set();
-        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        Shapes.Begin(Camera);
-
         // Draw static boundaries
         foreach (var body in world.GetObjects())
         {
@@ -152,10 +148,6 @@ public class ImpulseMethodDebugScene : Scene
         {
             AeroDrawingHelpers.DrawCollisionInfo(manifold, Screen, Shapes);
         }
-        
-        Shapes.End();
-        Screen.Unset();
-        Screen.Present(Sprites);
     }
 
 }

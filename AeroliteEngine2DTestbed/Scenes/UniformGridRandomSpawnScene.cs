@@ -160,12 +160,8 @@ public class UniformGridRandomSpawnScene : Scene
         world.Update(dt);
     }
 
-    public override void Draw(GameTime gameTime)
+    protected override void DrawScene(GameTime gameTime)
     {
-        Screen.Set();
-        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        Shapes.Begin(Camera);
-
         // Draw grid
         if (showGrid)
         {
@@ -186,9 +182,5 @@ public class UniformGridRandomSpawnScene : Scene
             var boundingArea = AABB2D.CreateFromShape(body.Shape, body.Position);
             AeroDrawingHelpers.DrawBoundingArea(boundingArea, Color.Yellow * 0.5f, Screen, Shapes);
         }
-
-        Shapes.End();
-        Screen.Unset();
-        Screen.Present(Sprites);
     }
 }

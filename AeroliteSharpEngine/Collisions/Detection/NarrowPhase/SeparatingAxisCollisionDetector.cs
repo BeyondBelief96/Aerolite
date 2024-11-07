@@ -1,7 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using AeroliteSharpEngine.AeroMath;
+﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
-using AeroliteSharpEngine.Collisions.Detection.PrimitiveTests;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 
@@ -14,135 +13,23 @@ public static class SeparatingAxisCollisionDetector
     /// <summary>
     /// Tests for collisions and computes contact information between two polygons.
     /// </summary>
-    /// <param name="verticesA"></param>
-    /// <param name="verticesB"></param>
+    /// <param name="polygonA">The vertices of polygonA</param>
+    /// <param name="polygonB">The vertices of polygonB</param>
     /// <returns></returns>
     public static (bool hasCollision, AeroVec2 normal, float depth, ContactPoint contact) TestPolygonPolygon(
-        IReadOnlyList<AeroVec2> verticesA,
-        IReadOnlyList<AeroVec2> verticesB)
+        AeroPolygon polygonA,
+        AeroPolygon polygonB)
     {
-        // Test axes from both polygons
-        var resultA = CheckSeparatingAxes(verticesA, verticesB);
-        if (!resultA.hasCollision)
-            return (false, AeroVec2.Zero, 0, default);
-        
-        var resultB = CheckSeparatingAxes(verticesB, verticesA);
-        if (!resultB.hasCollision)
-            return (false, AeroVec2.Zero, 0, default);
-        
-        // Get the axis with minimum penetration
-        var (normal, depth) = GetCollisionNormal(
-            resultA.penetration, resultA.normal,
-            resultB.penetration, resultB.normal,
-            verticesA, verticesB);
-        
-        return (true, normal, depth, new ContactPoint());
-    }
-
-    /// <summary>
-    /// Checks for separation between two polygons against all axes of the polygon represented by <see cref="axisVertices"/>
-    /// </summary>
-    /// <param name="axisVertices">The polygon whose axes were using to test.</param>
-    /// <param name="otherVertices">The other polygon in test.</param>
-    /// <returns></returns>
-    private static (bool hasCollision, float penetration, AeroVec2 normal) CheckSeparatingAxes(
-        IReadOnlyList<AeroVec2> axisVertices,
-        IReadOnlyList<AeroVec2> otherVertices)
-    {
-        // These two will be the axis and the minimum overlap/distance needed to separate the two bodies.
-        var minPenetration = float.MaxValue;
-        var minNormal = AeroVec2.Zero;
-
-        // Check each edge's normal as a potential separating axis
-        for (int i = 0; i < axisVertices.Count; i++)
+        if (polygonA.FindMinimumSeparation(polygonB) >= 0)
         {
-            var normal = GetEdgeNormal(axisVertices, i);
-            var overlap = GetOverlap(axisVertices, otherVertices, normal);
-            
-            // If we find an axis with no overlap, we can exit early as we have found a separating axis.
-            if (!overlap.hasOverlap)
-                return (false, 0, AeroVec2.Zero);
-            
-            // We want the axis that we can move the minimum amount of distance to separate the
-            // two objects, and the axis that corresponds to. 
-            if (overlap.amount < minPenetration)
-            {
-                minPenetration = overlap.amount;
-                minNormal = normal;
-            }
+            return (false, default, default, default);
         }
 
-        return (true, minPenetration, minNormal);
-    }
-
-    /// <summary>
-    /// Gets the overlap between two polygons along a given axis
-    /// </summary>
-    private static (bool hasOverlap, float amount) GetOverlap(
-        IReadOnlyList<AeroVec2> verticesA,
-        IReadOnlyList<AeroVec2> verticesB,
-        AeroVec2 axis)
-    {
-        var projectionA = ProjectVertices(verticesA, axis);
-        var projectionB = ProjectVertices(verticesB, axis);
-
-        // Check if projections overlap
-        if (projectionA.max < projectionB.min || projectionB.max < projectionA.min)
-            return (false, 0);
-
-        // Calculate overlap amount
-        var overlap = Math.Min(
-            projectionA.max - projectionB.min,
-            projectionB.max - projectionA.min);
-
-        return (true, overlap);
-    }
-
-    /// <summary>
-    /// Projects vertices onto an axis and returns min/max values
-    /// </summary>
-    /// <param name="vertices">The vertices to project.</param>
-    /// <param name="axis">The axis to project on.</param>
-    private static (float min, float max) ProjectVertices(
-        IReadOnlyList<AeroVec2> vertices,
-        AeroVec2 axis)
-    {
-        float min = float.MaxValue;
-        float max = float.MinValue;
-
-        foreach (var vertex in vertices)
+        if (polygonB.FindMinimumSeparation(polygonA) >= 0)
         {
-            var projection = AeroVec2.Dot(vertex, axis);
-            min = Math.Min(min, projection);
-            max = Math.Max(max, projection);
+            return (false, default, default, default);
         }
-
-        return (min, max);
-    }
-
-    /// <summary>
-    /// Determines the final collision normal from the two polygon's penetration results
-    /// </summary>
-    private static (AeroVec2 normal, float depth) GetCollisionNormal(
-        float depthA, AeroVec2 normalA,
-        float depthB, AeroVec2 normalB,
-        IReadOnlyList<AeroVec2> verticesA,
-        IReadOnlyList<AeroVec2> verticesB)
-    {
-        // Use the axis with the least penetration
-        var (normal, depth) = depthA < depthB 
-            ? (normalA, depthA) 
-            : (normalB, depthB);
         
-        return (normal, depth);
-    }
-    
-    private static AeroVec2 GetEdgeNormal(IReadOnlyList<AeroVec2> vertices, int index)
-    {
-        var current = vertices[index];
-        var next = vertices[(index + 1) % vertices.Count];
-        var edge = next - current;
-        
-        return new AeroVec2(-edge.Y, edge.X).UnitVector();
+        return (true, default, default, default);
     }
 }

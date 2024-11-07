@@ -5,7 +5,7 @@ namespace AeroliteSharpEngine.Collisions.Detection.PrimitiveTests;
 /// <summary>
 /// Helper class containing basic collision primitive tests and closest point computations for 2D shapes.
 /// </summary>
-public static class PrimitiveUtilities
+public static class CollisionUtilities
 {
     /// <summary>
     /// Computes the closest point on a plane to the given point
@@ -168,6 +168,29 @@ public static class PrimitiveUtilities
 
             return numIntersections;
         }
+
+        /// <summary>
+        /// Projects vertices onto an axis and returns min/max values
+        /// </summary>
+        /// <param name="vertices">The vertices to project.</param>
+        /// <param name="axis">The axis to project on.</param>
+        /// <returns>The minimum and maximum projection values along the given axis.</returns>
+        public static (float min, float max) ProjectVertices(
+            IReadOnlyList<AeroVec2> vertices,
+            AeroVec2 axis)
+        {
+            float min = float.MaxValue;
+            float max = float.MinValue;
+
+            foreach (var vertex in vertices)
+            {
+                var projection = AeroVec2.Dot(vertex, axis);
+                min = Math.Min(min, projection);
+                max = Math.Max(max, projection);
+            }
+
+            return (min, max);
+        }
         
         /// <summary>
         /// Finds the closest point on any edge of the polygon to a given point
@@ -185,7 +208,7 @@ public static class PrimitiveUtilities
             {
                 var start = vertices[i];
                 var end = vertices[(i + 1) % vertices.Count];
-                var edgeClosest = PrimitiveUtilities.ClosestPointOnLineSegment(point, start, end);
+                var edgeClosest = CollisionUtilities.ClosestPointOnLineSegment(point, start, end);
             
                 var distanceSquared = (point - edgeClosest.closestPoint).MagnitudeSquared;
                 if (distanceSquared < minDistanceSquared)

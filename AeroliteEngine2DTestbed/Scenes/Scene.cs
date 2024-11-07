@@ -22,6 +22,18 @@ namespace AeroliteEngine2DTestbed.Scenes
         }
 
         public abstract void Update(GameTime gameTime);
-        public abstract void Draw(GameTime gameTime);
+        protected abstract void DrawScene(GameTime gameTime);
+        public void Draw(GameTime gameTime)
+        {
+            Screen.Set();
+            Game.GraphicsDevice.Clear(new Color(10, 10, 20));
+            Shapes.Begin(Camera);
+            
+            DrawScene(gameTime);
+            
+            Shapes.End();
+            Screen.Unset();
+            Screen.Present(Sprites);
+        }
     }
 }

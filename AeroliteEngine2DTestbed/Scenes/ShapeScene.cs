@@ -132,12 +132,8 @@ public class ShapeScene : Scene
         world.Update(dt);
     }
 
-    public override void Draw(GameTime gameTime)
+    protected override void DrawScene(GameTime gameTime)
     {
-        Screen.Set();
-        Game.GraphicsDevice.Clear(new Color(10, 10, 20));
-        Shapes.Begin(Camera);
-
         foreach (var (body, color) in bodies)
         {
             // Convert body position to render space

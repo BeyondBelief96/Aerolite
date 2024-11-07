@@ -89,7 +89,7 @@ namespace AeroliteSharpEngine.Collisions
                 if (obj is not AeroBody2D body || _validatedConvexObjectIds.Contains(body.Id)) continue;
                 if (body.Shape is not IConvexShape)
                 {
-                    if (body.Shape is AeroPolygon polygon && !polygon.IsConvex()) continue;
+                    if (body.Shape is AeroPolygon polygon && !polygon.IsConvex) continue;
                     {
                         throw new InvalidOperationException(
                             $"Object {obj} uses non-convex shape" +

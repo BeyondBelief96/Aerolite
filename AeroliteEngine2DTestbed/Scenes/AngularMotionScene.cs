@@ -100,72 +100,63 @@ public class AngularMotionScene : Scene
         _world.Update(dt);
     }
 
-    public override void Draw(GameTime gameTime)
-{
-    Screen.Set();
-    Game.GraphicsDevice.Clear(new Color(50, 60, 70));
-    
-    Shapes.Begin(Camera);
-    
-    foreach (var body in _world.GetDynamicBodies())
+    protected override void DrawScene(GameTime gameTime)
     {
-        // Transform body position to render space
-        var renderPos = CoordinateSystem.ScreenToRender(
-            new Vector2(body.Position.X, body.Position.Y),
-            Screen.Width,
-            Screen.Height
-        );
-
-        switch (body.Shape)
+        foreach (var body in _world.GetDynamicBodies())
         {
-            case AeroCircle circle:
-                // Draw circle with a radius line to show rotation
-                Shapes.DrawCircle(
-                    renderPos.X, 
-                    renderPos.Y, 
-                    circle.Radius, 
-                    32, 
-                    Color.White
-                );
-                
-                // Calculate endpoint for rotation indicator line
-                var endPoint = new Vector2(
-                    renderPos.X + circle.Radius * MathF.Cos(body.Angle),
-                    renderPos.Y + circle.Radius * MathF.Sin(body.Angle)
-                );
-                
-                Shapes.DrawLine(
-                    renderPos,
-                    endPoint, 
-                    Color.Red
-                );
-                break;
-
-            case AeroPolygon polygon:
-                // Transform all polygon vertices to render space
-                var vertices = polygon.WorldVertices
-                    .Select(v => CoordinateSystem.ScreenToRender(
-                        new Vector2(v.X, v.Y),
-                        Screen.Width,
-                        Screen.Height))
-                    .ToList();
-                
-                // Draw polygon edges
-                Shapes.DrawPolygon(vertices.ToArray(), Color.White);
-                
-                // Draw center point
-                Shapes.DrawCircleFill(renderPos.X, renderPos.Y, 2, 8, Color.Red);
-                break;
+            // Transform body position to render space
+            var renderPos = CoordinateSystem.ScreenToRender(
+                new Vector2(body.Position.X, body.Position.Y),
+                Screen.Width,
+                Screen.Height
+            );
+    
+            switch (body.Shape)
+            {
+                case AeroCircle circle:
+                    // Draw circle with a radius line to show rotation
+                    Shapes.DrawCircle(
+                        renderPos.X, 
+                        renderPos.Y, 
+                        circle.Radius, 
+                        32, 
+                        Color.White
+                    );
+                    
+                    // Calculate endpoint for rotation indicator line
+                    var endPoint = new Vector2(
+                        renderPos.X + circle.Radius * MathF.Cos(body.Angle),
+                        renderPos.Y + circle.Radius * MathF.Sin(body.Angle)
+                    );
+                    
+                    Shapes.DrawLine(
+                        renderPos,
+                        endPoint, 
+                        Color.Red
+                    );
+                    break;
+    
+                case AeroPolygon polygon:
+                    // Transform all polygon vertices to render space
+                    var vertices = polygon.WorldVertices
+                        .Select(v => CoordinateSystem.ScreenToRender(
+                            new Vector2(v.X, v.Y),
+                            Screen.Width,
+                            Screen.Height))
+                        .ToList();
+                    
+                    // Draw polygon edges
+                    Shapes.DrawPolygon(vertices.ToArray(), Color.White);
+                    
+                    // Draw center point
+                    Shapes.DrawCircleFill(renderPos.X, renderPos.Y, 2, 8, Color.Red);
+                    break;
+            }
         }
+    
+        // Optionally, draw the coordinate system axes for debugging
+        var (left, right, bottom, top) = CoordinateSystem.GetRenderBounds(Screen.Width, Screen.Height);
+        Shapes.DrawLine(new Vector2(left, 0), new Vector2(right, 0), Color.Yellow);  // X axis
+        Shapes.DrawLine(new Vector2(0, bottom), new Vector2(0, top), Color.Yellow);  // Y axis
     }
-
-    // Optionally, draw the coordinate system axes for debugging
-    var (left, right, bottom, top) = CoordinateSystem.GetRenderBounds(Screen.Width, Screen.Height);
-    Shapes.DrawLine(new Vector2(left, 0), new Vector2(right, 0), Color.Yellow);  // X axis
-    Shapes.DrawLine(new Vector2(0, bottom), new Vector2(0, top), Color.Yellow);  // Y axis
-
-    Shapes.End();
-    Screen.Unset();
-    Screen.Present(Sprites);
-}
 }
