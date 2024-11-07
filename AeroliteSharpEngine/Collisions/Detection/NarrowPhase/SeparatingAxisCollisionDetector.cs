@@ -16,20 +16,39 @@ public static class SeparatingAxisCollisionDetector
     /// <param name="polygonA">The vertices of polygonA</param>
     /// <param name="polygonB">The vertices of polygonB</param>
     /// <returns></returns>
-    public static (bool hasCollision, AeroVec2 normal, float depth, ContactPoint contact) TestPolygonPolygon(
+    public static (bool hasCollision, AeroVec2 normal, ContactPoint contact) TestPolygonPolygon(
         AeroPolygon polygonA,
         AeroPolygon polygonB)
     {
-        if (polygonA.FindMinimumSeparation(polygonB) >= 0)
+        var contactPoint = new ContactPoint();
+        AeroVec2 contactNormal;
+        float abSeparation = polygonA.FindMinimumSeparation(polygonB, out var aAxis, out var aPoint);
+        if (abSeparation >= 0)
         {
-            return (false, default, default, default);
+            return (false, default, default);
         }
 
-        if (polygonB.FindMinimumSeparation(polygonA) >= 0)
+        float baSeparation = polygonB.FindMinimumSeparation(polygonA, out var bAxis, out var bPoint);
+        if (baSeparation >= 0)
         {
-            return (false, default, default, default);
+            return (false, default, default);
         }
-        
-        return (true, default, default, default);
+
+        if (abSeparation > baSeparation)
+        {
+            contactPoint.Depth = -abSeparation;
+            contactNormal = aAxis;
+            contactPoint.StartPoint = aPoint;
+            contactPoint.EndPoint = contactPoint.StartPoint + contactNormal * contactPoint.Depth;
+        }
+        else
+        {
+            contactPoint.Depth = -baSeparation;
+            contactNormal = -bAxis;
+            contactPoint.StartPoint = bPoint;
+            contactPoint.EndPoint = contactPoint.StartPoint + contactNormal * contactPoint.Depth;
+        }
+
+        return (true, contactNormal, contactPoint);
     }
 }

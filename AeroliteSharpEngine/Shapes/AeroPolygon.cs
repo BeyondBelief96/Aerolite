@@ -96,28 +96,49 @@ public class AeroPolygon : AeroShape2D
     }
 
     /// <summary>
-    /// Finds the minimum separation distance of this polygon from the given polygon along one of the normals
-    /// of this polygon.
+    /// Calculates the minimum separation distance between two polygons along this polygon's edge normals.
+    /// Returns a positive value if the polygons are separated by a gap, or a negative value if they overlap.
     /// </summary>
-    /// <param name="otherPolygon">The polygon to find the minimum separation distance from.</param>
-    /// <returns>The minimum separation distance of this polygon from the other polygon along one of the normals
-    /// of this polygon.</returns>
-    public float FindMinimumSeparation(AeroPolygon otherPolygon)
+    /// <param name="otherPolygon">The polygon to check separation against</param>
+    /// <param name="axisOfSeparation">The axis along which the minimum separation occurs</param>
+    /// <param name="minVertex">The vertex that produces the minimum separation</param>
+    /// <returns>The minimum separation distance between the polygons</returns>
+    public float FindMinimumSeparation(AeroPolygon otherPolygon, out AeroVec2 axisOfSeparation, out AeroVec2 minVertex)
     {
         float separation = float.MinValue;
-        for (int i = 0; i < _worldVertices.Count; i++)
+        axisOfSeparation = AeroVec2.Zero;
+        minVertex = AeroVec2.Zero;
+    
+        int vertexCount = _worldVertices.Count;
+        var otherVertices = otherPolygon.WorldVertices;
+        int otherVertexCount = otherVertices.Count;
+    
+        for (int i = 0; i < vertexCount; i++)
         {
             var va = _worldVertices[i];
             var edgeNormal = GetEdgeNormal(i);
             float minSeparation = float.MaxValue;
-            for (int j = 0; j < otherPolygon.WorldVertices.Count; j++)
+            AeroVec2 minPoint = AeroVec2.Zero;
+        
+            // Find minimum projection along current edge normal
+            for (int j = 0; j < otherVertexCount; j++)
             {
-                var vb = otherPolygon.WorldVertices[j];
+                var vb = otherVertices[j];
                 var projection = AeroVec2.Dot(vb - va, edgeNormal);
-                minSeparation = Math.Min(minSeparation, projection);
+                if (projection < minSeparation)
+                {
+                    minSeparation = projection;
+                    minPoint = vb;
+                }
             }
 
-            separation = Math.Max(separation, minSeparation);
+            // Update overall minimum separation if this edge provides larger separation
+            if (minSeparation > separation)
+            {
+                separation = minSeparation;
+                axisOfSeparation = edgeNormal;
+                minVertex = minPoint;
+            }
         }
 
         return separation;

@@ -43,53 +43,11 @@ public class ImpulseMethodDebugScene : Scene
         
         world = new AeroWorld2D(config);
         
-        // Simulate wind.
-        // world.AddGlobalForce(new AeroVec2(50.0f, 0.0f));
-        
-        // Add large static circle body in middle.
-        var staticCircle = new AeroBody2D(Screen.Width / 2, Screen.Height / 2, 0.0f, new AeroCircle(300.0f), 1.0f, 0.0f);
-        world.AddPhysicsObject(staticCircle);
-
-        // Create static boundaries
-        // CreateBoundaries(screen);
+        // Add large static object body in middle.
+        var staticObject = new AeroBody2D(Screen.Width / 2, Screen.Height / 2, 0.0f, new AeroBox(300.0f, 300.0f), 1.0f, 0.0f);
+        world.AddPhysicsObject(staticObject);
         
         Camera.Zoom = 1;
-    }
-
-    private void CreateBoundaries(Screen screen)
-    {
-        // Floor
-        var floor = new AeroBody2D(
-            screen.Width / 2,  // Center X
-            screen.Height - 50, // Near bottom
-            0.0f,  // Static mass
-            new AeroBox(screen.Width - 100, 50) // Full width, 50 height
-        );
-        floor.Restitution = 0.3f;  // Some bounce
-        floor.Friction = 0.5f;     // Some friction
-        world.AddPhysicsObject(floor);
-
-        // Left wall
-        var leftWall = new AeroBody2D(
-            25,  // Left edge + half width
-            screen.Height / 2,
-            0.0f,  // Static mass
-            new AeroBox(50, screen.Height - 100)  // Tall box
-        );
-        leftWall.Restitution = 0.3f;
-        leftWall.Friction = 0.5f;
-        world.AddPhysicsObject(leftWall);
-
-        // Right wall
-        var rightWall = new AeroBody2D(
-            screen.Width - 25,  // Right edge - half width
-            screen.Height / 2,
-            0.0f,  // Static mass
-            new AeroBox(50, screen.Height - 100)  // Tall box
-        );
-        rightWall.Restitution = 0.3f;
-        rightWall.Friction = 0.5f;
-        world.AddPhysicsObject(rightWall);
     }
 
     public override void Update(GameTime gameTime)

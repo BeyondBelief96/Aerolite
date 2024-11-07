@@ -94,13 +94,14 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             HasCollision = false,
         };
         
-        var (hasCollision, normal, depth, contactPoint) = SeparatingAxisCollisionDetector.TestPolygonPolygon(
+        var (hasCollision, normal, contactPoint) = SeparatingAxisCollisionDetector.TestPolygonPolygon(
             polygonA, polygonB);
         
         if(!hasCollision) return manifold;
 
         manifold.HasCollision = hasCollision;
         manifold.Normal = normal;
+        manifold.Contact = contactPoint;
 
         return manifold;
     }
