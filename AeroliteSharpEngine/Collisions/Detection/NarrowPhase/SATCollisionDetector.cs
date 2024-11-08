@@ -1,5 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
+using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
@@ -8,15 +9,39 @@ namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 /// Implementation of collision detection using the Separating Axis Theorem (SAT)
 /// for convex shapes.
 /// </summary>
-public static class SeparatingAxisCollisionDetector
+public class SATCollisionDetector : ConvexShapeCollisionDetectorBase
 {
+    protected override CollisionManifold TestPolygonPolygon(
+        IPhysicsObject2D bodyA,
+        IPhysicsObject2D bodyB,
+        AeroPolygon polygonA,
+        AeroPolygon polygonB)
+    {
+        var manifold = new CollisionManifold
+        {
+            ObjectA = bodyA,
+            ObjectB = bodyB,
+            HasCollision = false,
+        };
+
+        var (hasCollision, normal, contactPoint) = TestPolygonPolygon(
+            polygonA, polygonB);
+
+        if (!hasCollision) return manifold;
+
+        manifold.HasCollision = hasCollision;
+        manifold.Normal = normal;
+        manifold.Contact = contactPoint;
+
+        return manifold;
+    }
     /// <summary>
     /// Tests for collisions and computes contact information between two polygons.
     /// </summary>
     /// <param name="polygonA">The vertices of polygonA</param>
     /// <param name="polygonB">The vertices of polygonB</param>
     /// <returns></returns>
-    public static (bool hasCollision, AeroVec2 normal, ContactPoint contact) TestPolygonPolygon(
+    private static (bool hasCollision, AeroVec2 normal, ContactPoint contact) TestPolygonPolygon(
         AeroPolygon polygonA,
         AeroPolygon polygonB)
     {

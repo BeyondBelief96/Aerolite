@@ -1,4 +1,5 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
+using AeroliteSharpEngine.Collisions.Detection.Factories;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 using AeroliteSharpEngine.Collisions.Resolution.Interfaces;
@@ -6,8 +7,13 @@ using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 
 namespace AeroliteSharpEngine.Collisions.Detection;
 
+/// <summary>
+/// Configuration object used to configure the engines collision detection and resolution phases.
+/// </summary>
 public class CollisionSystemConfiguration
 {
+    private readonly ICollisionDetectorFactory _detectorFactory;
+    
     /// <summary>
     /// The spatial broad phase algorithm to use.
     /// </summary>
@@ -35,27 +41,32 @@ public class CollisionSystemConfiguration
     public BoundingAreaType BoundingAreaType { get; private set; }
     
     /// <summary>
+    /// The collision algorithm to use for the specified collision system type. (SAT, GJK etc)
+    /// </summary>
+    public CollisionAlgorithm Algorithm { get; private set; }
+    
+    /// <summary>
     /// Boolean value to toggle validation of convex shapes at runtime. Can be toggled off to
     /// save performance if you're confident in the models/shapes being used.
     /// </summary>
     public bool ValidateConvexShapes { get; private set; }
 
-    public CollisionSystemConfiguration(CollisionSystemType type, IBroadPhase broadPhase, ICollisionResolver collisionResolver, BoundingAreaType boundingAreaType = BoundingAreaType.AABB,  bool validateConvexShapes = false)
+    public CollisionSystemConfiguration(CollisionSystemType type, IBroadPhase broadPhase, CollisionAlgorithm algorithm, ICollisionResolver collisionResolver, BoundingAreaType boundingAreaType = BoundingAreaType.AABB,  bool validateConvexShapes = false)
     {
         Type = type;
         BroadPhase = broadPhase;
+        Algorithm = algorithm;
         BoundingAreaType = boundingAreaType;
         CollisionResolver = collisionResolver;
-        if (type == CollisionSystemType.ConvexOnly)
+        ValidateConvexShapes = type == CollisionSystemType.ConvexOnly && validateConvexShapes;
+        
+        _detectorFactory = type switch
         {
-            ValidateConvexShapes = validateConvexShapes;
-            NarrowPhase = new ConvexShapeCollisionDetector();
-        }
-        else
-        {
-            ValidateConvexShapes = false;
-            NarrowPhase = new GeneralShapeCollisionDetector();
-        }
+            CollisionSystemType.ConvexOnly => new ConvexCollisionDetectorFactory(),
+            _ => new GeneralCollisionDetectorFactory()
+        };
+
+        NarrowPhase = _detectorFactory.CreateDetector(algorithm);
     }
 
     /// <summary>
@@ -68,12 +79,24 @@ public class CollisionSystemConfiguration
         Type = type;
         return this;
     }
+    
+    /// <summary>
+    /// Creates an instance of <see cref="CollisionSystemConfiguration"/> with the given <see cref="CollisionAlgorithm"/>
+    /// </summary>
+    /// <param name="algorithm">The collision system type to use.</param>
+    /// <returns>This instance of <see cref="CollisionSystemConfiguration"/></returns>
+    public CollisionSystemConfiguration WithCollisionAlgorithm(CollisionAlgorithm algorithm)
+    {
+        Algorithm = algorithm;
+        NarrowPhase = _detectorFactory.CreateDetector(algorithm);
+        return this;
+    }
 
     /// <summary>
     /// Creates an instance of <see cref="CollisionSystemConfiguration"/> with the given <see cref="IBroadPhase"/>
     /// </summary>
     /// <param name="broadPhase">The broad phase implementation to use.</param>
-    /// <returns></returns>
+    /// <returns>This instance of <see cref="CollisionSystemConfiguration"/></returns>
     public CollisionSystemConfiguration WithBroadPhase(IBroadPhase broadPhase)
     {
         BroadPhase = broadPhase;
@@ -84,7 +107,7 @@ public class CollisionSystemConfiguration
     /// Creates an instance of <see cref="CollisionSystemConfiguration"/> with the given <see cref="BoundingAreaType"/>
     /// </summary>
     /// <param name="boundingAreaType">The bounding area type to use.</param>
-    /// <returns></returns>
+    /// <returns>This instance of <see cref="CollisionSystemConfiguration"/></returns>
     public CollisionSystemConfiguration WithBoundingAreaType(BoundingAreaType boundingAreaType)
     {
         BoundingAreaType = boundingAreaType;
@@ -95,7 +118,7 @@ public class CollisionSystemConfiguration
     /// Creates an instance of <see cref="CollisionSystemConfiguration"/> with the given <see cref="ICollisionResolver"/>
     /// </summary>
     /// <param name="collisionResolver">The collision resolver implementation to use.</param>
-    /// <returns></returns>
+    /// <returns>This instance of <see cref="CollisionSystemConfiguration"/></returns>
     public CollisionSystemConfiguration WithCollisionResolver(ICollisionResolver collisionResolver)
     {
         CollisionResolver = collisionResolver;
@@ -111,6 +134,6 @@ public class CollisionSystemConfiguration
     /// <returns></returns>
     public static CollisionSystemConfiguration Default()
     {
-        return new CollisionSystemConfiguration(CollisionSystemType.ConvexOnly, new UniformGrid(BoundingAreaType.AABB), new ProjectionCollisionResolver());
+        return new CollisionSystemConfiguration(CollisionSystemType.ConvexOnly, new UniformGrid(BoundingAreaType.AABB), CollisionAlgorithm.SAT, new ImpulseMethodCollisionResolver());
     }
 }

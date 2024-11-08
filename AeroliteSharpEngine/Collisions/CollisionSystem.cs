@@ -9,7 +9,7 @@ using AeroliteSharpEngine.Shapes.Interfaces;
 namespace AeroliteSharpEngine.Collisions
 {
     /// <summary>
-    /// Main collision detection system that coordinates broad and narrow phase
+    /// Main collision detection system that coordinates broad and narrow phase collision routines.
     /// </summary>
     public class CollisionSystem(CollisionSystemConfiguration collisionSystemConfiguration) : ICollisionSystem
     {

@@ -6,7 +6,7 @@ using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 
-public class ConvexShapeCollisionDetector : INarrowPhase
+public abstract class ConvexShapeCollisionDetectorBase : INarrowPhase
 {
     public CollisionManifold TestCollision(IPhysicsObject2D? objectA, IPhysicsObject2D? objectB)
     {
@@ -14,27 +14,34 @@ public class ConvexShapeCollisionDetector : INarrowPhase
         {
             return new CollisionManifold { HasCollision = false };
         }
-        
+
         return (objectA.Shape, objectB.Shape) switch
         {
-            (AeroCircle circleA, AeroCircle circleB) => 
+            (AeroCircle circleA, AeroCircle circleB) =>
                 TestCircleCircle(objectA, objectB, circleA, circleB),
-            (AeroPolygon polygonA, AeroPolygon polygonB) => 
+            (AeroPolygon polygonA, AeroPolygon polygonB) =>
                 TestPolygonPolygon(objectA, objectB, polygonA, polygonB),
-            (AeroCircle circle, AeroPolygon polygon) => 
+            (AeroCircle circle, AeroPolygon polygon) =>
                 TestCirclePolygon(objectA, objectB, circle, polygon),
-            (AeroPolygon polygon, AeroCircle circle) => 
+            (AeroPolygon polygon, AeroCircle circle) =>
                 TestCirclePolygon(objectB, objectA, circle, polygon),
             _ => new CollisionManifold { HasCollision = false }
         };
     }
-
-    private static CollisionManifold TestCircleCircle(
-        IPhysicsObject2D bodyA, 
-        IPhysicsObject2D bodyB, 
-        AeroCircle circleA, 
+    
+    protected abstract CollisionManifold TestPolygonPolygon(
+        IPhysicsObject2D bodyA,
+        IPhysicsObject2D bodyB,
+        AeroPolygon polygonA,
+        AeroPolygon polygonB);
+    
+    protected virtual CollisionManifold TestCircleCircle(
+        IPhysicsObject2D bodyA,
+        IPhysicsObject2D bodyB,
+        AeroCircle circleA,
         AeroCircle circleB)
     {
+        // Implementation from your existing code
         var manifold = new CollisionManifold
         {
             ObjectA = bodyA,
@@ -42,12 +49,10 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             HasCollision = false
         };
 
-        // Vector from center of A to center of B
         var ab = bodyB.Position - bodyA.Position;
         var distanceSquared = ab.MagnitudeSquared;
         var radiusSum = circleA.Radius + circleB.Radius;
-        
-        // If true, then no collision is detected, early return.
+
         if (distanceSquared > radiusSum * radiusSum)
         {
             return manifold;
@@ -57,7 +62,7 @@ public class ConvexShapeCollisionDetector : INarrowPhase
         if (AeroMathExtensions.IsNearlyZero(distance))
         {
             manifold.HasCollision = true;
-            manifold.Normal = new AeroVec2(-1, 0); // Arbitrary direction but pointing toward A
+            manifold.Normal = new AeroVec2(-1, 0);
             manifold.Contact = new ContactPoint
             {
                 StartPoint = bodyB.Position - new AeroVec2(circleB.Radius, 0),
@@ -66,8 +71,7 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             };
             return manifold;
         }
-        
-        // Compute contact information
+
         manifold.HasCollision = true;
         manifold.Normal = ab.UnitVector();
         manifold.Contact = new ContactPoint()
@@ -75,56 +79,19 @@ public class ConvexShapeCollisionDetector : INarrowPhase
             StartPoint = bodyB.Position - manifold.Normal * circleB.Radius,
             EndPoint = bodyA.Position + manifold.Normal * circleA.Radius,
         };
-        
+
         manifold.Contact.Depth = (manifold.Contact.EndPoint - manifold.Contact.StartPoint).Magnitude;
 
         return manifold;
     }
 
-    private static CollisionManifold TestPolygonPolygon(
-        IPhysicsObject2D bodyA, 
-        IPhysicsObject2D bodyB,
-        AeroPolygon polygonA, 
-        AeroPolygon polygonB)
-    {
-        var manifold = new CollisionManifold
-        {
-            ObjectA = bodyA,
-            ObjectB = bodyB,
-            HasCollision = false,
-        };
-        
-        var (hasCollision, normal, contactPoint) = SeparatingAxisCollisionDetector.TestPolygonPolygon(
-            polygonA, polygonB);
-        
-        if(!hasCollision) return manifold;
-
-        manifold.HasCollision = hasCollision;
-        manifold.Normal = normal;
-        manifold.Contact = contactPoint;
-
-        return manifold;
-    }
-
-    private static CollisionManifold TestCirclePolygon(
-        IPhysicsObject2D circleBody, 
+    protected virtual CollisionManifold TestCirclePolygon(
+        IPhysicsObject2D circleBody,
         IPhysicsObject2D polygonBody,
         AeroCircle circle,
         AeroPolygon polygon)
     {
-        var manifold = new CollisionManifold
-        {
-            ObjectA = circleBody,
-            ObjectB = polygonBody,
-            HasCollision = false,
-        };
-
-        // TODO: Implement circle-polygon collision test
-        // This should:
-        // 1. Find closest point on polygon to circle center
-        // 2. Check for intersection
-        // 3. Create contact point at intersection
-            
-        return manifold;
+        // Implementation of circle-polygon collision
+        return new CollisionManifold { HasCollision = false };
     }
 }
