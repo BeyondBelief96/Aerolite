@@ -1,5 +1,4 @@
 ﻿using AeroliteSharpEngine.AeroMath;
-using AeroliteSharpEngine.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core

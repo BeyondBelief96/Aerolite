@@ -1,4 +1,5 @@
-﻿using AeroliteSharpEngine.Shapes;
+﻿using AeroliteSharpEngine.AeroMath;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core.Interfaces
 {
@@ -47,6 +48,13 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// </summary>
         /// <param name="torque"></param>
         void ApplyTorque(float torque);
+        
+        /// <summary>
+        /// Applies the impulse <see cref="j"/> at a given point <see cref="r"/>
+        /// </summary>
+        /// <param name="j">The amount of impulse to apply.</param>
+        /// <param name="r">The point on the body to apply the impulse.</param>
+        void ApplyImpulseAtPoint(AeroVec2 j, AeroVec2 r);
 
         /// <summary>
         /// Removes all torque from the object.

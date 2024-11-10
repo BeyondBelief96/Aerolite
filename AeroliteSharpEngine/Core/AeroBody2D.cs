@@ -7,6 +7,7 @@ namespace AeroliteSharpEngine.Core
     public class AeroBody2D : Physics2DObject2DBase, IBody2D
     {
         public float Angle { get; set; }
+        
         public float PreviousAngle { get; set; }
         public float AngularVelocity { get; set; }
         public float AngularAcceleration { get; set; }
@@ -32,6 +33,14 @@ namespace AeroliteSharpEngine.Core
         {
             if (IsStatic) return;
             NetTorque += torque;
+        }
+
+        public void ApplyImpulseAtPoint(AeroVec2 j, AeroVec2 r)
+        {
+            if(IsStatic) return;
+
+            Velocity += j * InverseMass;
+            AngularVelocity += r.Cross(j) * InverseInertia;
         }
 
         public void ClearTorque()
