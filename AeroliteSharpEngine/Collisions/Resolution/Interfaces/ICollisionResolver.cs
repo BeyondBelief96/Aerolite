@@ -8,7 +8,7 @@ namespace AeroliteSharpEngine.Collisions.Resolution.Interfaces;
 public interface ICollisionResolver
 {
     /// <summary>
-    /// Resolves collisions given the information from the collision manifolds.
+    /// Resolves the list of collisions given the information from the collision manifolds.
     /// </summary>
     /// <param name="collisionManifolds">List of collision manifolds to resolve</param>
     void ResolveCollisions(IReadOnlyList<CollisionManifold> collisionManifolds);

@@ -36,7 +36,7 @@ namespace AeroliteEngine2DTestbed
             _sprites = new Sprites(this);
             _shapes = new Shapes(this);
             
-            _currentScene = new ImpulseMethodDebugScene(this, _screen, _sprites, _shapes);
+            _currentScene = new CoulombDemoScene(this, _screen, _sprites, _shapes);
             base.Initialize();
         }
 

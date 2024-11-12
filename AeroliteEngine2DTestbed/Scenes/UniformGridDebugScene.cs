@@ -158,7 +158,7 @@ public class UniformGridDebugScene : Scene
                 Equals(pair.Item1, body) || Equals(pair.Item2, body));
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
-            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
+            AeroDrawingHelpers.DrawPhysicsObject2D(body, drawColor, Shapes, Screen);
         }
     
         // Draw mouse body and its bounding area
@@ -167,7 +167,7 @@ public class UniformGridDebugScene : Scene
             bool inCollision = potentialCollisions.Any(pair => 
                 Equals(pair.Item1, mouseBody) || Equals(pair.Item2, mouseBody));
             
-            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
+            AeroDrawingHelpers.DrawPhysicsObject2D(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
             
             // Draw bounding area
             if (mouseBoundingArea != null)

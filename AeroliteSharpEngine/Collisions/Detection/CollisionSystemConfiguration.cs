@@ -4,6 +4,7 @@ using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 using AeroliteSharpEngine.Collisions.Resolution.Interfaces;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
+using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
 
 namespace AeroliteSharpEngine.Collisions.Detection;
 

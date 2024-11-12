@@ -4,6 +4,7 @@ using AeroliteEngine2DTestbed.Helpers;
 using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
+using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Shapes;
 using Flat;
@@ -18,7 +19,7 @@ public class ImpulseMethodDebugScene : Scene
 {
     private readonly AeroWorld2D world;
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
-    private int currentShapeIndex = 1;
+    private int currentShapeIndex = 0;
     private readonly Color staticColor = new Color(150, 150, 150);
     private readonly Color dynamicColor = new Color(255, 150, 100);
 
@@ -32,7 +33,7 @@ public class ImpulseMethodDebugScene : Scene
             ("Box", (x, y) => new AeroBox(40, 40)),
             ("Triangle", (x, y) => new AeroRegularPolygon(3, 30)),
             ("Pentagon", (x, y) => new AeroRegularPolygon(5, 30)),
-            ("Hexagon", (x, y) => new AeroRegularPolygon(6, 30))
+            ("Hexagon", (x, y) => new AeroRegularPolygon(6, 30)),
         };
 
         // Initialize world with gravity
@@ -45,7 +46,7 @@ public class ImpulseMethodDebugScene : Scene
         world = new AeroWorld2D(config);
         
         // Add large static object body in middle.
-        var staticObject = new AeroBody2D(Screen.Width / 2, Screen.Height / 2, 0.0f, new AeroBox(300.0f, 300.0f), 1.0f, 0.5f);
+        var staticObject = new AeroBody2D(Screen.Width / 2.0f, Screen.Height / 2.0f, 0.0f, new AeroBox(300.0f, 300.0f), 1.0f, 0.5f);
         world.AddPhysicsObject(staticObject);
         
         // Create thinner boundaries
@@ -53,7 +54,7 @@ public class ImpulseMethodDebugScene : Scene
         
         // Floor
         var floor = new AeroBody2D(
-            Screen.Width / 2, 
+            Screen.Width / 2.0f, 
             Screen.Height - 100.0f, 
             0.0f, 
             new AeroBox(Screen.Width - 100.0f, wallThickness), 
@@ -63,7 +64,7 @@ public class ImpulseMethodDebugScene : Scene
         // Left wall
         var leftWall = new AeroBody2D(
             wallThickness / 2, 
-            Screen.Height / 2, 
+            Screen.Height / 2.0f, 
             0.0f, 
             new AeroBox(wallThickness, Screen.Height), 
             0.1f, 
@@ -72,7 +73,7 @@ public class ImpulseMethodDebugScene : Scene
         // Right wall
         var rightWall = new AeroBody2D(
             Screen.Width - wallThickness / 2, 
-            Screen.Height / 2, 
+            Screen.Height / 2.0f, 
             0.0f, 
             new AeroBox(wallThickness, Screen.Height), 
             0.1f, 
@@ -111,11 +112,21 @@ public class ImpulseMethodDebugScene : Scene
 
     private void SpawnShapeAtPosition(float x, float y)
     {
-        var (_, creator) = shapeCreators[currentShapeIndex];
-        var body = new AeroBody2D(x, y, 1.0f, creator(x, y), 1.0f, 0.5f);
+        var (type, creator) = shapeCreators[currentShapeIndex];
 
-        body.Velocity = new AeroVec2(RandomHelper.RandomSingle(5, 800), 0.0f);
-        world.AddPhysicsObject(body);
+        if (type == "Circle")
+        {
+            var particle = new AeroParticle2D(x, y, 1.0f, 0.5f, 0.5f, 10.0f);
+            world.AddPhysicsObject(particle);
+        }
+        else
+        {
+            var body = new AeroBody2D(x, y, 1.0f, creator(x, y), 1.0f, 0.5f);
+
+            // body.Velocity = new AeroVec2(RandomHelper.RandomSingle(5, 800), 0.0f);
+            world.AddPhysicsObject(body);
+        }
+        
     }
 
     private void ResetScene()
@@ -125,12 +136,10 @@ public class ImpulseMethodDebugScene : Scene
 
     protected override void DrawScene(GameTime gameTime)
     {
-        // Draw static boundaries
-        foreach (var body in world.GetObjects())
+        foreach (var physicsObject in world.GetObjects())
         {
-            if (body is not AeroBody2D aeroBody) continue;
-            Color color = aeroBody.IsStatic ? staticColor : dynamicColor;
-            AeroDrawingHelpers.DrawBody(aeroBody, color, Shapes, Screen);
+            Color color = physicsObject.IsStatic ? staticColor : dynamicColor;
+            AeroDrawingHelpers.DrawPhysicsObject2D(physicsObject, color, Shapes, Screen);
         }
 
         // Draw collision contact points if in debug mode

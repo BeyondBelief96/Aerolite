@@ -166,7 +166,7 @@ public class CollisionDetectionDebugScene : Scene
                 Equals(m.ObjectA, body) || Equals(m.ObjectB, body) && m.HasCollision);
             
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 0.5f) : color;
-            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
+            AeroDrawingHelpers.DrawPhysicsObject2D(body, drawColor, Shapes, Screen);
         }
 
         // Draw mouse body
@@ -175,7 +175,7 @@ public class CollisionDetectionDebugScene : Scene
             bool inCollision = world.CollisionSystem.Collisions.Any(m => 
                 Equals(m.ObjectA, mouseBody) || Equals(m.ObjectB, mouseBody) && m.HasCollision);
             
-            AeroDrawingHelpers.DrawBody(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
+            AeroDrawingHelpers.DrawPhysicsObject2D(mouseBody, inCollision ? Color.White : Color.Orange, Shapes, Screen);
         }
 
         // Draw collision information

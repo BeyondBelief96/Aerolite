@@ -1,7 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
+using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
@@ -12,48 +16,105 @@ namespace AeroliteEngine2DTestbed.Helpers;
 public static class AeroDrawingHelpers
 {
     /// <summary>
-    /// Helper function to draw an <see cref="IBody2D"/> to the screen using monogame.
+    /// Helper function to draw an <see cref="IPhysicsObject2D"/> to the screen using monogame.
     /// </summary>
-    /// <param name="body">The body being drawn.</param>
+    /// <param name="physicsObject">The body being drawn.</param>
     /// <param name="color">The color to draw the body.</param>
     /// <param name="shapes">Helper class to draw shapes to the screen.</param>
     /// <param name="screen">Helper class containing information about the simulated screen.</param>
-    public static void DrawBody(IBody2D body, Color color, Shapes shapes, Screen screen)
+    public static void DrawPhysicsObject2D(IPhysicsObject2D physicsObject, Color color, Shapes shapes, Screen screen)
     {
         Vector2 renderPos = CoordinateSystem.ScreenToRender(
-            new Vector2(body.Position.X, body.Position.Y),
+            new Vector2(physicsObject.Position.X, physicsObject.Position.Y),
             screen.Width,
             screen.Height
         );
 
-        switch (body.Shape)
+        if (physicsObject is AeroParticle2D particle)
         {
-            case AeroCircle circle:
-                shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
-                break;
+            shapes.DrawCircleFill(renderPos, ((AeroCircle)particle.Shape).Radius, 32, color);
+        }
+        else if(physicsObject is IBody2D body)
+        {
+            switch (physicsObject.Shape)
+            {
+                case AeroCircle circle:
+                    shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
+                    break;
 
-            // The draw function rotates counter-clockwise, where my physics engine rotation is clockwise, so we negate the angle.
-            case AeroBox box:
-                shapes.DrawBoxFill(renderPos, box.Width, box.Height, -body.Angle, color);
-                break;
+                // The draw function rotates counter-clockwise, where my physics engine rotation is clockwise, so we negate the angle.
+                case AeroBox box:
+                    shapes.DrawBoxFill(renderPos, box.Width, box.Height, -body.Angle, color);
+                    break;
+                case AeroTriangle triangle:
+                    var triangleVertices = triangle.WorldVertices
+                        .Select(v => CoordinateSystem.ScreenToRender(
+                            new Vector2(v.X, v.Y),
+                            screen.Width,
+                            screen.Height))
+                        .ToArray();
+                    for (var i = 0; i < triangleVertices.Length - 2; i++)
+                    {
+                        shapes.DrawTriangleFill(
+                            triangleVertices[0],
+                            triangleVertices[i + 1],
+                            triangleVertices[i + 2],
+                            color
+                        );
+                    }
 
-            case AeroPolygon polygon:
-                var vertices = polygon.WorldVertices
-                    .Select(v => CoordinateSystem.ScreenToRender(
-                        new Vector2(v.X, v.Y),
-                        screen.Width,
-                        screen.Height))
-                    .ToArray();
-                for (var i = 0; i < vertices.Length - 2; i++)
-                {
-                    shapes.DrawTriangleFill(
-                        vertices[0],
-                        vertices[i + 1],
-                        vertices[i + 2],
-                        color
-                    );
-                }
-                break;
+                    break;
+
+                case AeroPolygon polygon:
+                    var vertices = polygon.WorldVertices
+                        .Select(v => CoordinateSystem.ScreenToRender(
+                            new Vector2(v.X, v.Y),
+                            screen.Width,
+                            screen.Height))
+                        .ToArray();
+                    for (var i = 0; i < vertices.Length - 2; i++)
+                    {
+                        shapes.DrawTriangleFill(
+                            vertices[0],
+                            vertices[i + 1],
+                            vertices[i + 2],
+                            color
+                        );
+                    }
+                    break;
+            }
+        }
+    }
+    
+    public static void KeepParticleInScreenBounds(IEnumerable<IPhysicsObject2D> physicsObjects, Screen screen)
+    {
+        foreach (var physicsObject in physicsObjects)
+        {
+            var radius = ((AeroCircle)physicsObject.Shape).Radius;
+            bool bounced = false;
+            var pos = physicsObject.Position;
+            var vel = physicsObject.Velocity;
+
+            if (pos.X < radius || pos.X > screen.Width - radius)
+            {
+                vel.X *= -1;
+                bounced = true;
+            }
+            if (pos.Y < radius || pos.Y > screen.Height - radius)
+            {
+                vel.Y *= -1;
+                bounced = true;
+            }
+
+            if (bounced)
+            {
+                physicsObject.Position = new AeroVec2(
+                    Math.Clamp(pos.X, radius, screen.Width - radius),
+                    Math.Clamp(pos.Y, radius, screen.Height - radius)
+                );
+                physicsObject.Velocity = vel;
+            }
+            
         }
     }
     

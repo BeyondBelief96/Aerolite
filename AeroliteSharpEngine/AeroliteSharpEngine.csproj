@@ -9,4 +9,9 @@
   <PropertyGroup>
     <DefineConstants>USE_DOUBLE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Collisions\Resolution\Interfaces\ICollisionStrategyFactory.cs" />
+    <Compile Remove="Collisions\Resolution\Interfaces\ICollisionResolutionStrategy.cs" />
+  </ItemGroup>
 </Project>

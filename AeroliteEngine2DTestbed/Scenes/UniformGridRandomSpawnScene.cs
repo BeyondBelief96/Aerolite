@@ -178,7 +178,7 @@ public class UniformGridRandomSpawnScene : Scene
             // Use brighter color for bodies in potential collisions
             Color drawColor = inCollision ? Color.Lerp(color, Color.White, 1.0f) : color;
 
-            AeroDrawingHelpers.DrawBody(body, drawColor, Shapes, Screen);
+            AeroDrawingHelpers.DrawPhysicsObject2D(body, drawColor, Shapes, Screen);
             var boundingArea = AABB2D.CreateFromShape(body.Shape, body.Position);
             AeroDrawingHelpers.DrawBoundingArea(boundingArea, Color.Yellow * 0.5f, Screen, Shapes);
         }
