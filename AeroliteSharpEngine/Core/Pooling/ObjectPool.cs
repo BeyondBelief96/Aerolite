@@ -1,4 +1,4 @@
-﻿namespace AeroliteSharpEngine.Core.MemoryPool;
+﻿namespace AeroliteSharpEngine.Core.Pooling;
 
 public class ObjectPool<T> where T : class, new()
 {

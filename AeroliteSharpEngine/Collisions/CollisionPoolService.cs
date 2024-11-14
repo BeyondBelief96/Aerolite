@@ -1,5 +1,5 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
-using AeroliteSharpEngine.Core.MemoryPool;
+using AeroliteSharpEngine.Core.Pooling;
 
 namespace AeroliteSharpEngine.Collisions;
 

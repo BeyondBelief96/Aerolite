@@ -1,6 +1,6 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 
-namespace AeroliteSharpEngine.Core.MemoryPool;
+namespace AeroliteSharpEngine.Core.Pooling;
 
 public class ContactPointPool
 {
