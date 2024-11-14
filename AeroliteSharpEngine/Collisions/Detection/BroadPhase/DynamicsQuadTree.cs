@@ -12,6 +12,7 @@ public class DynamicQuadTree : IBroadPhase
     {
         public AeroVec2 Center { get; init; } = center;
         public AeroVec2 HalfDimension { get; init; } = halfDimension;
+        
         public bool IsLeaf { get; init; } = isLeaf;
     }
 
@@ -59,6 +60,9 @@ public class DynamicQuadTree : IBroadPhase
         _maxDepth = maxDepth;
         _boundingAreaType = boundingAreaType;
         _checkedPairs = new HashSet<(int, int)>();
+        BoundingAreaType = boundingAreaType;
+        MaxObjectsPerNode = maxObjectsPerNode;
+        MaxDepth = maxDepth;
 
         // Calculate the center point of the region
         var center = new AeroVec2(
@@ -71,6 +75,11 @@ public class DynamicQuadTree : IBroadPhase
         
         _root = new QuadTreeNode(center, halfDimensions);
     }
+    
+    public BoundingAreaType BoundingAreaType { get; }
+    public int MaxObjectsPerNode { get; }
+    public int MaxDepth { get; }
+
 
     public void Update(IEnumerable<IPhysicsObject2D?> objects)
     {

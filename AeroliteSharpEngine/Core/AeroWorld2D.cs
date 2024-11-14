@@ -1,11 +1,13 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.ForceGenerators;
 using AeroliteSharpEngine.Interfaces;
 using AeroliteSharpEngine.Performance;
+using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core;
 
@@ -19,6 +21,8 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     private readonly ForceRegistry _forceRegistry = new();
     private readonly IPerformanceMonitor _performanceMonitor = new ConsolePerformanceLogger();
     private AeroWorldConfiguration _configuration = configuration;
+    
+    private SimulationBounds Bounds => _configuration.SimulationBounds;
     
     #endregion
     
@@ -39,6 +43,47 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     #endregion
     
     #region Public Methods
+    
+    #region Bounds Management Methods
+
+    /// <summary>
+    /// Updates the simulation bounds with new dimensions
+    /// </summary>
+    public void ResizeSimulation(float width, float height)
+    {
+        UpdateBounds(new SimulationBounds(width, height, Bounds.RemovalThreshold));
+    }
+
+    /// <summary>
+    /// Updates the removal threshold for out-of-bounds objects
+    /// </summary>
+    public void SetRemovalThreshold(float threshold)
+    {
+        UpdateBounds(new SimulationBounds(Bounds.Width, Bounds.Height, threshold));
+    }
+
+    /// <summary>
+    /// Updates all simulation bounds parameters
+    /// </summary>
+    public void UpdateBounds(float width, float height, float threshold)
+    {
+        UpdateBounds(new SimulationBounds(width, height, threshold));
+    }
+
+    private void UpdateBounds(SimulationBounds newBounds)
+    {
+        // Update configuration
+        _configuration = _configuration.WithBounds(
+            newBounds.Width, 
+            newBounds.Height, 
+            newBounds.RemovalThreshold
+        );
+
+        // Update broadphase if needed
+        UpdateBroadPhase();
+    }
+
+    #endregion
 
     public AeroWorldConfiguration GetConfiguration() => _configuration;
 
@@ -117,6 +162,8 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             _performanceMonitor.BeginStep();
 
         _forceRegistry.UpdateForces(dt);
+        
+        RemoveOutOfBoundsObjects();
 
         foreach (var physicsObject in _dynamicObjects)
         {
@@ -153,6 +200,49 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);
     }
+    
+    #endregion
+    
+    #region Private Methods
+    
+    private void UpdateBroadPhase()
+    {
+        if (_configuration.CollisionSystemConfiguration.BroadPhase is DynamicQuadTree quadTree)
+        {
+            var newQuadTree = new DynamicQuadTree(
+                Bounds.Width,
+                Bounds.Height,
+                new AeroVec2(Bounds.Left, Bounds.Top),
+                quadTree.BoundingAreaType,
+                quadTree.MaxObjectsPerNode,
+                quadTree.MaxDepth
+            );
+
+            _configuration = _configuration.WithCollisionSystemConfiguration(
+                _configuration.CollisionSystemConfiguration.WithBroadPhase(newQuadTree)
+            );
+            
+            CollisionSystem = new CollisionSystem(_configuration.CollisionSystemConfiguration);
+        }
+    }
+    
+    private void RemoveOutOfBoundsObjects()
+    {
+        var objectsToRemove = _dynamicObjects
+            .Where(IsOutOfBounds)
+            .ToList();
+
+        foreach (var obj in objectsToRemove)
+        {
+            RemovePhysicsObject(obj);
+        }
+    }
+
+    private bool IsOutOfBounds(IPhysicsObject2D obj)
+    {
+        return Bounds.IsOutsideRemovalThreshold(obj.Position);
+    }
+
     
     #endregion
 }

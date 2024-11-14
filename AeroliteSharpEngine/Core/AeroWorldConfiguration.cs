@@ -7,6 +7,11 @@ namespace AeroliteSharpEngine.Core;
 public struct AeroWorldConfiguration 
 {
     /// <summary>
+    /// Stores information about the bounds of the physics simulation space.
+    /// </summary>
+    public SimulationBounds SimulationBounds { get; private set; }
+    
+    /// <summary>
     /// Configuration value for the force of gravity to act on all objects in the physics world every time step.
     /// </summary>
     public float Gravity { get; private set; }
@@ -35,10 +40,12 @@ public struct AeroWorldConfiguration
     /// </summary>
     public static AeroWorldConfiguration Default => new()
     {
+        SimulationBounds = new SimulationBounds(2560, 1440),
         Gravity = 0f,
         CollisionSystemConfiguration = Collisions.Detection.CollisionSystemConfiguration.Default(),
         Integrator = new EulerIntegrator(),
         EnablePerformanceMonitoring = false
+        
     };
     
     /// <summary>
@@ -49,6 +56,19 @@ public struct AeroWorldConfiguration
     public AeroWorldConfiguration WithGravity(float gravity)
     {
         Gravity = gravity;
+        return this;
+    }
+    
+    /// <summary>
+    /// Configures the physics world to have the configured width and height.
+    /// </summary>
+    /// <param name="width">The value to set the simulation width to.</param>
+    /// <param name="height">The value to set the simulation height to.</param>
+    /// <param name="threshold">The value to set the threshold to remove objects out of bounds at.</param>
+    /// <returns>An instance of <see cref="AeroWorldConfiguration"/></returns>
+    public AeroWorldConfiguration WithBounds(float width, float height, float threshold = 100.0f)
+    {
+        SimulationBounds = new SimulationBounds(width, height, threshold);
         return this;
     }
     

@@ -36,7 +36,7 @@ public class QuadTreeDebugScene : Scene
     private int currentShapeIndex;
 
     // Keep track of static boundaries
-    private readonly List<IPhysicsObject2D> bodySceneBoundaries = new();
+    private readonly List<IPhysicsObject2D> bodySceneBoundaries = [];
 
     public QuadTreeDebugScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
@@ -164,6 +164,8 @@ public class QuadTreeDebugScene : Scene
                 SpawnParticle(Screen.Width / 2.0f + RandomHelper.RandomSingle(-50, 50), Screen.Height - 150);
                 particleSpawnTimer = 0f;
             }
+            
+            //AeroDrawingHelpers.KeepParticleInScreenBounds(world.GetDynamicParticles(), Screen);
         }
 
         // Reset scene if R is pressed
@@ -176,11 +178,6 @@ public class QuadTreeDebugScene : Scene
         }
 
         world.Update(dt);
-
-        if (isParticleScene)
-        {
-            AeroDrawingHelpers.KeepParticleInScreenBounds(world.GetDynamicParticles(), Screen);
-        }
     }
 
     private void SpawnParticle(float x, float y)
