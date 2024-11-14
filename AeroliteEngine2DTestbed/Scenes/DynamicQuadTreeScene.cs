@@ -33,7 +33,7 @@ public class QuadTreeDebugScene : Scene
     private const int MAX_PARTICLES = 10_000;
 
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
-    private int currentShapeIndex = 0;
+    private int currentShapeIndex;
 
     // Keep track of static boundaries
     private readonly List<IPhysicsObject2D> bodySceneBoundaries = new();
@@ -56,12 +56,9 @@ public class QuadTreeDebugScene : Scene
             maxObjectsPerNode: 3,
             maxDepth: 6
         );
-        
-        var uniformGrid = new UniformGrid(BoundingAreaType.AABB);
-
         var config = AeroWorldConfiguration.Default
             .WithPerformanceMonitoring(true)
-            .WithIntegrator(new RK4Integrator())
+            .WithIntegrator(new EulerIntegrator())
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
                 .WithBroadPhase(quadTree)
                 .WithCollisionResolver(new ImpulseMethodCollisionResolver()));
