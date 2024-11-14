@@ -14,7 +14,7 @@ public class ImpulseMethodCollisionResolver : CollisionResolverBase
     protected override void ResolveBodyBody(CollisionManifold manifold, IBody2D bodyA, IBody2D bodyB)
     {
         var e = Math.Min(bodyA.Restitution, bodyB.Restitution);
-        var f = Math.Min(bodyA.Friction, bodyB.Friction);
+        var f = (bodyA.StaticFriction + bodyB.StaticFriction) * 0.5f;
         
         var ra = manifold.Contact.EndPoint - bodyA.Position;
         var rb = manifold.Contact.StartPoint - bodyB.Position;
@@ -37,7 +37,7 @@ public class ImpulseMethodCollisionResolver : CollisionResolverBase
     protected override void ResolveBodyParticle(CollisionManifold manifold, IBody2D body, AeroParticle2D particle)
     {
         var e = Math.Min(body.Restitution, particle.Restitution);
-        var f = Math.Min(body.Friction, particle.Friction);
+        var f = Math.Min(body.StaticFriction, particle.StaticFriction);
         
         var r = manifold.Contact.StartPoint - body.Position;
         
@@ -57,7 +57,7 @@ public class ImpulseMethodCollisionResolver : CollisionResolverBase
         var vRelTangent = vRel.Dot(tangent);
         var denominatorT = particle.InverseMass + body.InverseMass +
             (r.Cross(tangent) * r.Cross(tangent)) * body.InverseInertia;
-        var jt = tangent * (f * -(1 + e) * vRelTangent / denominatorT);
+        var jt = tangent * (f * (-(1 + e) * vRelTangent) / denominatorT);
         
         var j = jn + jt;
         particle.ApplyImpulse(j);
@@ -94,8 +94,7 @@ public class ImpulseMethodCollisionResolver : CollisionResolverBase
         return normal * magnitude;
     }
 
-    private static AeroVec2 CalculateTangentialImpulse(
-        AeroVec2 normal, AeroVec2 vRel, float f,
+    private static AeroVec2 CalculateTangentialImpulse(AeroVec2 normal, AeroVec2 vRel, float f,
         IBody2D bodyA, IBody2D bodyB,
         AeroVec2 ra, AeroVec2 rb)
     {
@@ -108,7 +107,7 @@ public class ImpulseMethodCollisionResolver : CollisionResolverBase
             (raCrossT * raCrossT) * bodyA.InverseInertia +
             (rbCrossT * rbCrossT) * bodyB.InverseInertia;
             
-        var magnitude = f * -(1 + f) * vRelTangent / denominator;
+        var magnitude = -f * vRelTangent / denominator;
         return tangent * magnitude;
     }
 }

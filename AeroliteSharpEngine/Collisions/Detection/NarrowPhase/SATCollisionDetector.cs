@@ -1,5 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
+using AeroliteSharpEngine.Collisions.Detection.PrimitiveTests;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
@@ -35,6 +36,7 @@ public class SATCollisionDetector : ConvexShapeCollisionDetectorBase
 
         return manifold;
     }
+
     /// <summary>
     /// Tests for collisions and computes contact information between two polygons.
     /// </summary>

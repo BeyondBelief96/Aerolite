@@ -6,6 +6,7 @@ using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.ForceGenerators;
+using AeroliteSharpEngine.Integrators;
 using Flat.Graphics;
 using Flat.Input;
 using Microsoft.Xna.Framework;
@@ -25,9 +26,9 @@ public class CoulombDemoScene : Scene
     private const float PARTICLE_RADIUS = 8.0f;
     private const float PROTON_CHARGE = 1.0f;
     private const float ELECTRON_CHARGE = -1.0f;
-    private const float FORCE_SCALE = 1e-5f;
+    private const float FORCE_SCALE = 2e-6f;
     private const float DAMPING = 0.999f;
-    private const int MAX_PARTICLES = 100;
+    private const int MAX_PARTICLES = 700;
     private const float SPAWN_INTERVAL = 0.01f;
     
     private readonly TrailSystem trailSystem;
@@ -41,10 +42,11 @@ public class CoulombDemoScene : Scene
 
     public CoulombDemoScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
-    {
+    {  
         var config = AeroWorldConfiguration.Default
             .WithGravity(0.0f)
             .WithPerformanceMonitoring(true)
+            .WithIntegrator(new RK4Integrator())
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default().WithBroadPhase(new UniformGrid(BoundingAreaType.BoundingCircle, 20.0f)));
         
         world = new AeroWorld2D(config);

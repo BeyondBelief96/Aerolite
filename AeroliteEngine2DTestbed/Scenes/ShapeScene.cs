@@ -80,7 +80,7 @@ public class ShapeScene : Scene
         body.Velocity = velocity;
         body.Damping = 0.99f; 
         body.Restitution = 0.8f;  
-        body.Friction = 0.2f; 
+        body.StaticFriction = 0.2f; 
 
         // Add to collections
         bodies.Add((body, color));

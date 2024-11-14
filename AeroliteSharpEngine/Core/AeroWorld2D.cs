@@ -11,6 +11,8 @@ namespace AeroliteSharpEngine.Core;
 
 public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWorld
 {
+    #region Fields
+    
     private readonly List<IPhysicsObject2D> _dynamicObjects = [];
     private readonly List<IPhysicsObject2D> _staticObjects = [];
     private readonly List<AeroVec2> _globalForces = [];
@@ -18,14 +20,26 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     private readonly IPerformanceMonitor _performanceMonitor = new ConsolePerformanceLogger();
     private AeroWorldConfiguration _configuration = configuration;
     
+    #endregion
+    
+    #region Properties
+    
     public float Gravity { get; set; } = configuration.Gravity;
     public ICollisionSystem CollisionSystem { get; private set; } = new CollisionSystem(configuration.CollisionSystemConfiguration);
     public bool PerformanceMonitoringEnabled { get; set; } = configuration.EnablePerformanceMonitoring;
+    
+    #endregion
+    
+    #region Constructor
 
     // Default constructor
     public AeroWorld2D() : this(AeroWorldConfiguration.Default)
     {
     }
+    
+    #endregion
+    
+    #region Public Methods
 
     public AeroWorldConfiguration GetConfiguration() => _configuration;
 
@@ -115,6 +129,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             
             _configuration.Integrator.IntegrateLinear(physicsObject, dt);
             _configuration.Integrator.IntegrateAngular(physicsObject, dt);
+            physicsObject.UpdateGeometry();
         }
         
         // Also update static bodies - they might be rotated/moved by the user
@@ -123,16 +138,17 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
             physicsObject.UpdateGeometry();
         }
         
-        foreach (var physicsObject in _dynamicObjects)
-        {
-            physicsObject.UpdateGeometry();
-        }
-        
         //TODO: Maybe optimize how the collision system handles both static/dynamic objects.
         // Currently this has allocate a new list in O(n) time each from which is not great.
-        CollisionSystem.HandleCollisions(GetObjects());
-        
+
+        for (int n = 0; n < 1; n++)
+        {
+            CollisionSystem.HandleCollisions(GetObjects());
+        }
+ 
         if(PerformanceMonitoringEnabled)
             _performanceMonitor.EndStep(this);
     }
+    
+    #endregion
 }

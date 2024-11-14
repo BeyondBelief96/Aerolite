@@ -6,6 +6,7 @@ using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Shapes;
 using Flat;
 using Flat.Graphics;
@@ -40,13 +41,14 @@ public class ImpulseMethodDebugScene : Scene
         var config = AeroWorldConfiguration.Default
             .WithGravity(500.0f)  // Standard gravity
             .WithPerformanceMonitoring(true)
+            .WithIntegrator(new RK4Integrator())
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
                 .WithCollisionResolver(new ImpulseMethodCollisionResolver()));
         
         world = new AeroWorld2D(config);
         
         // Add large static object body in middle.
-        var staticObject = new AeroBody2D(Screen.Width / 2.0f, Screen.Height / 2.0f, 0.0f, new AeroBox(300.0f, 300.0f), 1.0f, 0.5f);
+        var staticObject = new AeroBody2D(Screen.Width / 2.0f, Screen.Height / 2.0f, 0.0f, new AeroBox(300.0f, 300.0f), 0.5f, 0.5f);
         world.AddPhysicsObject(staticObject);
         
         // Create thinner boundaries
@@ -58,7 +60,7 @@ public class ImpulseMethodDebugScene : Scene
             Screen.Height - 100.0f, 
             0.0f, 
             new AeroBox(Screen.Width - 100.0f, wallThickness), 
-            0.1f, 
+            0.5f, 
             0.5f);
         
         // Left wall
@@ -67,7 +69,7 @@ public class ImpulseMethodDebugScene : Scene
             Screen.Height / 2.0f, 
             0.0f, 
             new AeroBox(wallThickness, Screen.Height), 
-            0.1f, 
+            1.0f, 
             0.5f);
         
         // Right wall
@@ -76,7 +78,7 @@ public class ImpulseMethodDebugScene : Scene
             Screen.Height / 2.0f, 
             0.0f, 
             new AeroBox(wallThickness, Screen.Height), 
-            0.1f, 
+            1.0f, 
             0.5f);
 
         world.AddPhysicsObject(floor);
@@ -113,19 +115,13 @@ public class ImpulseMethodDebugScene : Scene
     private void SpawnShapeAtPosition(float x, float y)
     {
         var (type, creator) = shapeCreators[currentShapeIndex];
-
-        if (type == "Circle")
+        
+        var body = new AeroBody2D(x, y, 1.0f, creator(x, y), 0.5f, 0.5f)
         {
-            var particle = new AeroParticle2D(x, y, 1.0f, 0.5f, 0.5f, 10.0f);
-            world.AddPhysicsObject(particle);
-        }
-        else
-        {
-            var body = new AeroBody2D(x, y, 1.0f, creator(x, y), 1.0f, 0.5f);
-
-            // body.Velocity = new AeroVec2(RandomHelper.RandomSingle(5, 800), 0.0f);
-            world.AddPhysicsObject(body);
-        }
+            Velocity = new AeroVec2(RandomHelper.RandomSingle(5, 800), 0.0f)
+        };
+        world.AddPhysicsObject(body);
+        
         
     }
 

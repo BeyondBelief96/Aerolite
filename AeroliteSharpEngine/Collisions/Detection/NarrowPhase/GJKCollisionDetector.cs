@@ -15,4 +15,10 @@ public class GJKCollisionDetector : ConvexShapeCollisionDetectorBase
         // Implement GJK algorithm here
         throw new NotImplementedException("GJK algorithm not implemented yet");
     }
+
+    protected override CollisionManifold TestCirclePolygon(IPhysicsObject2D circleBody, IPhysicsObject2D polygonBody, AeroCircle circle,
+        AeroPolygon polygon)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -39,7 +39,16 @@ public static class AeroDrawingHelpers
             switch (physicsObject.Shape)
             {
                 case AeroCircle circle:
-                    shapes.DrawCircleFill(renderPos, circle.Radius, 32, color);
+                    shapes.DrawCircle(renderPos, circle.Radius, 32, color);
+                
+                    // Calculate the end point of the rotation line
+                    var direction = new Vector2(
+                        MathF.Cos(-body.Angle), // Negate angle to match your clockwise rotation
+                        MathF.Sin(-body.Angle)
+                    );
+                    var lineEnd = renderPos + direction * circle.Radius;
+                
+                    shapes.DrawLine(renderPos, lineEnd, color);
                     break;
 
                 // The draw function rotates counter-clockwise, where my physics engine rotation is clockwise, so we negate the angle.

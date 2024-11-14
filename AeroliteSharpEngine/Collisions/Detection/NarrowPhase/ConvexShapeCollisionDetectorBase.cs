@@ -1,6 +1,7 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
+using AeroliteSharpEngine.Collisions.Detection.PrimitiveTests;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 
@@ -91,7 +92,48 @@ public abstract class ConvexShapeCollisionDetectorBase : INarrowPhase
         AeroCircle circle,
         AeroPolygon polygon)
     {
-        // Implementation of circle-polygon collision
-        return new CollisionManifold { HasCollision = false };
+        var manifold = new CollisionManifold()
+        {
+            ObjectA = circleBody,
+            ObjectB = polygonBody,
+            HasCollision = false
+        };
+
+        // Find the closest point on the polygon to the circle center
+        var closestPoint = CollisionUtilities.FindClosestEdgePoint(polygon.WorldVertices, circleBody.Position);
+    
+        // Vector from polygon to circle (matching bodyA to bodyB direction)
+        var normal = closestPoint - circleBody.Position;
+        float distanceSquared = normal.MagnitudeSquared;
+    
+        // Check if circle and polygon are colliding
+        if (distanceSquared > circle.Radius * circle.Radius)
+        {
+            return manifold;
+        }
+
+        float distance = MathF.Sqrt(distanceSquared);
+    
+        // Normalize the normal vector (if not zero distance)
+        if (!AeroMathExtensions.IsNearlyZero(distance))
+        {
+            normal.Normalize();
+        }
+        else
+        {
+            // If circle center is exactly on the polygon edge, use the edge normal
+            normal = polygon.GetEdgeNormal(0);
+        }
+
+        manifold.HasCollision = true;
+        manifold.Normal = normal;  // Points from circle to polygon
+        manifold.Contact = new ContactPoint
+        {
+            StartPoint = circleBody.Position + (normal * circle.Radius), 
+            EndPoint = closestPoint,          // End at polygon point
+            Depth = circle.Radius - distance  // Penetration depth
+        };
+
+        return manifold;
     }
 }

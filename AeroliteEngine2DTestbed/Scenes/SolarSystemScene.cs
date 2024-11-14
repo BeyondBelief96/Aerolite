@@ -20,7 +20,7 @@ public class SolarSystemScene : Scene
     private const float SunMass = 1000f;              // Reduced from 10000
     private const float PlanetMass = 1f;              // Base mass for planets
     private const float AsteroidMass = 0.1f;          // Small mass for asteroids
-    private const float OrbitSpeedMultiplier = 1.0f; 
+    private const float OrbitSpeedMultiplier = 10.0f; 
 
     private readonly IAeroPhysicsWorld _world;
     private AeroParticle2D _sun;

@@ -28,7 +28,7 @@ namespace AeroliteSharpEngine.Core
             set => _restitution = AeroMathExtensions.Clamp(value, 0, 1);
         }
 
-        public float Friction { get; set; }
+        public float StaticFriction { get; set; }
         public AeroVec2 Position { get; set; }
         public AeroVec2 PreviousPosition { get; set; }
         public AeroVec2 Velocity { get; set; }
@@ -69,7 +69,7 @@ namespace AeroliteSharpEngine.Core
             NetForce = new AeroVec2();
             Damping = 0.99f;
             Restitution = restitution;
-            Friction = friction;
+            StaticFriction = friction;
             Shape = shape;
         }
 

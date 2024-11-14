@@ -27,7 +27,7 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// <summary>
         /// Represents the coefficient of friction of the object. 
         /// </summary>
-        float Friction { get; set; }
+        float StaticFriction { get; set; }
 
         /// <summary>
         /// The position of the objects center of mass.

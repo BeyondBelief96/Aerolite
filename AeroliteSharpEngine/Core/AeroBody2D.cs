@@ -10,6 +10,7 @@ namespace AeroliteSharpEngine.Core
         
         public float PreviousAngle { get; set; }
         public float AngularVelocity { get; set; }
+        
         public float AngularAcceleration { get; set; }
         public float NetTorque { get; set; }
         public float Inertia { get; private set; }

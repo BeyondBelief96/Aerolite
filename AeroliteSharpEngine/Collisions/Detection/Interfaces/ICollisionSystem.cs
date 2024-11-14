@@ -29,9 +29,9 @@ public interface ICollisionSystem
     void Clear();
     
     /// <summary>
-    /// Performs collision detection on the collection of <see cref="IPhysicsObject2D"/>
+    /// Performs collision detection and resolution on the collection of <see cref="IPhysicsObject2D"/>
     /// </summary>
-    /// <param name="objects"></param>
+    /// <param name="objects">The collection of simulation objects to perform collision checks and resolutions on.</param>
     /// <returns>The collision manifolds which contain collision information.</returns>
     void HandleCollisions(IReadOnlyList<IPhysicsObject2D> objects);
 }

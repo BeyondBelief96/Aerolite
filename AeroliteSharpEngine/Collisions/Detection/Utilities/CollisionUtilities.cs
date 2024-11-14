@@ -191,6 +191,23 @@ public static class CollisionUtilities
 
             return (min, max);
         }
+
+        public static (float min, float max) ProjectCircle(AeroVec2 circleCenter, float circleRadius, AeroVec2 axis)
+        {
+            axis.Normalize();
+            var p1 = circleCenter + axis * circleRadius;
+            var p2 = circleCenter - axis * circleRadius;
+
+            var min = p1.Dot(axis);
+            var max = p2.Dot(axis);
+            
+            if (min > max)
+            {
+                AeroMathExtensions.Swap(ref min, ref max);
+            }
+
+            return (min, max);
+        }
         
         /// <summary>
         /// Finds the closest point on any edge of the polygon to a given point

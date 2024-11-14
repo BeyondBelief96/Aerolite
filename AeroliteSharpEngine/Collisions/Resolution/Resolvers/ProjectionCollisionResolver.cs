@@ -1,5 +1,6 @@
 ﻿using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Resolution.Interfaces;
+using AeroliteSharpEngine.Core.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions.Resolution.Resolvers;
 
@@ -18,8 +19,11 @@ public class ProjectionCollisionResolver : ICollisionResolver
             float da = bodyA.InverseMass * (collisionManifold.Contact.Depth / (bodyA.InverseMass + bodyB.InverseMass));
             float db = bodyB.InverseMass * (collisionManifold.Contact.Depth / (bodyB.InverseMass + bodyA.InverseMass));
             
-            bodyA.Position -= da * collisionManifold.Normal;
-            bodyB.Position += db * collisionManifold.Normal;
+            bodyA.Position -= da * collisionManifold.Normal * 0.8f;
+            bodyB.Position += db * collisionManifold.Normal * 0.8f;
+
+            bodyA.UpdateGeometry();
+            bodyB.UpdateGeometry();
         }
     }
 }

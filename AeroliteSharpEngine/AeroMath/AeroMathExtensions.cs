@@ -10,7 +10,7 @@ public static class AeroMathExtensions
     /// <summary>
     /// The machine epsilon value for double (double precision)
     /// </summary>
-    public const double DoubleEpsilon = 2.2204460492503131E-16;
+    private const double DoubleEpsilon = 2.2204460492503131E-16;
     
     /// <summary>
     /// Default tolerance for float comparisons, slightly larger than machine epsilon
@@ -22,6 +22,11 @@ public static class AeroMathExtensions
         if (value < min) value = min;
         if(value > max) value = max;
         return value;
+    }
+
+    public static void Swap<T>(ref T a, ref T b)
+    {
+        (a, b) = (b, a);
     }
     
     /// <summary>
