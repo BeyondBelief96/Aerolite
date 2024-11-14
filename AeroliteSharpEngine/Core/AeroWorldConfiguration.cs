@@ -37,7 +37,7 @@ public struct AeroWorldConfiguration
     {
         Gravity = 0f,
         CollisionSystemConfiguration = Collisions.Detection.CollisionSystemConfiguration.Default(),
-        Integrator = new SymplecticEulerIntegrator(),
+        Integrator = new EulerIntegrator(),
         EnablePerformanceMonitoring = false
     };
     

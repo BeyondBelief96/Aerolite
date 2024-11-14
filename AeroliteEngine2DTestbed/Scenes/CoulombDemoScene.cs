@@ -42,12 +42,14 @@ public class CoulombDemoScene : Scene
 
     public CoulombDemoScene(Game game, Screen screen, Sprites sprites, Shapes shapes)
         : base(game, screen, sprites, shapes)
-    {  
+    {
         var config = AeroWorldConfiguration.Default
             .WithGravity(0.0f)
             .WithPerformanceMonitoring(true)
-            .WithIntegrator(new SymplecticEulerIntegrator())
-            .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default().WithBroadPhase(new UniformGrid(BoundingAreaType.BoundingCircle, 20.0f)));
+            .WithIntegrator(new EulerIntegrator())
+            .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
+                .WithBroadPhase(new DynamicQuadTree(screen.Width, screen.Height, new AeroVec2(0, 0),
+                    BoundingAreaType.AABB)));
         
         world = new AeroWorld2D(config);
         Camera.Zoom = 1;

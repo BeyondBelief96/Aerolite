@@ -8,16 +8,10 @@ namespace AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 /// Represents an axis-aligned bounding box using center-radius representation
 /// </summary>
 // ReSharper disable once InconsistentNaming
-public struct AABB2D : IBoundingArea
+public struct AABB2D(AeroVec2 center, AeroVec2 halfExtents) : IBoundingArea
 {
-    public AeroVec2 Center { get; private set; }
-    public AeroVec2 HalfExtents { get; private set; }
-
-    private AABB2D(AeroVec2 center, AeroVec2 halfExtents)
-    {
-        Center = center;
-        HalfExtents = halfExtents;
-    }
+    public AeroVec2 Center { get; private set; } = center;
+    public AeroVec2 HalfExtents { get; private set; } = halfExtents;
 
     public void Realign(float angle, AeroVec2 position)
     {

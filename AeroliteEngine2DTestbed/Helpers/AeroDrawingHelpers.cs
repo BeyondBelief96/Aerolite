@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 using AeroliteSharpEngine.Core;
@@ -214,6 +216,16 @@ public static class AeroDrawingHelpers
                 screen.Height
             );
             shapes.DrawLine(start, end, new Color(50, 50, 50));
+        }
+    }
+    
+    public static void DrawQuadTree(DynamicQuadTree quadTree, Color nodeColor, Color leafNodeColor, Screen screen, Shapes shapes)
+    {
+        foreach (var node in quadTree.GetAllNodes())
+        {
+            var center = CoordinateSystem.ScreenToRender(new Vector2(node.Center.X, node.Center.Y), screen.Width, screen.Height);
+
+            shapes.DrawBox(center, node.HalfDimension.X * 2.0f, node.HalfDimension.Y * 2.0f, Color.Green);
         }
     }
 }

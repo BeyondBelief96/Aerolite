@@ -3,7 +3,7 @@ using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.Integrators;
 
-public class SymplecticEulerIntegrator : IIntegrator
+public class EulerIntegrator : IIntegrator
 {
     public void IntegrateLinear(IPhysicsObject2D obj, float dt)
     {

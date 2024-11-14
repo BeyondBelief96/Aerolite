@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using AeroliteEngine2DTestbed.Helpers;
 using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection;
-using AeroliteSharpEngine.Collisions.Resolution.Resolvers;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
 using AeroliteSharpEngine.Core;
 using AeroliteSharpEngine.Integrators;
@@ -43,6 +43,7 @@ public class ImpulseMethodDebugScene : Scene
             .WithPerformanceMonitoring(true)
             .WithIntegrator(new RK4Integrator())
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default()
+                .WithBroadPhase(new DynamicQuadTree(screen.Width, screen.Height, new AeroVec2(0, 0), BoundingAreaType.AABB))
                 .WithCollisionResolver(new ImpulseMethodCollisionResolver()));
         
         world = new AeroWorld2D(config);
