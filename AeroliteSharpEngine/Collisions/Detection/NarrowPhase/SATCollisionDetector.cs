@@ -10,31 +10,44 @@ namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 /// Implementation of collision detection using the Separating Axis Theorem (SAT)
 /// for convex shapes.
 /// </summary>
-public class SATCollisionDetector : ConvexShapeCollisionDetectorBase
+public class SATCollisionDetector : ConvexShapeCollisionDetector
 {
-    protected override CollisionManifold TestPolygonPolygon(
+    protected override void TestPolygonPolygon(
+        CollisionManifold manifold,
         IPhysicsObject2D bodyA,
         IPhysicsObject2D bodyB,
         AeroPolygon polygonA,
         AeroPolygon polygonB)
     {
-        var manifold = new CollisionManifold
+        float abSeparation = polygonA.FindMinimumSeparation(polygonB, out var aAxis, out var aPoint);
+        if (abSeparation >= 0)
         {
-            ObjectA = bodyA,
-            ObjectB = bodyB,
-            HasCollision = false,
-        };
+            return; // No collision
+        }
 
-        var (hasCollision, normal, contactPoint) = TestPolygonPolygon(
-            polygonA, polygonB);
+        float baSeparation = polygonB.FindMinimumSeparation(polygonA, out var bAxis, out var bPoint);
+        if (baSeparation >= 0)
+        {
+            return; // No collision
+        }
 
-        if (!hasCollision) return manifold;
+        // We have a collision - set up the manifold
+        manifold.HasCollision = true;
 
-        manifold.HasCollision = hasCollision;
-        manifold.Normal = normal;
-        manifold.Contact = contactPoint;
-
-        return manifold;
+        if (abSeparation > baSeparation)
+        {
+            manifold.Contact.Depth = -abSeparation;
+            manifold.Normal = aAxis;
+            manifold.Contact.StartPoint = aPoint;
+            manifold.Contact.EndPoint = aPoint + manifold.Normal * manifold.Contact.Depth;
+        }
+        else
+        {
+            manifold.Contact.Depth = -baSeparation;
+            manifold.Normal = -bAxis;
+            manifold.Contact.StartPoint = bPoint;
+            manifold.Contact.EndPoint = bPoint + manifold.Normal * manifold.Contact.Depth;
+        }
     }
 
     /// <summary>

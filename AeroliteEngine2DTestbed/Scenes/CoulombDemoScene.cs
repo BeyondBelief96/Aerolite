@@ -26,7 +26,7 @@ public class CoulombDemoScene : Scene
     private const float PARTICLE_RADIUS = 8.0f;
     private const float PROTON_CHARGE = 1.0f;
     private const float ELECTRON_CHARGE = -1.0f;
-    private const float FORCE_SCALE = 2e-6f;
+    private const float FORCE_SCALE = 2e-7f;
     private const float DAMPING = 0.999f;
     private const int MAX_PARTICLES = 700;
     private const float SPAWN_INTERVAL = 0.01f;
@@ -46,7 +46,7 @@ public class CoulombDemoScene : Scene
         var config = AeroWorldConfiguration.Default
             .WithGravity(0.0f)
             .WithPerformanceMonitoring(true)
-            .WithIntegrator(new RK4Integrator())
+            .WithIntegrator(new SymplecticEulerIntegrator())
             .WithCollisionSystemConfiguration(CollisionSystemConfiguration.Default().WithBroadPhase(new UniformGrid(BoundingAreaType.BoundingCircle, 20.0f)));
         
         world = new AeroWorld2D(config);

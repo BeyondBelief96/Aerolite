@@ -1,13 +1,10 @@
-﻿using AeroliteSharpEngine.Collisions.Detection;
-using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
-using AeroliteSharpEngine.Collisions.Detection.Interfaces;
-using AeroliteSharpEngine.Core.Interfaces;
+﻿using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 
-namespace AeroliteSharpEngine.Collisions
+namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase
 {
-    public class GeneralShapeCollisionDetector : INarrowPhase
+    public class GeneralShapeCollisionDetector : NarrowPhaseBase
     {
-        public CollisionManifold TestCollision(IPhysicsObject2D object2DA, IPhysicsObject2D object2DB)
+        protected override void TestCollisionInternal(CollisionManifold manifold)
         {
             throw new NotImplementedException();
         }

@@ -8,7 +8,10 @@ public class ContactPointPool
 
     public ContactPointPool(int initialCapacity = 100)
     {
-        _pool = new ObjectPool<ContactPoint>(initialCapacity, resetAction: contact => contact.Reset());
+        _pool = new ObjectPool<ContactPoint>(
+            initialCapacity,
+            resetAction: contact => contact.Reset()
+        );
     }
 
     public ContactPoint Get() => _pool.Get();

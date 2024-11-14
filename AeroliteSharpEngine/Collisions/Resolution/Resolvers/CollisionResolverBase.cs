@@ -34,13 +34,18 @@ public abstract class CollisionResolverBase : ICollisionResolver
         }
         else if (manifold.ObjectA is AeroParticle2D particle2 && manifold.ObjectB is IBody2D body2)
         {
-            // Swap objects and normal for consistent handling
-            var swappedManifold = new CollisionManifold(manifold.Contact, manifold.ObjectB, manifold.ObjectA)
-            {
-                Normal = -manifold.Normal,
-                HasCollision = true
-            };
+            // Get swapped manifold from pool
+            var swappedManifold = CollisionPoolService.Instance.GetManifold();
+            swappedManifold.ObjectA = manifold.ObjectB;
+            swappedManifold.ObjectB = manifold.ObjectA;
+            swappedManifold.Normal = -manifold.Normal;
+            swappedManifold.HasCollision = true;
+            swappedManifold.Contact = manifold.Contact; // Reuse contact point
+            
             ResolveBodyParticle(swappedManifold, body2, particle2);
+            
+            // Return the swapped manifold to the pool
+            CollisionPoolService.Instance.ReturnManifold(swappedManifold);
         }
         else if (manifold.ObjectA is AeroParticle2D particleA && manifold.ObjectB is AeroParticle2D particleB)
         {

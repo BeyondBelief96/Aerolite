@@ -13,6 +13,7 @@ public class ProjectionCollisionResolver : ICollisionResolver
             var bodyA = collisionManifold.ObjectA;
             var bodyB = collisionManifold.ObjectB;
 
+            if (bodyA == null || bodyB == null) return;
             // Don't move if both bodies are static.
             if (bodyA.IsStatic && bodyB.IsStatic) return;
             

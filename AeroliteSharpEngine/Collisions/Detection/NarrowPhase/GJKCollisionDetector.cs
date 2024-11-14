@@ -4,9 +4,10 @@ using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Collisions.Detection.NarrowPhase;
 
-public class GJKCollisionDetector : ConvexShapeCollisionDetectorBase
+public class GJKCollisionDetector : ConvexShapeCollisionDetector
 {
-    protected override CollisionManifold TestPolygonPolygon(
+    protected override void TestPolygonPolygon(
+        CollisionManifold manifold,
         IPhysicsObject2D bodyA,
         IPhysicsObject2D bodyB,
         AeroPolygon polygonA,
@@ -14,11 +15,5 @@ public class GJKCollisionDetector : ConvexShapeCollisionDetectorBase
     {
         // Implement GJK algorithm here
         throw new NotImplementedException("GJK algorithm not implemented yet");
-    }
-
-    protected override CollisionManifold TestCirclePolygon(IPhysicsObject2D circleBody, IPhysicsObject2D polygonBody, AeroCircle circle,
-        AeroPolygon polygon)
-    {
-        throw new NotImplementedException();
     }
 }
