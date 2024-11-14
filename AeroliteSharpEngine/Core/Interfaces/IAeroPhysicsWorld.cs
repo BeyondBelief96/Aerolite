@@ -92,6 +92,11 @@ public interface IAeroPhysicsWorld
     void AddGlobalForce(AeroVec2 force);
 
     /// <summary>
+    /// Removes all global forces from the physics simulation.
+    /// </summary>
+    public void ClearGlobalForces();
+
+    /// <summary>
     /// Adds a physics object to the world to be simulated.
     /// </summary>
     /// <param name="physicsObject2D"></param>

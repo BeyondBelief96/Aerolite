@@ -31,8 +31,7 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     #endregion
     
     #region Constructor
-
-    // Default constructor
+    
     public AeroWorld2D() : this(AeroWorldConfiguration.Default)
     {
     }
@@ -105,6 +104,11 @@ public class AeroWorld2D(AeroWorldConfiguration configuration) : IAeroPhysicsWor
     public void AddGlobalForce(AeroVec2 force)
     {
         _globalForces.Add(force);
+    }
+
+    public void ClearGlobalForces()
+    {
+        _globalForces.Clear();
     }
 
     public void Update(float dt)
