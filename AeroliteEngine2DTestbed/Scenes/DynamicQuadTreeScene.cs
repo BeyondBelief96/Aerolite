@@ -30,7 +30,7 @@ public class QuadTreeDebugScene : Scene
     private readonly Color leafNodeColor = new(20, 100, 20, 60);
     private readonly Color particleColor = new(255, 200, 100, 180);
     private readonly Color bodyColor = new(100, 150, 255);
-    private const int MAX_PARTICLES = 10_000;
+    private const int MAX_PARTICLES = 3000;
 
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
     private int currentShapeIndex;
@@ -56,6 +56,9 @@ public class QuadTreeDebugScene : Scene
             maxObjectsPerNode: 3,
             maxDepth: 6
         );
+        
+        var uniformGrid = new UniformGrid(BoundingAreaType.AABB);
+        
         var config = AeroWorldConfiguration.Default
             .WithPerformanceMonitoring(true)
             .WithIntegrator(new EulerIntegrator())
@@ -165,7 +168,7 @@ public class QuadTreeDebugScene : Scene
                 particleSpawnTimer = 0f;
             }
             
-            //AeroDrawingHelpers.KeepParticleInScreenBounds(world.GetDynamicParticles(), Screen);
+            AeroDrawingHelpers.KeepParticleInScreenBounds(world.GetDynamicParticles(), Screen);
         }
 
         // Reset scene if R is pressed

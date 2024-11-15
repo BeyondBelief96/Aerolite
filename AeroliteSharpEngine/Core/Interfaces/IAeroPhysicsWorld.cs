@@ -8,120 +8,156 @@ using AeroliteSharpEngine.Interfaces;
 namespace AeroliteSharpEngine.Core.Interfaces;
 
 /// <summary>
-/// Interface for using and interacting with the created physics world. This is the core of the Aerolite physics engine.
+/// Interface for the core physics simulation world. This is the main entry point for interacting
+/// with the Aerolite physics engine.
 /// </summary>
 public interface IAeroPhysicsWorld
 {
+    #region Properties and Events
+
     /// <summary>
-    /// The gravitational constant used for the world. If this is anything but 0, this will be applied to all non-static objects
-    /// during the time step update.
+    /// The gravitational acceleration applied to all non-static objects.
     /// </summary>
     float Gravity { get; set; }
-    
+
     /// <summary>
-    /// Used to toggle performance monitoring for the physics engine.
+    /// Controls whether performance monitoring is enabled.
     /// </summary>
     bool PerformanceMonitoringEnabled { get; set; }
-    
+
     /// <summary>
-    /// Provides access to configure the physics engine's underlying collision system.
+    /// The collision detection and resolution system.
     /// </summary>
-    /// <returns></returns>
     ICollisionSystem CollisionSystem { get; }
 
     /// <summary>
-    /// Returns an iterable list of the current objects present in the world (static and dynamic).
+    /// The current bounds of the simulation space.
     /// </summary>
-    IReadOnlyList<IPhysicsObject2D> GetObjects();
-    
-    /// <summary>
-    /// Returns an enumerable list of non-static physics objects in the world.
-    /// </summary>
-    IReadOnlyList<IPhysicsObject2D> GetDynamicObjects();
-    
-    /// <summary>
-    /// Returns an enumerable list of static physic objects in the world.
-    /// </summary>
-    /// <returns></returns>
-    IReadOnlyList<IPhysicsObject2D> GetStaticObjects();
+    SimulationBounds Bounds { get; }
 
     /// <summary>
-    /// Returns any physics objects in the world that implement <see cref="IBody2D"/>
+    /// Triggered when simulation bounds are changed.
     /// </summary>
-    /// <returns></returns>
-    IReadOnlyList<IBody2D> GetDynamicBodies();
+    event Action<SimulationBounds>? OnBoundsChanged;
 
     /// <summary>
-    /// Returns any physics object in the world that are of type <see cref="AeroParticle2D"/>
+    /// Triggered when an object is removed from the simulation.
     /// </summary>
-    /// <returns></returns>
-    IReadOnlyList<AeroParticle2D> GetDynamicParticles();
+    event Action<IPhysicsObject2D>? OnObjectRemoved;
+
+    #endregion
+
+    #region Configuration
 
     /// <summary>
-    /// Returns an iterable list of the current collisions for current time step of the world.
+    /// Gets the current world configuration.
     /// </summary>
-    /// <returns></returns>
-    IEnumerable<CollisionManifold> GetCollisions();
-    
-    /// <summary>
-    /// Returns the current world configuration.
-    /// </summary>
-    /// <returns></returns>
     AeroWorldConfiguration GetConfiguration();
-    
+
     /// <summary>
-    /// Used to update the world with a new configuration.
+    /// Updates the world with a new configuration.
     /// </summary>
-    /// <param name="config"></param>
     void UpdateConfiguration(AeroWorldConfiguration config);
 
-    /// <summary>
-    /// Allows a user to register a force generator with a specific physics object. 
-    /// These force generators will be applied to their registered objects during the time 
-    /// step update.
-    /// </summary>
-    /// <param name="physicsObject2D"></param>
-    /// <param name="generator"></param>
-    void AddForceGenerator(IPhysicsObject2D physicsObject2D, IForceGenerator generator);
+    #endregion
+
+    #region Object Management
 
     /// <summary>
-    /// Adds a global force to the world. These apply to all non-static objects during the physics time step update.
-    /// Could be used to simulate a constant wind for example.
+    /// Adds a physics object to the simulation.
     /// </summary>
-    /// <param name="force"></param>
-    void AddGlobalForce(AeroVec2 force);
+    void AddPhysicsObject(IPhysicsObject2D obj);
 
     /// <summary>
-    /// Removes all global forces from the physics simulation.
+    /// Removes a physics object from the simulation.
     /// </summary>
-    public void ClearGlobalForces();
+    void RemovePhysicsObject(IPhysicsObject2D obj);
 
     /// <summary>
-    /// Adds a physics object to the world to be simulated.
-    /// </summary>
-    /// <param name="physicsObject2D"></param>
-    void AddPhysicsObject(IPhysicsObject2D physicsObject2D);
-    
-    /// <summary>
-    /// Removes a physics object from the world.
-    /// </summary>
-    /// <param name="physicsObject2D"></param>
-    void RemovePhysicsObject(IPhysicsObject2D physicsObject2D);
-
-    /// <summary>
-    /// Clears the world of all physics objects, and forces.
+    /// Clears all objects and forces from the world.
     /// </summary>
     void ClearWorld();
 
     /// <summary>
-    /// Utility method to clear all dynamic (non-static) objects from the world.
+    /// Clears only dynamic objects, leaving static objects intact.
     /// </summary>
     void ClearDynamicObjects();
 
+    #endregion
+
+    #region Force Management
+
     /// <summary>
-    /// The main workhorse of the physics world. This simulates the current timestep for all current
-    /// physics objects in the world, and applies all forces and performs integration.
+    /// Registers a force generator with a specific physics object.
     /// </summary>
-    /// <param name="dt"></param>
+    void AddForceGenerator(IPhysicsObject2D obj, IForceGenerator generator);
+
+    /// <summary>
+    /// Adds a global force that affects all non-static objects.
+    /// </summary>
+    void AddGlobalForce(AeroVec2 force);
+
+    /// <summary>
+    /// Removes all global forces from the simulation.
+    /// </summary>
+    void ClearGlobalForces();
+
+    #endregion
+
+    #region Bounds Management
+
+    /// <summary>
+    /// Updates the simulation space dimensions.
+    /// </summary>
+    void ResizeSimulation(float width, float height);
+
+    /// <summary>
+    /// Sets the threshold distance beyond bounds at which objects are removed.
+    /// </summary>
+    void SetRemovalThreshold(float threshold);
+
+    #endregion
+
+    #region Queries
+
+    /// <summary>
+    /// Returns all objects (static and dynamic) in the simulation.
+    /// </summary>
+    IReadOnlyList<IPhysicsObject2D> GetObjects();
+
+    /// <summary>
+    /// Returns all non-static objects in the simulation.
+    /// </summary>
+    IReadOnlyList<IPhysicsObject2D> GetDynamicObjects();
+
+    /// <summary>
+    /// Returns all static objects in the simulation.
+    /// </summary>
+    IReadOnlyList<IPhysicsObject2D> GetStaticObjects();
+
+    /// <summary>
+    /// Returns all rigid bodies in the simulation.
+    /// </summary>
+    IReadOnlyList<IBody2D> GetDynamicBodies();
+
+    /// <summary>
+    /// Returns all particles in the simulation.
+    /// </summary>
+    IReadOnlyList<AeroParticle2D> GetDynamicParticles();
+
+    /// <summary>
+    /// Returns current collision manifolds from the last update.
+    /// </summary>
+    IEnumerable<CollisionManifold> GetCollisions();
+
+    #endregion
+
+    #region Simulation
+
+    /// <summary>
+    /// Advances the simulation by the specified time step.
+    /// </summary>
     void Update(float dt);
+
+    #endregion
 }

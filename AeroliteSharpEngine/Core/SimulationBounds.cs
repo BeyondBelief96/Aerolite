@@ -5,7 +5,7 @@ namespace AeroliteSharpEngine.Core;
 /// <summary>
 /// Struct that holds information about the bounds of the simulation space.
 /// </summary>
-public readonly struct SimulationBounds
+public readonly record struct SimulationBounds
 {
     public float Left { get; }
     public float Right { get; }
@@ -20,7 +20,7 @@ public readonly struct SimulationBounds
         Width = width;
         Height = height;
         RemovalThreshold = removalThreshold;
-        
+
         // Calculate bounds assuming (0,0) is top-left
         Left = 0;
         Right = width;

@@ -17,18 +17,18 @@ public class DynamicQuadTree : IBroadPhase
     }
 
     private sealed class QuadTreeNode(AeroVec2 center, AeroVec2 halfDimension)
-    {
-        public AeroVec2 Center { get; } = center;
-        public AeroVec2 HalfDimension { get; } = halfDimension;
-        public List<IPhysicsObject2D> Objects { get; } = new();
-        public QuadTreeNode?[] Children { get; } = new QuadTreeNode?[4]; // NW, NE, SW, SE
-        public bool IsLeaf => Children[0] == null;
-
-        public QuadTreeNodeData ToNodeData()
-        {
-            return new QuadTreeNodeData(Center, HalfDimension, Objects.Count, IsLeaf);
-        }
-    }
+         {
+             public AeroVec2 Center { get; } = center;
+             public AeroVec2 HalfDimension { get; } = halfDimension;
+             public List<IPhysicsObject2D> Objects { get; } = new();
+             public QuadTreeNode?[] Children { get; } = new QuadTreeNode?[4]; // NW, NE, SW, SE
+             public bool IsLeaf => Children[0] == null;
+     
+             public QuadTreeNodeData ToNodeData()
+             {
+                 return new QuadTreeNodeData(Center, HalfDimension, Objects.Count, IsLeaf);
+             }
+         }
 
     private readonly int _maxObjectsPerNode;
     private readonly int _maxDepth;
