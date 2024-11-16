@@ -13,6 +13,7 @@ namespace AeroliteSharpEngine.Core;
 
 public class AeroWorld2D : IAeroPhysicsWorld
 {
+    
     #region Private Fields
     private readonly List<IPhysicsObject2D> _dynamicObjects = [];
     private readonly List<IPhysicsObject2D> _staticObjects = [];
@@ -89,11 +90,17 @@ public class AeroWorld2D : IAeroPhysicsWorld
 
     public void RemovePhysicsObject(IPhysicsObject2D obj)
     {
+        ArgumentNullException.ThrowIfNull(obj);
+        
+        // Remove from appropriate list
         if (obj.IsStatic)
             _staticObjects.Remove(obj);
         else
             _dynamicObjects.Remove(obj);
 
+        // ForceRegistry will handle cleanup of all associated force generators
+        _forceRegistry.RemoveObject(obj);
+        
         OnObjectRemoved?.Invoke(obj);
     }
 
@@ -108,16 +115,43 @@ public class AeroWorld2D : IAeroPhysicsWorld
 
     public void ClearDynamicObjects()
     {
+        // Remove force registrations for all dynamic objects
+        foreach (var obj in _dynamicObjects)
+        {
+            _forceRegistry.RemoveObject(obj);
+        }
+        
         _dynamicObjects.Clear();
         _globalForces.Clear();
-        _forceRegistry.Clear();
         CollisionSystem.Clear();
     }
     #endregion
 
     #region Force Management
-    public void AddForceGenerator(IPhysicsObject2D obj, IForceGenerator generator)
-        => _forceRegistry.Add(obj, generator);
+    
+    public void AddForceGenerator(IPhysicsObject2D? obj, IForceGenerator? generator)
+    {
+        ArgumentNullException.ThrowIfNull(obj);
+        ArgumentNullException.ThrowIfNull(generator);
+        
+        // Only add force generators to objects that exist in our world
+        if (_dynamicObjects.Contains(obj) || _staticObjects.Contains(obj))
+        {
+            _forceRegistry.Add(obj, generator);
+        }
+        else
+        {
+            throw new InvalidOperationException("Cannot add force generator to object not in world.");
+        }
+    }
+
+    public void RemoveForceGenerator(IPhysicsObject2D? obj, IForceGenerator? generator)
+    {
+        ArgumentNullException.ThrowIfNull(obj);
+        ArgumentNullException.ThrowIfNull(generator);
+        
+        _forceRegistry.RemoveRegistration(obj, generator);
+    }
 
     public void AddGlobalForce(AeroVec2 force) 
         => _globalForces.Add(force);

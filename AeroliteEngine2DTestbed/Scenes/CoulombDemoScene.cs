@@ -337,18 +337,17 @@ public class CoulombDemoScene : Scene
         Vector2 center = new(Screen.Width / 2f, Screen.Height / 2f);
         float spawnRadius = Math.Min(Screen.Width, Screen.Height) * 0.45f;
         float angle = (float)(random.NextDouble() * Math.PI * 2);
-    
+
         // Spawn position
         float x = center.X + spawnRadius * (float)Math.Cos(angle);
         float y = center.Y + spawnRadius * (float)Math.Sin(angle);
 
         // Adjust velocity based on mode
-        float speedFactor = currentMode == 2 ? 100f : 150f; // Slower for three-body problem
+        float speedFactor = currentMode == 2 ? 100f : 150f;
         AeroVec2 velocity;
-        
+    
         if (currentMode == 2) // Three-body problem
         {
-            // Add slight inward spiral for more interesting orbits
             velocity = new AeroVec2(
                 (center.X - x),
                 (center.Y - y)
@@ -356,35 +355,37 @@ public class CoulombDemoScene : Scene
         }
         else
         {
-            // Original tangential velocity
             velocity = new AeroVec2(
                 -(y - center.Y),
                 (x - center.X)
             );
         }
-        
+    
         velocity = velocity.UnitVector() * speedFactor;
 
         bool isProton = world.GetDynamicObjects().Count % 2 == 0;
-        
+    
         var particle = new ChargedParticle2D(
-            x, y, PARTICLE_MASS * 0.1f, // Lighter particles for better orbital motion
+            x, y, PARTICLE_MASS * 0.1f,
             isProton ? PROTON_CHARGE : ELECTRON_CHARGE,
             radius: PARTICLE_RADIUS
         )
         {
-            Damping = currentMode == 2 ? 0.9999f : DAMPING, // Less damping for three-body
+            Damping = currentMode == 2 ? 0.9999f : DAMPING,
             Velocity = velocity
         };
 
-        // Add Coulomb interactions
+        // Add particle to world first
+        world.AddPhysicsObject(particle);
+
+        // Now add Coulomb interactions after particle is in world
         foreach (var obj in world.GetObjects())
         {
-            if (obj is ChargedParticle2D existingParticle)
+            if (obj is ChargedParticle2D existingParticle && obj != particle)
             {
                 world.AddForceGenerator(particle, 
                     new CoulombForceGenerator(existingParticle, FORCE_SCALE));
-            
+        
                 if (!existingParticle.IsStatic)
                 {
                     world.AddForceGenerator(existingParticle, 
@@ -392,8 +393,6 @@ public class CoulombDemoScene : Scene
                 }
             }
         }
-
-        world.AddPhysicsObject(particle);
     }
 
     public override void Update(GameTime gameTime)
