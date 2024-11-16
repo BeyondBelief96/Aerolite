@@ -44,6 +44,11 @@ public interface IAeroPhysicsWorld
     /// Triggered when an object is removed from the simulation.
     /// </summary>
     event Action<IPhysicsObject2D>? OnObjectRemoved;
+    
+    /// <summary>
+    /// Triggered when an object is added to the simulation.
+    /// </summary>
+    event Action<IPhysicsObject2D>? OnObjectAdded;
 
     #endregion
 

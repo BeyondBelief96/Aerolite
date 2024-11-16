@@ -42,6 +42,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
     #region Events
     public event Action<SimulationBounds>? OnBoundsChanged;
     public event Action<IPhysicsObject2D>? OnObjectRemoved;
+    public event Action<IPhysicsObject2D>? OnObjectAdded;
     #endregion
 
     #region Constructor
@@ -82,6 +83,8 @@ public class AeroWorld2D : IAeroPhysicsWorld
             _staticObjects.Add(obj);
         else
             _dynamicObjects.Add(obj);
+        
+        OnObjectAdded?.Invoke(obj);
     }
 
     public void RemovePhysicsObject(IPhysicsObject2D obj)
