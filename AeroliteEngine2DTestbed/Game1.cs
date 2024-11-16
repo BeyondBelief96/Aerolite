@@ -22,11 +22,11 @@ namespace AeroliteEngine2DTestbed
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.SynchronizeWithVerticalRetrace = true;
+            _graphics.SynchronizeWithVerticalRetrace = false;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            this.IsFixedTimeStep = true;
+            this.IsFixedTimeStep = false;
             this.TargetElapsedTime = TimeSpan.FromTicks((long)Math.Round((double)TimeSpan.TicksPerSecond / UpdatesPerSecond));
         }
 

@@ -21,7 +21,6 @@ namespace AeroliteEngine2DTestbed.Scenes;
 public class QuadTreeDebugScene : Scene
 {
     private readonly AeroWorld2D world;
-    private readonly DynamicQuadTree quadTree;
     private bool isParticleScene = false;
     private float particleSpawnTimer = 0f;
 
@@ -30,7 +29,7 @@ public class QuadTreeDebugScene : Scene
     private readonly Color leafNodeColor = new(20, 100, 20, 60);
     private readonly Color particleColor = new(255, 200, 100, 180);
     private readonly Color bodyColor = new(100, 150, 255);
-    private const int MAX_PARTICLES = 3000;
+    private const int MAX_PARTICLES = 3_000;
 
     private readonly List<(string name, Func<float, float, AeroShape2D> creator)> shapeCreators;
     private int currentShapeIndex;
@@ -48,12 +47,12 @@ public class QuadTreeDebugScene : Scene
             ("Hexagon", (x, y) => new AeroRegularPolygon(6, 30)),
         };
 
-        quadTree = new DynamicQuadTree(
+        var quadTree = new DynamicQuadTree(
             screen.Width, 
             screen.Height,
             new AeroVec2(0, 0),
             BoundingAreaType.AABB,
-            maxObjectsPerNode: 3,
+            maxObjectsPerNode: 10,
             maxDepth: 6
         );
         
@@ -162,9 +161,15 @@ public class QuadTreeDebugScene : Scene
         if (isParticleScene)
         {
             particleSpawnTimer += dt;
-            if (particleSpawnTimer >= 0.001f)
+            if (particleSpawnTimer >= 0.001)
             {
-                SpawnParticle(Screen.Width / 2.0f + RandomHelper.RandomSingle(-50, 50), Screen.Height - 150);
+                for (int i = 0; i < 100; i++) // Spawn 10 particles at once
+                {
+                    SpawnParticle(
+                        Screen.Width / 2.0f + RandomHelper.RandomSingle(-50, 50), 
+                        Screen.Height - 150
+                    );
+                }
                 particleSpawnTimer = 0f;
             }
             
@@ -191,7 +196,7 @@ public class QuadTreeDebugScene : Scene
             x, y, 0.1f,
             restitution: 0.7f,
             friction: 0.1f,
-            radius: RandomHelper.RandomSingle(3, 8));
+            radius: RandomHelper.RandomSingle(3.0f, 10.0f));
 
         particle.Velocity = new AeroVec2(
             RandomHelper.RandomSingle(-300, 300),
@@ -216,7 +221,7 @@ public class QuadTreeDebugScene : Scene
     protected override void DrawScene(GameTime gameTime)
     {
         // Draw quadtree using helper
-        AeroDrawingHelpers.DrawQuadTree(quadTree, nodeColor, leafNodeColor, Screen, Shapes);
+        //AeroDrawingHelpers.DrawQuadTree(quadTree, nodeColor, leafNodeColor, Screen, Shapes);
 
         // Draw physics objects
         foreach (var obj in world.GetObjects())

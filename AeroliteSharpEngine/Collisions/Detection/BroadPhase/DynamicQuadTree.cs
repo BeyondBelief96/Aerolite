@@ -5,6 +5,10 @@ using AeroliteSharpEngine.Collisions.Detection.Interfaces;
 
 namespace AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 
+/// <summary>
+/// A broadphase spatial partitioning scheme that splits space into quads recursively. Allows configurable amount
+/// of objects before partitioning and configurable tree depth. 
+/// </summary>
 public class DynamicQuadTree : IBroadPhase
 {
     // Public struct for visualization data
@@ -15,7 +19,12 @@ public class DynamicQuadTree : IBroadPhase
         
         public bool IsLeaf { get; init; } = isLeaf;
     }
-
+    
+    /// <summary>
+    /// Represents the node of a quadtree.
+    /// </summary>
+    /// <param name="center">The center coordinate of this node.</param>
+    /// <param name="halfDimension">Vector containing the half width and half height.</param>
     private sealed class QuadTreeNode(AeroVec2 center, AeroVec2 halfDimension)
          {
              public AeroVec2 Center { get; } = center;
@@ -59,7 +68,7 @@ public class DynamicQuadTree : IBroadPhase
         _maxObjectsPerNode = maxObjectsPerNode;
         _maxDepth = maxDepth;
         _boundingAreaType = boundingAreaType;
-        _checkedPairs = new HashSet<(int, int)>();
+        _checkedPairs = [];
         BoundingAreaType = boundingAreaType;
         MaxObjectsPerNode = maxObjectsPerNode;
         MaxDepth = maxDepth;
