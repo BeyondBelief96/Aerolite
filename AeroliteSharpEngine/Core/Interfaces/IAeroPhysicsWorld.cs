@@ -3,6 +3,7 @@ using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.Core.Interfaces;

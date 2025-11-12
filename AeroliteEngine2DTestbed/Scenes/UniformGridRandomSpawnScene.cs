@@ -6,6 +6,7 @@ using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection.BoundingAreas;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;

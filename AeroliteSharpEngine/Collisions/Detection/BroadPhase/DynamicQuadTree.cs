@@ -12,7 +12,7 @@ namespace AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 public class DynamicQuadTree : IBroadPhase
 {
     // Public struct for visualization data
-    public readonly struct QuadTreeNodeData(AeroVec2 center, AeroVec2 halfDimension, int objectCount, bool isLeaf)
+    public readonly struct QuadTreeNodeData(AeroVec2 center, AeroVec2 halfDimension, bool isLeaf)
     {
         public AeroVec2 Center { get; init; } = center;
         public AeroVec2 HalfDimension { get; init; } = halfDimension;
@@ -35,7 +35,7 @@ public class DynamicQuadTree : IBroadPhase
      
              public QuadTreeNodeData ToNodeData()
              {
-                 return new QuadTreeNodeData(Center, HalfDimension, Objects.Count, IsLeaf);
+                 return new QuadTreeNodeData(Center, HalfDimension, IsLeaf);
              }
          }
 

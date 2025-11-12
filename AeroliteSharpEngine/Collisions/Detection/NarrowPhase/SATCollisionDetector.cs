@@ -56,7 +56,7 @@ public class SATCollisionDetector : ConvexShapeCollisionDetector
     /// <param name="polygonA">The vertices of polygonA</param>
     /// <param name="polygonB">The vertices of polygonB</param>
     /// <returns></returns>
-    private static (bool hasCollision, AeroVec2 normal, ContactPoint contact) TestPolygonPolygon(
+    private static (bool hasCollision, AeroVec2 normal, ContactPoint? contact) TestPolygonPolygon(
         AeroPolygon polygonA,
         AeroPolygon polygonB)
     {

@@ -5,6 +5,7 @@ using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.ForceGenerators;
 using AeroliteSharpEngine.Integrators;
 using Flat.Graphics;

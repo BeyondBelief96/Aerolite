@@ -3,11 +3,11 @@ using AeroliteSharpEngine.Collisions;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Detection.CollisionPrimitives;
 using AeroliteSharpEngine.Collisions.Detection.Interfaces;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.ForceGenerators;
 using AeroliteSharpEngine.Interfaces;
 using AeroliteSharpEngine.Performance;
-using AeroliteSharpEngine.Shapes;
 
 namespace AeroliteSharpEngine.Core;
 

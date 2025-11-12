@@ -1,6 +1,6 @@
 ﻿using AeroliteSharpEngine.AeroMath;
 
-namespace AeroliteSharpEngine.Core;
+namespace AeroliteSharpEngine.Core.Configuration;
 
 /// <summary>
 /// Struct that holds information about the bounds of the simulation space.

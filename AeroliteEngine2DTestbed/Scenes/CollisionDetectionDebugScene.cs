@@ -5,6 +5,7 @@ using System.Linq;
 using AeroliteEngine2DTestbed.Helpers;
 using AeroliteSharpEngine.AeroMath;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.Shapes;
 using Flat.Graphics;
 using Flat.Input;

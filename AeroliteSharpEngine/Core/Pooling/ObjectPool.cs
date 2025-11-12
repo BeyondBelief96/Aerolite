@@ -3,10 +3,10 @@
 public class ObjectPool<T> where T : class, new()
 {
     private readonly Stack<T> _pool;
-    private readonly Action<T> _resetAction;
+    private readonly Action<T>? _resetAction;
     private readonly int _maxSize;
 
-    public ObjectPool(int initialCapacity = 100, int maxSize = 1000, Action<T> resetAction = null)
+    public ObjectPool(int initialCapacity = 100, int maxSize = 1000, Action<T>? resetAction = null)
     {
         _pool = new Stack<T>(initialCapacity);
         _maxSize = maxSize;

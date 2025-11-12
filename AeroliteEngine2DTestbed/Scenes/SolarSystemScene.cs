@@ -13,6 +13,7 @@ using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Core.Interfaces;
 using AeroliteSharpEngine.ForceGenerators;
 using AeroliteSharpEngine.Shapes;
+using AeroliteSharpEngine.Core.Configuration;
 
 public class SolarSystemScene : Scene
 {

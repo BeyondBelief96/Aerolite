@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
+using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 
 namespace AeroliteEngine2DTestbed
 {
@@ -37,7 +38,7 @@ namespace AeroliteEngine2DTestbed
             _sprites = new Sprites(this);
             _shapes = new Shapes(this);
             
-            _currentScene = new CoulombDemoScene(this, _screen, _sprites, _shapes);
+            _currentScene = new CollisionDetectionDebugScene(this, _screen, _sprites, _shapes);
             base.Initialize();
         }
 

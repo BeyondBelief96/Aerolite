@@ -2,7 +2,7 @@
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Interfaces;
 
-namespace AeroliteSharpEngine.Core;
+namespace AeroliteSharpEngine.Core.Configuration;
 
 public struct AeroWorldConfiguration 
 {

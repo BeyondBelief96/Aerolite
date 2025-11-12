@@ -34,6 +34,8 @@ namespace AeroliteSharpEngine.AeroMath
         /// </summary>
         public static AeroVec2 Zero => new AeroVec2(0, 0);
 
+
+
         #endregion
 
         #region Constructor
@@ -87,10 +89,10 @@ namespace AeroliteSharpEngine.AeroMath
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Normalize()
         {
-            if (AeroMathExtensions.IsNearlyZero(Magnitude)) // Use epsilon instead of just 0
+            if (AeroMathExtensions.IsNearlyZero(Magnitude)) 
             {
-                X = 0;
-                Y = 0;
+                X = float.Epsilon;
+                Y = float.Epsilon;
             }
             else
             {

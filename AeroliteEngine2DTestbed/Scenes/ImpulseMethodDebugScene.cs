@@ -6,6 +6,7 @@ using AeroliteSharpEngine.Collisions.Detection;
 using AeroliteSharpEngine.Collisions.Detection.BroadPhase;
 using AeroliteSharpEngine.Collisions.Resolution.Resolvers.Impulse;
 using AeroliteSharpEngine.Core;
+using AeroliteSharpEngine.Core.Configuration;
 using AeroliteSharpEngine.Integrators;
 using AeroliteSharpEngine.Shapes;
 using Flat;
