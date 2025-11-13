@@ -18,7 +18,7 @@ public class AeroWorld2D : IAeroPhysicsWorld
     private readonly List<IPhysicsObject2D> _dynamicObjects = [];
     private readonly List<IPhysicsObject2D> _staticObjects = [];
     private readonly List<AeroVec2> _globalForces = [];
-    private readonly ForceRegistry _forceRegistry = new();
+    private readonly ForceRegistry2D _forceRegistry = new();
     private readonly IPerformanceMonitor _performanceMonitor;
     private AeroWorldConfiguration _configuration;
     #endregion

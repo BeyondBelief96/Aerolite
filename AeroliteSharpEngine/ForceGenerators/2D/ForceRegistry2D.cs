@@ -4,7 +4,7 @@ using AeroliteSharpEngine.Interfaces;
 
 namespace AeroliteSharpEngine.ForceGenerators;
 
-internal class ForceRegistry
+internal class ForceRegistry2D
 {
     private readonly Dictionary<int, (IPhysicsObject2D Object, HashSet<IForceGenerator> Generators)> _registrations = new();
 

@@ -10,11 +10,14 @@ namespace AeroliteSharpEngine.Core._3D
     public abstract class Physics3DObjectBase : IPhysicsObject3D
     {
         #region Fields
+
         private static int _nextId;
         private static readonly object IdLock = new object();
+
         #endregion  
 
         #region Properties
+
         /// <summary>
         /// Unique identifier for this physics object.
         /// </summary>
@@ -75,7 +78,10 @@ namespace AeroliteSharpEngine.Core._3D
         /// Returns whether this object has a non-infinite mass (0.0 is infinite).
         /// </summary>
         public bool HasFiniteMass => !AeroMathExtensions.AreEqual(InverseMass, 0.0f);
+
         #endregion
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Physics3DObjectBase"/> class with the specified mass, restitution, and friction.
@@ -112,6 +118,10 @@ namespace AeroliteSharpEngine.Core._3D
             Restitution = restitution;
             StaticFriction = friction;
         }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Adds the supplied force to the object's current net force.
@@ -192,5 +202,7 @@ namespace AeroliteSharpEngine.Core._3D
         {
             return Id == other.Id;
         }
+
+        #endregion
     }
 }

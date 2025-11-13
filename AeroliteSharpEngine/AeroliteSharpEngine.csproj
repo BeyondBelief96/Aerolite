@@ -15,4 +15,8 @@
     <Compile Remove="Collisions\Resolution\Interfaces\ICollisionStrategyFactory.cs" />
     <Compile Remove="Collisions\Resolution\Interfaces\ICollisionResolutionStrategy.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ForceGenerators\3D\" />
+  </ItemGroup>
 </Project>
