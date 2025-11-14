@@ -80,7 +80,7 @@ namespace AeroliteSharpEngine.Core.Interfaces
         /// Returns whether this object has a non-infinite mass (0.0 is infinite).
         /// </summary>
         bool HasFiniteMass { get; }
-
+ 
         /// <summary>
         /// Adds the supplied force to the objects current net force.
         /// </summary>

@@ -47,6 +47,16 @@
             K = k;
         }
 
+        public AeroQuaternion(float angle, AeroVec3 axis)
+        {
+            float halfAngle = angle * 0.5f;
+            float sinHalfAngle = (float)Math.Sin(halfAngle);
+            R = (float)Math.Cos(halfAngle);
+            I = axis.X * sinHalfAngle;
+            J = axis.Y * sinHalfAngle;
+            K = axis.Z * sinHalfAngle;
+        }
+
         #endregion
 
         #region Methods
